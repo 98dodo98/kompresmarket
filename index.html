@@ -2066,6 +2066,7 @@ body {
   .cat-grid { grid-template-columns: 1fr 1fr; }
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -3401,6 +3402,47 @@ body {
 </div>
 
 <script>
+// ===== SUPABASE =====
+const SUPABASE_URL = 'https://fiqmoiaxnpmvdfmrzfft.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZpcW1vaWF4bnBtdmRmbXJ6ZmZ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczNzQ1MDIsImV4cCI6MjA5Mjk1MDUwMn0.L2wp4t6fZcL1baONMDvnKWS_oW6VYb3bwJYJi5Z2ikM';
+const _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// Supabase session → loadUser formatına çevir
+function sessionToUser(session) {
+  if (!session) return null;
+  const meta = session.user.user_metadata || {};
+  return {
+    id: session.user.id,
+    mail: session.user.email,
+    ad: meta.ad || '',
+    soyad: meta.soyad || '',
+    firma: meta.firma || '',
+    adres: meta.adres || '',
+    plan: meta.plan || null,
+    role: meta.role || 'buyer',
+    verified: true
+  };
+}
+
+// Oturum açık mı kontrol et
+async function checkSession() {
+  const { data: { session } } = await _sb.auth.getSession();
+  if (session) {
+    _memStore[USER_KEY] = JSON.stringify(sessionToUser(session));
+    updateNav();
+  }
+}
+
+// Auth state değişince nav güncelle
+_sb.auth.onAuthStateChange((event, session) => {
+  if (session) {
+    _memStore[USER_KEY] = JSON.stringify(sessionToUser(session));
+  } else {
+    delete _memStore[USER_KEY];
+  }
+  updateNav();
+});
+
 const subcats = {
   komp: ['Pistonlu Kompresörler','Vidalı Kompresörler','Paletli Kompresörler','Turbo Kompresörler','Yağsız Kompresörler'],
   kuru: ['Gazlı (Soğutmalı) Kurutucular','Kimyasal (Adsorpsiyonlu) Kurutucular'],
@@ -3960,14 +4002,12 @@ function demoLogin(role) {
 }
 window.demoLogin = demoLogin;
 
-function submitLogin() {
+async function submitLogin() {
   const mail = (document.getElementById('l-mail')?.value || '').trim();
   const pw   = (document.getElementById('l-pw')?.value || '').trim();
   const errEl = document.getElementById('login-error');
 
-  // Hata alanını sıfırla
   errEl.style.display = 'none';
-  errEl.textContent = '';
   setErr('l-mail', false);
   setErr('l-pw', false);
 
@@ -3984,47 +4024,37 @@ function submitLogin() {
     return;
   }
 
-  const u = loadUser();
-  // Kayıtlı kullanıcı var mı, mail + şifre eşleşiyor mu?
-  if (!u || !u.verified) {
-    errEl.textContent = 'Bu e-posta adresiyle kayıtlı bir hesap bulunamadı.';
+  // Butonu devre dışı bırak
+  const btn = document.querySelector('#p-login .btn-reg');
+  if (btn) { btn.disabled = true; btn.textContent = 'Giriş yapılıyor...'; }
+
+  const { data, error } = await _sb.auth.signInWithPassword({ email: mail, password: pw });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Giriş Yap'; }
+
+  if (error) {
+    errEl.textContent = error.message.includes('Invalid') ? 'E-posta veya şifre hatalı.' : error.message;
     errEl.style.display = 'block';
-    setErr('l-mail', true);
-    return;
-  }
-  if (u.mail.toLowerCase() !== mail.toLowerCase()) {
-    errEl.textContent = 'Bu e-posta adresiyle kayıtlı bir hesap bulunamadı.';
-    errEl.style.display = 'block';
-    setErr('l-mail', true);
-    return;
-  }
-  if (u.pw && u.pw !== pw) {
-    errEl.textContent = 'Şifre hatalı. Lütfen tekrar deneyin.';
-    errEl.style.display = 'block';
-    setErr('l-pw', true);
     return;
   }
 
-  // Giriş başarılı
+  const u = sessionToUser(data.session);
   document.getElementById('l-mail').value = '';
   document.getElementById('l-pw').value = '';
-  updateNav();
   showToast('Hoş geldiniz!', u.ad + ' ' + u.soyad + ' olarak giriş yapıldı.', u.role === 'seller' ? 'Satıcı' : 'Alıcı', false);
   if (u.role === 'seller') go('dashboard');
-  else go('home');
+  else goBuyerDashboard();
 }
 
-function submitRegister(type) {
+async function submitRegister(type) {
   const prefix = type === 'buyer' ? 'b' : 's';
-  const ad = (document.getElementById(prefix+'-ad')?.value || '').trim();
+  const ad    = (document.getElementById(prefix+'-ad')?.value || '').trim();
   const soyad = (document.getElementById(prefix+'-soyad')?.value || '').trim();
-  const mail = (document.getElementById(prefix+'-mail')?.value || '').trim();
+  const mail  = (document.getElementById(prefix+'-mail')?.value || '').trim();
   const firma = (document.getElementById(prefix+'-firma')?.value || '').trim();
   const adres = (document.getElementById(prefix+'-adres')?.value || '').trim();
+  const pw    = (document.getElementById(prefix+'-pw')?.value || '').trim();
 
-  const pw = (document.getElementById(prefix+'-pw')?.value || '').trim();
-
-  // Hataları temizle
   [prefix+'-ad', prefix+'-soyad', prefix+'-mail'].forEach(i => setErr(i, false));
 
   let hasErr = false;
@@ -4038,10 +4068,10 @@ function submitRegister(type) {
     if (pw.length < 6) { setErr('s-pw', true); hasErr = true; }
     else if (pw !== pw2) { setErr('s-pw', true); setErr('s-pw2', true); hasErr = true; }
   }
+  if (type === 'buyer' && pw.length < 6) { setErr('b-pw', true); hasErr = true; }
 
   if (hasErr) {
-    const pwErr = type === 'seller' && (document.getElementById('s-pw')?.classList.contains('err'));
-    showToast('Eksik bilgi', pwErr ? 'Şifre en az 6 karakter olmalı ve eşleşmeli.' : 'Lütfen tüm zorunlu alanları doldurun.', null, true);
+    showToast('Eksik bilgi', 'Lütfen tüm zorunlu alanları doldurun.', null, true);
     return;
   }
 
@@ -4051,24 +4081,25 @@ function submitRegister(type) {
     plan = sel ? sel.getAttribute('data-plan') : 'Aylık';
   }
 
-  const user = {
-    ad, soyad, mail, pw, firma, adres, plan,
-    role: type,
-    verified: true,
-    joinedAt: Date.now()
-  };
-  saveUser(user);
-  updateNav();
+  const btn = document.querySelector('#form-' + (type === 'buyer' ? 'buyer' : 'seller') + ' .btn-reg');
+  if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
 
-  showToast(
-    'Hoş geldiniz!',
-    ad + ', hesabınız başarıyla oluşturuldu.',
-    type === 'seller' ? 'Satıcı' : 'Alıcı',
-    false
-  );
+  const { data, error } = await _sb.auth.signUp({
+    email: mail,
+    password: pw,
+    options: { data: { ad, soyad, firma, adres, plan, role: type } }
+  });
 
+  if (btn) { btn.disabled = false; btn.textContent = type === 'buyer' ? 'Üye Ol — Ücretsiz' : 'Satıcı Hesabı Oluştur'; }
+
+  if (error) {
+    showToast('Hata', error.message.includes('already') ? 'Bu e-posta adresi zaten kayıtlı.' : error.message, null, true);
+    return;
+  }
+
+  showToast('Hoş geldiniz!', ad + ', hesabınız başarıyla oluşturuldu.', type === 'seller' ? 'Satıcı' : 'Alıcı', false);
   if (type === 'seller') go('dashboard');
-  else go('home');
+  else goBuyerDashboard();
 }
 
 function showVerifyPage(p) {
@@ -4209,8 +4240,9 @@ document.addEventListener('click', e => {
   m.classList.remove('open');
 });
 
-function logout() {
+async function logout() {
   closeUserMenu();
+  await _sb.auth.signOut();
   clearUser();
   updateNav();
   showToast('Çıkış yapıldı', 'Hesabınızdan başarıyla çıkış yaptınız.', null, false);
@@ -4720,6 +4752,7 @@ window.updateSubCat = updateSubCat;
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
+  checkSession();
   try { loadTeklifler(); } catch(e) {}
   try { refreshBadge(); } catch(e) {}
   try { updateNav(); } catch(e) {}
