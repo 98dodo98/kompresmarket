@@ -3458,12 +3458,22 @@ function updateSubCat() {
   sel.innerHTML = v ? subcats[v].map(s=>`<option>${s}</option>`).join('') : '<option>Önce ana kategori seçin</option>';
 }
 
-function go(page) {
+function go(page, addHistory = true) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const el = document.getElementById('p-' + page);
-  if (el) { el.classList.add('active'); window.scrollTo(0,0); }
+  if (el) {
+    el.classList.add('active');
+    window.scrollTo(0, 0);
+    if (addHistory) history.pushState({ page }, '', '#' + page);
+  }
 }
 window.go = go;
+
+// İleri/geri buton desteği
+window.addEventListener('popstate', function(e) {
+  const page = e.state?.page || 'home';
+  go(page, false);
+});
 
 function switchTab(type, btn) {
   document.querySelectorAll('.reg-tab').forEach(t => t.classList.remove('active'));
@@ -4753,6 +4763,13 @@ window.updateSubCat = updateSubCat;
 
 document.addEventListener('DOMContentLoaded', () => {
   checkSession();
+  // URL hash'e göre başlangıç sayfasını belirle
+  const hash = window.location.hash.replace('#', '');
+  if (hash && document.getElementById('p-' + hash)) {
+    go(hash, false);
+  } else {
+    history.replaceState({ page: 'home' }, '', '#home');
+  }
   try { loadTeklifler(); } catch(e) {}
   try { refreshBadge(); } catch(e) {}
   try { updateNav(); } catch(e) {}
