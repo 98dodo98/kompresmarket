@@ -3568,10 +3568,21 @@ const SEED_TEKLIFLER = [
 async function loadTeklifler() {
   const { data, error } = await _sb
     .from('offers')
-    .select('*, profiles(ad, soyad, firma, adres)')
+    .select('*')
     .order('created_at', { ascending: false });
 
   if (error || !data?.length) return SEED_TEKLIFLER.slice();
+
+  // Alıcı profillerini çek
+  const userIds = [...new Set(data.map(x => x.user_id).filter(Boolean))];
+  let profileMap = {};
+  if (userIds.length) {
+    const { data: profiles } = await _sb
+      .from('profiles')
+      .select('id, ad, soyad, firma, adres')
+      .in('id', userIds);
+    if (profiles) profiles.forEach(p => profileMap[p.id] = p);
+  }
 
   return data.map(x => ({
     id: x.id,
@@ -3585,12 +3596,7 @@ async function loadTeklifler() {
     okundu: false,
     yanitlandi: false,
     conversationId: x.conversation_id,
-    alici: x.profiles ? {
-      ad: x.profiles.ad || '',
-      soyad: x.profiles.soyad || '',
-      firma: x.profiles.firma || '',
-      adres: x.profiles.adres || ''
-    } : null
+    alici: profileMap[x.user_id] || null
   }));
 }
 
