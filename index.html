@@ -3565,13 +3565,28 @@ const SEED_TEKLIFLER = [
     iletisim:'mehmet@yedekparca.com', tarih:Date.now()-1000*60*60*24*6, okundu:false}
 ];
 
-function loadTeklifler() {
-  try {
-    const raw = _get(TEKLIF_KEY);
-    if (raw) return JSON.parse(raw);
-  } catch (e) {}
-  saveTeklifler(SEED_TEKLIFLER);
-  return SEED_TEKLIFLER.slice();
+async function loadTeklifler() {
+  // Supabase'den tüm teklifleri çek (satıcı tüm teklifleri görebilir)
+  const { data, error } = await _sb
+    .from('offers')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error || !data?.length) return SEED_TEKLIFLER.slice();
+
+  return data.map(x => ({
+    id: x.id,
+    kategori: x.kategori,
+    kategoriLabel: x.kategori_label,
+    baslik: x.baslik,
+    fields: x.fields || {},
+    aciklama: x.aciklama || '',
+    iletisim: x.iletisim || '',
+    tarih: new Date(x.created_at).getTime(),
+    okundu: false,
+    yanitlandi: false,
+    conversationId: x.conversation_id
+  }));
 }
 
 function saveTeklifler(arr) {
@@ -3683,11 +3698,12 @@ function filterInbox(f, btn) {
   renderInbox();
 }
 
-function renderInbox() {
+async function renderInbox() {
   const list = document.getElementById('inbox-list');
   const titleEl = document.getElementById('inbox-count-title');
   if (!list) return;
-  const arr = loadTeklifler();
+  list.innerHTML = '<div class="inbox-empty">Yükleniyor...</div>';
+  const arr = await loadTeklifler();
   const filtered = inboxFilter === 'all' ? arr : arr.filter(t => t.kategori === inboxFilter);
   if (titleEl) titleEl.textContent = 'Gelen İstekler — ' + filtered.length + ' kayıt';
   if (filtered.length === 0) {
@@ -3717,8 +3733,8 @@ function renderInbox() {
 /* ===== Teklif Detay Modal ===== */
 let currentTeklifId = null;
 
-function openTeklifModal(id) {
-  const arr = loadTeklifler();
+async function openTeklifModal(id) {
+  const arr = await loadTeklifler();
   const t = arr.find(x => x.id === id);
   if (!t) return;
   currentTeklifId = id;
@@ -4015,8 +4031,8 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-function refreshBadge() {
-  const arr = loadTeklifler();
+async function refreshBadge() {
+  const arr = await loadTeklifler();
   const unread = arr.filter(t => !t.okundu).length;
   const badge = document.getElementById('sb-badge');
   if (badge) {
