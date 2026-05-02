@@ -4881,7 +4881,7 @@ async function renderBuyerTeklifler() {
 }
 
 async function openTeklifDetail(idx) {
-  const arr = loadBuyerTeklifler();
+  const arr = await loadBuyerTeklifler();
   const x = arr[idx];
   if (!x) return;
   const dt = new Date(x.tarih);
@@ -4968,7 +4968,7 @@ async function sendChatMessage(idx) {
   const content = input.value.trim();
   if (!content) return;
 
-  const arr = loadBuyerTeklifler();
+  const arr = await loadBuyerTeklifler();
   const x = arr[idx];
   if (!x) return;
   const u = loadUser();
