@@ -3833,29 +3833,53 @@ async function openTeklifModal(id) {
 
   body.innerHTML = html;
 
-  // Mesaj geçmişini yükle
-  if (t.conversationId) {
-    const { data: msgs } = await _sb
-      .from('messages')
-      .select('*')
-      .eq('conversation_id', t.conversationId)
-      .order('created_at', { ascending: true });
+  // Mesaj geçmişini ve chat input'u yükle
+  const { data: msgs } = await _sb
+    .from('messages')
+    .select('*')
+    .eq('conversation_id', t.conversationId || '')
+    .order('created_at', { ascending: true });
 
-    if (msgs?.length) {
-      const u = loadUser();
-      let chatHtml = '<div class="tk-section"><div class="tk-section-lbl">Mesaj Geçmişi (' + msgs.length + ')</div>';
-      chatHtml += '<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;max-height:200px;overflow-y:auto">';
-      msgs.forEach(m => {
-        const isMe = m.sender_id === u?.id;
-        const dt2 = new Date(m.created_at);
-        chatHtml += `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};gap:2px">
-          <div style="max-width:80%;padding:8px 12px;border-radius:12px;font-size:13px;background:${isMe?'var(--accent)':'var(--bg2)'};color:${isMe?'#fff':'var(--text)'};line-height:1.5">${escapeHtml(m.content)}</div>
-          <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">${isMe?'Siz':'Alıcı'} • ${dt2.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>
-        </div>`;
-      });
-      chatHtml += '</div></div>';
-      body.innerHTML += chatHtml;
-    }
+  // Satıcı chat bölümü
+  const u = loadUser();
+  let chatHtml = '<div class="tk-section"><div class="tk-section-lbl">Mesajlar</div>';
+  chatHtml += `<div id="seller-chat-messages" style="display:flex;flex-direction:column;gap:8px;margin:8px 0;max-height:220px;overflow-y:auto;padding:4px">`;
+
+  if (msgs?.length) {
+    msgs.forEach(m => {
+      const isMe = m.sender_id === u?.id;
+      const dt2 = new Date(m.created_at);
+      chatHtml += `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};gap:2px">
+        <div style="max-width:80%;padding:8px 12px;border-radius:12px;font-size:13px;background:${isMe?'var(--accent)':'var(--bg2)'};color:${isMe?'#fff':'var(--text)'};line-height:1.5">${escapeHtml(m.content)}</div>
+        <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">${isMe?'Siz':'Alıcı'} • ${dt2.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>
+      </div>`;
+    });
+  } else {
+    chatHtml += '<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px">Henüz mesaj yok.</div>';
+  }
+
+  chatHtml += '</div>';
+
+  // Chat input
+  chatHtml += `<div style="display:flex;gap:8px;margin-top:8px">
+    <input type="text" id="seller-chat-input" placeholder="Mesaj yaz..." 
+      style="flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none"
+      onkeydown="if(event.key==='Enter')sendSellerMessage()">
+    <button onclick="sendSellerMessage()" style="padding:9px 16px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:13px;cursor:pointer;font-family:var(--font)">Gönder</button>
+  </div></div>`;
+
+  body.innerHTML += chatHtml;
+
+  // Realtime subscription
+  if (_chatSubscription) { _chatSubscription.unsubscribe(); _chatSubscription = null; }
+  if (t.conversationId) {
+    _chatSubscription = _sb
+      .channel('seller-chat-' + t.conversationId)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'messages',
+        filter: 'conversation_id=eq.' + t.conversationId
+      }, () => reloadSellerChat(t.conversationId))
+      .subscribe();
   }
 
   // Okunmadı yap butonu metni
@@ -3961,6 +3985,66 @@ function closeCompose() {
     closeTeklifModal();
   }
 }
+
+async function sendSellerMessage() {
+  const input = document.getElementById('seller-chat-input');
+  if (!input) return;
+  const content = input.value.trim();
+  if (!content || !currentTeklifId) return;
+  const u = loadUser();
+  if (!u) return;
+
+  // conversation_id al
+  const { data: offerData } = await _sb
+    .from('offers').select('conversation_id, user_id').eq('id', currentTeklifId).single();
+
+  let convId = offerData?.conversation_id;
+
+  // yoksa oluştur
+  if (!convId) {
+    const { data: conv, error } = await _sb.from('conversations').insert({
+      seller_id: u.id,
+      buyer_id: offerData?.user_id || u.id,
+      listing_id: currentTeklifId,
+      listing_title: ''
+    }).select().single();
+    if (error) { showToast('Hata', error.message, null, true); return; }
+    convId = conv.id;
+    await _sb.from('offers').update({ conversation_id: convId }).eq('id', currentTeklifId);
+    if (_chatSubscription) _chatSubscription.unsubscribe();
+    _chatSubscription = _sb.channel('seller-chat-' + convId)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + convId },
+        () => reloadSellerChat(convId)).subscribe();
+  }
+
+  input.value = '';
+  const { error } = await _sb.from('messages').insert({
+    conversation_id: convId, sender_id: u.id, content
+  });
+  if (error) showToast('Hata', error.message, null, true);
+  else reloadSellerChat(convId);
+}
+
+async function reloadSellerChat(convId) {
+  const el = document.getElementById('seller-chat-messages');
+  if (!el) return;
+  const u = loadUser();
+  const { data: msgs } = await _sb.from('messages').select('*')
+    .eq('conversation_id', convId).order('created_at', { ascending: true });
+  if (!msgs?.length) return;
+  el.innerHTML = msgs.map(m => {
+    const isMe = m.sender_id === u?.id;
+    const dt2 = new Date(m.created_at);
+    return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};gap:2px">
+      <div style="max-width:80%;padding:8px 12px;border-radius:12px;font-size:13px;background:${isMe?'var(--accent)':'var(--bg2)'};color:${isMe?'#fff':'var(--text)'};line-height:1.5">${escapeHtml(m.content)}</div>
+      <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">${isMe?'Siz':'Alıcı'} • ${dt2.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>
+    </div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+window.sendSellerMessage = sendSellerMessage;
+window.reloadSellerChat = reloadSellerChat;
 
 async function sendCompose() {
   if (!currentTeklifId) return;
