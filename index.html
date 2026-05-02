@@ -3566,10 +3566,9 @@ const SEED_TEKLIFLER = [
 ];
 
 async function loadTeklifler() {
-  // Supabase'den tüm teklifleri çek (satıcı tüm teklifleri görebilir)
   const { data, error } = await _sb
     .from('offers')
-    .select('*')
+    .select('*, profiles(ad, soyad, firma, adres)')
     .order('created_at', { ascending: false });
 
   if (error || !data?.length) return SEED_TEKLIFLER.slice();
@@ -3585,7 +3584,13 @@ async function loadTeklifler() {
     tarih: new Date(x.created_at).getTime(),
     okundu: false,
     yanitlandi: false,
-    conversationId: x.conversation_id
+    conversationId: x.conversation_id,
+    alici: x.profiles ? {
+      ad: x.profiles.ad || '',
+      soyad: x.profiles.soyad || '',
+      firma: x.profiles.firma || '',
+      adres: x.profiles.adres || ''
+    } : null
   }));
 }
 
@@ -3776,6 +3781,15 @@ async function openTeklifModal(id) {
 
   if (t.aciklama) {
     html += `<div class="tk-section"><div class="tk-section-lbl">Detaylı Açıklama</div><div class="tk-desc-box">${escapeHtml(t.aciklama)}</div></div>`;
+  }
+
+  // Alıcı bilgileri
+  if (t.alici && (t.alici.ad || t.alici.firma)) {
+    html += '<div class="tk-section"><div class="tk-section-lbl">Alıcı Bilgileri</div><div class="tk-spec-grid">';
+    if (t.alici.ad || t.alici.soyad) html += `<div class="tk-spec-cell"><div class="tk-spec-k">Ad Soyad</div><div class="tk-spec-v">${escapeHtml((t.alici.ad+' '+t.alici.soyad).trim())}</div></div>`;
+    if (t.alici.firma) html += `<div class="tk-spec-cell"><div class="tk-spec-k">Firma</div><div class="tk-spec-v">${escapeHtml(t.alici.firma)}</div></div>`;
+    if (t.alici.adres) html += `<div class="tk-spec-cell"><div class="tk-spec-k">Adres</div><div class="tk-spec-v">${escapeHtml(t.alici.adres)}</div></div>`;
+    html += '</div></div>';
   }
 
   if (t.iletisim) {
