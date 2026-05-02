@@ -3850,24 +3850,22 @@ function closeTeklifModal() {
   currentTeklifId = null;
 }
 
-function toggleReadCurrent() {
+async function toggleReadCurrent() {
   if (!currentTeklifId) return;
-  const arr = loadTeklifler();
+  const arr = await loadTeklifler();
   const t = arr.find(x => x.id === currentTeklifId);
   if (!t) return;
   t.okundu = !t.okundu;
-  saveTeklifler(arr);
-  refreshBadge();
   document.getElementById('tk-btn-read').textContent = t.okundu ? 'Okunmadı yap' : 'Okundu yap';
+  refreshBadge();
   renderInbox();
 }
 
-function deleteCurrentTeklif() {
+async function deleteCurrentTeklif() {
   if (!currentTeklifId) return;
   if (!confirm('Bu teklif isteğini silmek istediğinize emin misiniz?')) return;
-  let arr = loadTeklifler();
-  arr = arr.filter(x => x.id !== currentTeklifId);
-  saveTeklifler(arr);
+  // Supabase'den sil
+  await _sb.from('offers').delete().eq('id', currentTeklifId);
   refreshBadge();
   closeTeklifModal();
   renderInbox();
@@ -3875,9 +3873,9 @@ function deleteCurrentTeklif() {
 }
 
 /* ===== Yanıt yazma (compose) ===== */
-function openCompose() {
+async function openCompose() {
   if (!currentTeklifId) return;
-  const arr = loadTeklifler();
+  const arr = await loadTeklifler();
   const t = arr.find(x => x.id === currentTeklifId);
   if (!t) return;
 
