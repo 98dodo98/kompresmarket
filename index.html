@@ -2631,7 +2631,7 @@ body {
           <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
           <div class="field"><label>Detaylı Açıklama</label><textarea class="teklif-area" data-k="Açıklama" placeholder="Projenizle ilgili detayları, tercihlerinizi ve varsa özel koşulları buraya yazın..."></textarea></div>
           <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Bu teklif isteği, platformdaki tüm ücretli satıcılara bildirim olarak iletilecektir. Satıcılar size doğrudan ulaşacaktır.</span></div>
-          <button class="btn-teklif" onclick="submitTeklif('borulama','Borulama','form-borulama','Basınçlı Gaz Borulama')">Teklif İsteği Oluştur</button>
+          <button class="btn-teklif" data-kategori="borulama" data-label="Borulama" data-form="form-borulama" data-baslik="Basınçlı Gaz Borulama">Teklif İsteği Oluştur</button>
         </div>
       </div>
     </div>
@@ -2652,7 +2652,7 @@ body {
           <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
           <div class="field"><label>Detaylı Açıklama</label><textarea class="teklif-area" data-k="Açıklama" placeholder="Serbest yazın: montaj gereksinimleri, mevcut enerji altyapısı, tercihler..."></textarea></div>
           <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Tüm ücretli satıcılara bildirim gönderilir. Komisyon alınmaz.</span></div>
-          <button class="btn-teklif" onclick="submitTeklif('komp','Kompresör','form-komp','Kompresör')">Teklif İsteği Oluştur</button>
+          <button class="btn-teklif" data-kategori="komp" data-label="Kompresör" data-form="form-komp" data-baslik="Kompresör">Teklif İsteği Oluştur</button>
         </div>
       </div>
     </div>
@@ -2672,7 +2672,7 @@ body {
           <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
           <div class="field"><label>Detaylı Açıklama</label><textarea class="teklif-area" data-k="Açıklama" placeholder="Çalışma sıcaklığı, basıncı, kullanım amacı, mevcut kompresör modeli vb..."></textarea></div>
           <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Tüm ücretli satıcılara bildirim gönderilir.</span></div>
-          <button class="btn-teklif" onclick="submitTeklif('kuru','Kurutucu','form-kuru','Kurutucu')">Teklif İsteği Oluştur</button>
+          <button class="btn-teklif" data-kategori="kuru" data-label="Kurutucu" data-form="form-kuru" data-baslik="Kurutucu">Teklif İsteği Oluştur</button>
         </div>
       </div>
     </div>
@@ -2694,7 +2694,7 @@ body {
           <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
           <div class="field"><label>İhtiyaç Açıklaması</label><textarea class="teklif-area" data-k="Açıklama" rows="5" placeholder="İstediğiniz gibi yazın: belirtiler, yapılması istenen işlemler, aciliyet durumu, bütçe..."></textarea></div>
           <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Bu servis teklif isteği platformdaki tüm ücretli satıcılara iletilecektir.</span></div>
-          <button class="btn-teklif" onclick="submitTeklif('servis','Servis','form-servis','Servis')">Teklif İsteği Oluştur</button>
+          <button class="btn-teklif" data-kategori="servis" data-label="Servis" data-form="form-servis" data-baslik="Servis">Teklif İsteği Oluştur</button>
         </div>
       </div>
     </div>
@@ -4581,6 +4581,15 @@ document.addEventListener('click', function(e) {
   }
   if (e.target.classList.contains('contact-btn')) {
     openContactModal(e.target.dataset.seller, e.target.dataset.ilan);
+  }
+  // Teklif butonları
+  if (e.target.classList.contains('btn-teklif')) {
+    const btn = e.target;
+    const kategori = btn.dataset.kategori;
+    const kategoriLabel = btn.dataset.label;
+    const formId = btn.dataset.form;
+    const baslik = btn.dataset.baslik;
+    if (kategori && formId) submitTeklif(kategori, kategoriLabel, formId, baslik);
   }
 });
 
