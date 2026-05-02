@@ -3947,7 +3947,7 @@ async function sendCompose() {
     return;
   }
 
-  const arr = loadTeklifler();
+  const arr = await loadTeklifler();
   const t = arr.find(x => x.id === currentTeklifId);
   if (!t) return;
 
@@ -5112,7 +5112,7 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     try { history.replaceState({ page: 'home' }, '', '#home'); } catch(e) {}
   }
-  try { loadTeklifler(); } catch(e) {}
+  try { refreshBadge(); } catch(e) {}
   try { refreshBadge(); } catch(e) {}
   try { updateNav(); } catch(e) {}
   // Eğer doğrulama bekliyorsa ve kullanıcı /verify'e doğrudan gelirse alanları doldur
