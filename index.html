@@ -1996,11 +1996,13 @@ body {
   .cat-btn { font-size: 12px; padding: 8px 12px; white-space: nowrap; flex-shrink: 0; }
 
   /* Listing */
-  .listing-wrap { flex-direction: column; gap: 0; }
-  .filter-panel { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 16px; }
-  .listing-main { padding: 16px; }
+  .listing-wrap { display: flex !important; flex-direction: column; gap: 0; }
+  .filter-panel { width: 100% !important; border-right: none; border-bottom: 1px solid var(--border); padding: 14px 16px; position: static; max-height: none; overflow: visible; }
+  .filter-panel .f-range { width: 100%; }
+  .listing-main { padding: 12px 16px; }
   .cards-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .listing-header { flex-direction: column; gap: 8px; align-items: flex-start; }
+  .listing-sort { width: 100%; }
 
   /* Cards */
   .listing-card .card-thumb { height: 120px; }
@@ -2009,10 +2011,18 @@ body {
   .spec-tag { font-size: 10px; padding: 2px 6px; }
 
   /* Detail sayfası */
-  .detail-wrap { flex-direction: column; padding: 16px; gap: 16px; }
-  .detail-main { min-width: 0; }
-  .detail-aside { width: 100%; position: static; }
-  .gallery-main { height: 220px; }
+  .detail-layout { grid-template-columns: 1fr !important; padding: 12px !important; gap: 12px; }
+  .detail-right { width: 100%; }
+  .detail-img { height: 200px; margin-bottom: 12px; }
+  .spec-row { flex-wrap: wrap; gap: 4px; }
+  .spec-k { font-size: 12px; }
+  .spec-v { font-size: 12px; text-align: right; }
+  .price-card { padding: 14px; }
+  .price-val { font-size: 28px !important; }
+  .btn-contact-main { width: 100%; }
+  .btn-save-list { width: 100%; }
+  .seller-card { padding: 14px; }
+  .detail-back { padding: 10px 16px; font-size: 13px; }
 
   /* Dashboard */
   .dashboard-wrap { grid-template-columns: 1fr; }
@@ -2064,6 +2074,10 @@ body {
   .metrics-row { grid-template-columns: 1fr !important; }
   .hero-title { font-size: 26px; }
   .cat-grid { grid-template-columns: 1fr 1fr; }
+  .detail-layout { padding: 10px !important; }
+  .spec-v { max-width: 55%; word-break: break-word; }
+  .listing-card .card-thumb { height: 140px; }
+  .card-price { font-size: 14px; }
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -3281,7 +3295,7 @@ body {
 </div>
 
 <!-- ===== TEKLİF DETAY MODALI ===== -->
-<div class="tk-modal" id="teklif-detail-modal" onclick="if(event.target===this){this.classList.remove('open');document.body.style.overflow=''}">
+<div class="tk-modal" id="teklif-detail-modal" onclick="if(event.target===this){this.classList.remove('open');document.body.style.overflow='';if(_chatSubscription){_chatSubscription.unsubscribe();_chatSubscription=null;}}">
   <div class="tk-modal-card" style="max-width:500px">
     <div class="tk-modal-head">
       <div class="tk-modal-head-l">
@@ -3464,12 +3478,13 @@ function go(page, addHistory = true) {
   if (el) {
     el.classList.add('active');
     window.scrollTo(0, 0);
-    if (addHistory) history.pushState({ page }, '', '#' + page);
+    if (addHistory) {
+      try { history.pushState({ page }, '', '#' + page); } catch(e) {}
+    }
   }
 }
 window.go = go;
 
-// İleri/geri buton desteği
 window.addEventListener('popstate', function(e) {
   const page = e.state?.page || 'home';
   go(page, false);
@@ -3539,7 +3554,7 @@ function saveTeklifler(arr) {
   _set(TEKLIF_KEY, JSON.stringify(arr));
 }
 
-function submitTeklif(kategori, kategoriLabel, formId, baslikPrefix) {
+async function submitTeklif(kategori, kategoriLabel, formId, baslikPrefix) {
   const form = document.getElementById(formId);
   if (!form) return;
   const fields = {};
@@ -3554,38 +3569,49 @@ function submitTeklif(kategori, kategoriLabel, formId, baslikPrefix) {
     else fields[k] = v;
   });
 
-  // Minimum doğrulama: en az bir alan ya da açıklama olsun
   if (Object.keys(fields).length === 0 && !aciklama) {
     showToast('Eksik bilgi', 'Lütfen en az bir teknik alan veya açıklama girin.', kategoriLabel, true);
     return;
   }
 
+  const u = loadUser();
+  const baslik = baslikPrefix + ' Teklif İsteği';
+
+  // Supabase'e kaydet
+  if (u) {
+    const { error } = await _sb.from('offers').insert({
+      user_id: u.id,
+      kategori,
+      kategori_label: kategoriLabel,
+      baslik,
+      aciklama,
+      fields,
+      iletisim
+    });
+    if (error) {
+      showToast('Hata', error.message, null, true);
+      return;
+    }
+  }
+
+  // Satıcı inbox için lokal kaydet
   const teklif = {
     id: 't-' + Date.now() + '-' + Math.random().toString(36).slice(2,7),
-    kategori, kategoriLabel,
-    baslik: baslikPrefix + ' Teklif İsteği',
-    fields, aciklama, iletisim,
-    tarih: Date.now(),
-    okundu: false
+    kategori, kategoriLabel, baslik, fields, aciklama, iletisim,
+    tarih: Date.now(), okundu: false
   };
-
   const arr = loadTeklifler();
   arr.unshift(teklif);
   saveTeklifler(arr);
 
-  // Form temizleme
   form.querySelectorAll('[data-k]').forEach(inp => {
     if (inp.tagName === 'SELECT') inp.selectedIndex = 0;
     else inp.value = '';
   });
 
-  // Alıcı teklif geçmişine ekle
-  const buyerArr = loadBuyerTeklifler();
-  buyerArr.unshift(teklif);
-  saveBuyerTeklifler(buyerArr);
   updateBuyerBadges();
+  refreshBadge();
 
-  // Bildirim
   const ozet = Object.entries(fields).slice(0,2).map(([k,v]) => k+': '+v).join(' • ');
   showToast(
     'Teklif isteği gönderildi',
@@ -3593,9 +3619,6 @@ function submitTeklif(kategori, kategoriLabel, formId, baslikPrefix) {
     kategoriLabel,
     false
   );
-
-  // Sayaç ve liste güncelle
-  refreshBadge();
 }
 
 function showToast(title, msg, kategoriLabel, isError) {
@@ -3768,6 +3791,7 @@ function openTeklifModal(id) {
 function closeTeklifModal() {
   document.getElementById('tk-modal').classList.remove('open');
   document.body.style.overflow = '';
+  if (_chatSubscription) { _chatSubscription.unsubscribe(); _chatSubscription = null; }
   currentTeklifId = null;
 }
 
@@ -3860,7 +3884,7 @@ function closeCompose() {
   }
 }
 
-function sendCompose() {
+async function sendCompose() {
   if (!currentTeklifId) return;
   const mesaj = (document.getElementById('cmp-mesaj')?.value || '').trim();
 
@@ -3874,29 +3898,67 @@ function sendCompose() {
   const t = arr.find(x => x.id === currentTeklifId);
   if (!t) return;
 
+  const u = loadUser();
+  const btn = document.querySelector('.tk-btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Gönderiliyor...'; }
+
+  // Supabase'de conversation var mı kontrol et, yoksa aç
+  let conversationId = t.conversationId;
+  if (!conversationId && u) {
+    // Conversation oluştur
+    const { data: conv, error: convErr } = await _sb
+      .from('conversations')
+      .insert({
+        seller_id: u.id,
+        buyer_id: u.id, // Demo: gerçekte buyer_id teklifi gönderen kişi
+        listing_id: currentTeklifId,
+        listing_title: t.baslik
+      })
+      .select()
+      .single();
+
+    if (!convErr && conv) {
+      conversationId = conv.id;
+      t.conversationId = conv.id;
+    }
+  }
+
+  // Mesajı Supabase'e kaydet
+  if (conversationId && u) {
+    const { error: msgErr } = await _sb
+      .from('messages')
+      .insert({
+        conversation_id: conversationId,
+        sender_id: u.id,
+        content: mesaj
+      });
+
+    if (msgErr) {
+      showToast('Hata', 'Mesaj gönderilemedi: ' + msgErr.message, null, true);
+      if (btn) { btn.disabled = false; btn.textContent = 'Teklifi Gönder'; }
+      return;
+    }
+  }
+
+  // Lokal de kaydet
   if (!t.responses) t.responses = [];
-  const yanit = {
-    id: 'r-' + Date.now() + '-' + Math.random().toString(36).slice(2,6),
+  t.responses.push({
+    id: 'r-' + Date.now(),
     tarih: Date.now(),
     mesaj,
-    satici: 'Pnömatik Makine A.Ş.'
-  };
-  t.responses.push(yanit);
+    satici: u?.firma || 'Satıcı'
+  });
   t.yanitlandi = true;
   t.okundu = true;
   saveTeklifler(arr);
   refreshBadge();
 
-  showToast(
-    'Mesajınız alıcıya iletildi',
-    (t.iletisim ? t.iletisim + ' adresine ' : '') + 'mesajınız başarıyla gönderildi.',
-    t.kategoriLabel,
-    false
-  );
+  if (btn) { btn.disabled = false; btn.textContent = 'Teklifi Gönder'; }
 
-  // Foot'u resetle ve detay görünümüne dön
+  showToast('Mesajınız alıcıya iletildi', 'Mesajınız başarıyla gönderildi.', t.kategoriLabel, false);
   document.getElementById('tk-modal-foot-detail').style.display = 'flex';
   document.getElementById('tk-modal-foot-compose').style.display = 'none';
+  document.getElementById('cmp-mesaj').value = '';
   openTeklifModal(currentTeklifId);
   renderInbox();
 }
@@ -4543,47 +4605,77 @@ function sendContactMessage() {
 const SAVED_KEY = 'km_saved_v1';
 const BUYER_TEKLIF_KEY = 'km_buyer_teklifler_v1';
 
-function loadSaved() {
-  try { return JSON.parse(_get(SAVED_KEY) || '[]'); } catch(e) { return []; }
+// ===== FAVORİLER (Supabase) =====
+async function loadSaved() {
+  const u = loadUser();
+  if (!u) return [];
+  const { data } = await _sb.from('favorites').select('*').eq('user_id', u.id).order('created_at', { ascending: false });
+  return (data || []).map(x => ({ id: x.ilan_id, name: x.ilan_name, brand: x.ilan_brand, price: x.ilan_price, page: x.ilan_page }));
 }
-function saveSavedList(arr) { _set(SAVED_KEY, JSON.stringify(arr)); }
 
-function loadBuyerTeklifler() {
-  try { return JSON.parse(_get(BUYER_TEKLIF_KEY) || '[]'); } catch(e) { return []; }
+async function saveSavedList() {} // artık kullanılmıyor
+
+async function loadBuyerTeklifler() {
+  const u = loadUser();
+  if (!u) return [];
+  const { data } = await _sb.from('offers').select('*').eq('user_id', u.id).order('created_at', { ascending: false });
+  return (data || []).map(x => ({
+    id: x.id,
+    kategori: x.kategori,
+    kategoriLabel: x.kategori_label,
+    baslik: x.baslik,
+    aciklama: x.aciklama,
+    fields: x.fields || {},
+    iletisim: x.iletisim,
+    conversationId: x.conversation_id,
+    tarih: new Date(x.created_at).getTime()
+  }));
 }
-function saveBuyerTeklifler(arr) { _set(BUYER_TEKLIF_KEY, JSON.stringify(arr)); }
 
-function saveIlan(ilan) {
-  if (!loadUser()) { go('login'); return; }
-  const arr = loadSaved();
-  if (arr.find(x => x.id === ilan.id)) {
-    showToast('Zaten kayıtlı', 'Bu ilan zaten listende.', null, false);
+async function saveBuyerTeklifler() {} // artık kullanılmıyor
+
+async function saveIlan(ilan) {
+  const u = loadUser();
+  if (!u) { go('login'); return; }
+  const { error } = await _sb.from('favorites').upsert({
+    user_id: u.id,
+    ilan_id: ilan.id,
+    ilan_name: ilan.name,
+    ilan_brand: ilan.brand || '',
+    ilan_price: ilan.price || '',
+    ilan_page: ilan.page || ''
+  }, { onConflict: 'user_id,ilan_id' });
+  if (error) {
+    showToast('Hata', error.message, null, true);
     return;
   }
-  arr.unshift(ilan);
-  saveSavedList(arr);
   updateBuyerBadges();
   showToast('Favorilere eklendi', ilan.name + ' favori ilanlarına eklendi.', null, false);
 }
 
-function removeSaved(id) {
-  const arr = loadSaved().filter(x => x.id !== id);
-  saveSavedList(arr);
+async function removeSaved(id) {
+  const u = loadUser();
+  if (!u) return;
+  await _sb.from('favorites').delete().eq('user_id', u.id).eq('ilan_id', id);
   updateBuyerBadges();
   renderBuyerSaved();
 }
 
-function updateBuyerBadges() {
-  const saved = loadSaved();
-  const teklifler = loadBuyerTeklifler();
+async function updateBuyerBadges() {
+  const u = loadUser();
+  if (!u) return;
+  const [{ count: sc }, { count: tc }] = await Promise.all([
+    _sb.from('favorites').select('*', { count: 'exact', head: true }).eq('user_id', u.id),
+    _sb.from('offers').select('*', { count: 'exact', head: true }).eq('user_id', u.id)
+  ]);
   const sb = document.getElementById('buyer-saved-badge');
   const tb = document.getElementById('buyer-teklif-badge');
   const ms = document.getElementById('buyer-metric-saved');
   const mt = document.getElementById('buyer-metric-teklif');
-  if (sb) sb.textContent = saved.length;
-  if (tb) tb.textContent = teklifler.length;
-  if (ms) ms.textContent = saved.length;
-  if (mt) mt.textContent = teklifler.length;
+  if (sb) sb.textContent = sc || 0;
+  if (tb) tb.textContent = tc || 0;
+  if (ms) ms.textContent = sc || 0;
+  if (mt) mt.textContent = tc || 0;
 }
 
 function showBuyerDash(section) {
@@ -4599,11 +4691,12 @@ function showBuyerDash(section) {
   if (section === 'main') renderBuyerPreview();
 }
 
-function renderBuyerSaved() {
+async function renderBuyerSaved() {
   const list = document.getElementById('buyer-saved-list');
   const title = document.getElementById('buyer-saved-title');
   if (!list) return;
-  const arr = loadSaved();
+  list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Yükleniyor...</div>';
+  const arr = await loadSaved();
   if (title) title.textContent = 'Favori İlanlar — ' + arr.length + ' ilan';
   if (!arr.length) {
     list.innerHTML = '<div style="padding:32px 18px;text-align:center;color:var(--muted);font-size:13px">Henüz favori ilan yok. İlan sayfalarında "Favorilere Ekle" butonunu kullanın.</div>';
@@ -4616,17 +4709,18 @@ function renderBuyerSaved() {
         <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${escapeHtml(x.brand||'')}${x.price?' • '+escapeHtml(x.price):''}</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <button onclick="go('${escapeHtml(x.page||'ilanlar')}')" style="font-size:12px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;font-family:var(--font)">Görüntüle</button>
+        <button onclick="go('${escapeHtml(x.page||'kompresorler')}')" style="font-size:12px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;font-family:var(--font)">Görüntüle</button>
         <button onclick="removeSaved('${escapeHtml(x.id)}')" style="font-size:12px;padding:6px 12px;border:1px solid #f5c6c6;border-radius:var(--radius);background:transparent;color:#c44;cursor:pointer;font-family:var(--font)">Kaldır</button>
       </div>
     </div>`).join('');
 }
 
-function renderBuyerTeklifler() {
+async function renderBuyerTeklifler() {
   const list = document.getElementById('buyer-teklif-list');
   const title = document.getElementById('buyer-teklif-title');
   if (!list) return;
-  const arr = loadBuyerTeklifler();
+  list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Yükleniyor...</div>';
+  const arr = await loadBuyerTeklifler();
   if (title) title.textContent = 'Teklif İsteklerim — ' + arr.length + ' istek';
   if (!arr.length) {
     list.innerHTML = '<div style="padding:32px 18px;text-align:center;color:var(--muted);font-size:13px">Henüz teklif isteği göndermediniz.</div>';
@@ -4646,13 +4740,15 @@ function renderBuyerTeklifler() {
   }).join('');
 }
 
-function openTeklifDetail(idx) {
+async function openTeklifDetail(idx) {
   const arr = loadBuyerTeklifler();
   const x = arr[idx];
   if (!x) return;
   const dt = new Date(x.tarih);
   document.getElementById('teklif-detail-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
+
+  // Temel içeriği göster
   document.getElementById('teklif-detail-content').innerHTML = `
     <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
       <span style="font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;padding:4px 10px;border-radius:3px;background:rgba(201,74,30,.1);color:var(--accent)">${escapeHtml(x.kategoriLabel)}</span>
@@ -4664,24 +4760,122 @@ function openTeklifDetail(idx) {
       <div style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin-bottom:6px">Açıklama</div>
       <div style="font-size:13px;color:var(--text);line-height:1.6;padding:12px;background:var(--bg2);border-radius:var(--radius)">${escapeHtml(x.aciklama)}</div>
     </div>` : ''}
-    ${x.fields && Object.keys(x.fields).length ? `
-    <div>
-      <div style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin-bottom:8px">Form Detayları</div>
-      ${Object.entries(x.fields).map(([k,v]) => v ? `
-        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
-          <span style="color:var(--muted);min-width:120px;font-family:var(--mono);font-size:11px">${escapeHtml(k)}</span>
-          <span style="color:var(--text)">${escapeHtml(v)}</span>
-        </div>` : '').join('')}
-    </div>` : ''}
+    <div id="chat-section">
+      <div style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin-bottom:8px">Mesajlar</div>
+      <div id="chat-messages" style="min-height:60px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px">
+        <div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Yükleniyor...</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="chat-input" placeholder="Mesaj yaz..." style="flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none" onkeydown="if(event.key==='Enter')sendChatMessage(${idx})">
+        <button onclick="sendChatMessage(${idx})" style="padding:9px 16px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:13px;cursor:pointer;font-family:var(--font)">Gönder</button>
+      </div>
+    </div>
   `;
+
+  // Supabase'den mesajları yükle
+  if (x.conversationId) {
+    loadChatMessages(x.conversationId);
+    subscribeToChatMessages(x.conversationId);
+  } else {
+    document.getElementById('chat-messages').innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Henüz mesaj yok. İlk mesajı gönderin.</div>';
+  }
 }
+
+var _chatSubscription = null;
+
+function subscribeToChatMessages(conversationId) {
+  if (_chatSubscription) _chatSubscription.unsubscribe();
+  _chatSubscription = _sb
+    .channel('messages-' + conversationId)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: 'conversation_id=eq.' + conversationId
+    }, () => loadChatMessages(conversationId))
+    .subscribe();
+}
+
+async function loadChatMessages(conversationId) {
+  const el = document.getElementById('chat-messages');
+  if (!el) return;
+  const u = loadUser();
+  const { data, error } = await _sb
+    .from('messages')
+    .select('*')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: true });
+
+  if (error || !data?.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Henüz mesaj yok.</div>';
+    return;
+  }
+
+  el.innerHTML = data.map(m => {
+    const isMe = m.sender_id === u?.id;
+    const dt = new Date(m.created_at);
+    return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};gap:2px">
+      <div style="max-width:80%;padding:8px 12px;border-radius:12px;font-size:13px;background:${isMe?'var(--accent)':'var(--bg2)'};color:${isMe?'#fff':'var(--text)'};line-height:1.5">${escapeHtml(m.content)}</div>
+      <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">${dt.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>
+    </div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendChatMessage(idx) {
+  const input = document.getElementById('chat-input');
+  if (!input) return;
+  const content = input.value.trim();
+  if (!content) return;
+
+  const arr = loadBuyerTeklifler();
+  const x = arr[idx];
+  if (!x) return;
+  const u = loadUser();
+  if (!u) { go('login'); return; }
+
+  // conversation yoksa oluştur
+  let convId = x.conversationId;
+  if (!convId) {
+    const { data: conv, error } = await _sb
+      .from('conversations')
+      .insert({
+        buyer_id: u.id,
+        seller_id: u.id, // Demo: gerçekte satıcının ID'si olacak
+        listing_id: x.id,
+        listing_title: x.baslik
+      })
+      .select()
+      .single();
+
+    if (error) { showToast('Hata', error.message, null, true); return; }
+    convId = conv.id;
+    x.conversationId = convId;
+    saveBuyerTeklifler(arr);
+    subscribeToChatMessages(convId);
+  }
+
+  input.value = '';
+  const { error } = await _sb.from('messages').insert({
+    conversation_id: convId,
+    sender_id: u.id,
+    content
+  });
+
+  if (error) showToast('Hata', error.message, null, true);
+  else loadChatMessages(convId);
+}
+
 window.openTeklifDetail = openTeklifDetail;
+window.sendChatMessage = sendChatMessage;
+window.loadChatMessages = loadChatMessages;
 
 
-function renderBuyerPreview() {
+
+async function renderBuyerPreview() {
   const el = document.getElementById('buyer-saved-preview');
   if (!el) return;
-  const arr = loadSaved();
+  const arr = await loadSaved();
   if (!arr.length) {
     el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center">Henüz favori ilan yok. İlan sayfalarında "Favorilere Ekle" butonunu kullanın.</div>';
     return;
@@ -4692,27 +4886,35 @@ function renderBuyerPreview() {
         <div style="font-size:13px;font-weight:500;color:var(--text)">${escapeHtml(x.name)}</div>
         <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${escapeHtml(x.brand||'')}${x.price?' • '+escapeHtml(x.price):''}</div>
       </div>
-      <span style="font-size:12px;color:var(--accent);cursor:pointer" onclick="go('${escapeHtml(x.page||'ilanlar')}')">Görüntüle →</span>
+      <span style="font-size:12px;color:var(--accent);cursor:pointer" onclick="go('${escapeHtml(x.page||'kompresorler')}')">Görüntüle →</span>
     </div>`).join('');
 }
 
-function loadBuyerProfile() {
+async function loadBuyerProfile() {
   const u = loadUser();
   if (!u) return;
+  // Supabase'den profil çek
+  const { data } = await _sb.from('profiles').select('*').eq('id', u.id).single();
+  const p = data || u;
   const f = (id, val) => { const el = document.getElementById(id); if (el) el.value = val||''; };
-  f('bp-ad', u.ad); f('bp-soyad', u.soyad);
-  f('bp-mail', u.mail); f('bp-firma', u.firma); f('bp-adres', u.adres);
+  f('bp-ad', p.ad); f('bp-soyad', p.soyad);
+  f('bp-mail', u.mail); f('bp-firma', p.firma); f('bp-adres', p.adres);
 }
 
-function saveBuyerProfile() {
+async function saveBuyerProfile() {
   const u = loadUser();
   if (!u) return;
-  u.ad    = (document.getElementById('bp-ad')?.value||'').trim();
-  u.soyad = (document.getElementById('bp-soyad')?.value||'').trim();
-  u.mail  = (document.getElementById('bp-mail')?.value||'').trim();
-  u.firma = (document.getElementById('bp-firma')?.value||'').trim();
-  u.adres = (document.getElementById('bp-adres')?.value||'').trim();
-  saveUser(u);
+  const ad    = (document.getElementById('bp-ad')?.value||'').trim();
+  const soyad = (document.getElementById('bp-soyad')?.value||'').trim();
+  const firma = (document.getElementById('bp-firma')?.value||'').trim();
+  const adres = (document.getElementById('bp-adres')?.value||'').trim();
+
+  const { error } = await _sb.from('profiles').upsert({ id: u.id, ad, soyad, firma, adres });
+  if (error) { showToast('Hata', error.message, null, true); return; }
+
+  // Memory'deki user'ı güncelle
+  u.ad = ad; u.soyad = soyad; u.firma = firma; u.adres = adres;
+  _memStore[USER_KEY] = JSON.stringify(u);
   updateNav();
   showToast('Profil güncellendi', 'Bilgilerin başarıyla kaydedildi.', null, false);
 }
@@ -4768,7 +4970,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (hash && document.getElementById('p-' + hash)) {
     go(hash, false);
   } else {
-    history.replaceState({ page: 'home' }, '', '#home');
+    try { history.replaceState({ page: 'home' }, '', '#home'); } catch(e) {}
   }
   try { loadTeklifler(); } catch(e) {}
   try { refreshBadge(); } catch(e) {}
