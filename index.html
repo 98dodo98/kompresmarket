@@ -3833,6 +3833,31 @@ async function openTeklifModal(id) {
 
   body.innerHTML = html;
 
+  // Mesaj geçmişini yükle
+  if (t.conversationId) {
+    const { data: msgs } = await _sb
+      .from('messages')
+      .select('*')
+      .eq('conversation_id', t.conversationId)
+      .order('created_at', { ascending: true });
+
+    if (msgs?.length) {
+      const u = loadUser();
+      let chatHtml = '<div class="tk-section"><div class="tk-section-lbl">Mesaj Geçmişi (' + msgs.length + ')</div>';
+      chatHtml += '<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;max-height:200px;overflow-y:auto">';
+      msgs.forEach(m => {
+        const isMe = m.sender_id === u?.id;
+        const dt2 = new Date(m.created_at);
+        chatHtml += `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};gap:2px">
+          <div style="max-width:80%;padding:8px 12px;border-radius:12px;font-size:13px;background:${isMe?'var(--accent)':'var(--bg2)'};color:${isMe?'#fff':'var(--text)'};line-height:1.5">${escapeHtml(m.content)}</div>
+          <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">${isMe?'Siz':'Alıcı'} • ${dt2.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>
+        </div>`;
+      });
+      chatHtml += '</div></div>';
+      body.innerHTML += chatHtml;
+    }
+  }
+
   // Okunmadı yap butonu metni
   document.getElementById('tk-btn-read').textContent = t.okundu ? 'Okunmadı yap' : 'Okundu yap';
 
@@ -3952,32 +3977,49 @@ async function sendCompose() {
   if (!t) return;
 
   const u = loadUser();
+  if (!u) return;
+
   const btn = document.querySelector('.tk-btn-primary');
   if (btn) { btn.disabled = true; btn.textContent = 'Gönderiliyor...'; }
 
-  // Supabase'de conversation var mı kontrol et, yoksa aç
-  let conversationId = t.conversationId;
-  if (!conversationId && u) {
-    // Conversation oluştur
+  // Offers tablosundan buyer_id'yi al
+  const { data: offerData } = await _sb
+    .from('offers')
+    .select('user_id, conversation_id')
+    .eq('id', currentTeklifId)
+    .single();
+
+  let conversationId = offerData?.conversation_id;
+  const buyerId = offerData?.user_id;
+
+  // Conversation yoksa oluştur
+  if (!conversationId && buyerId) {
     const { data: conv, error: convErr } = await _sb
       .from('conversations')
       .insert({
         seller_id: u.id,
-        buyer_id: u.id, // Demo: gerçekte buyer_id teklifi gönderen kişi
+        buyer_id: buyerId,
         listing_id: currentTeklifId,
         listing_title: t.baslik
       })
       .select()
       .single();
 
-    if (!convErr && conv) {
+    if (convErr) {
+      showToast('Hata', 'Konuşma oluşturulamadı: ' + convErr.message, null, true);
+      if (btn) { btn.disabled = false; btn.textContent = 'Teklifi Gönder'; }
+      return;
+    }
+
+    if (conv) {
       conversationId = conv.id;
-      t.conversationId = conv.id;
+      // offers tablosunu güncelle
+      await _sb.from('offers').update({ conversation_id: conversationId }).eq('id', currentTeklifId);
     }
   }
 
   // Mesajı Supabase'e kaydet
-  if (conversationId && u) {
+  if (conversationId) {
     const { error: msgErr } = await _sb
       .from('messages')
       .insert({
@@ -3993,21 +4035,14 @@ async function sendCompose() {
     }
   }
 
-  // Lokal de kaydet
-  if (!t.responses) t.responses = [];
-  t.responses.push({
-    id: 'r-' + Date.now(),
-    tarih: Date.now(),
-    mesaj,
-    satici: u?.firma || 'Satıcı'
-  });
-  t.yanitlandi = true;
-  t.okundu = true;
-  saveTeklifler(arr);
-  refreshBadge();
-
   if (btn) { btn.disabled = false; btn.textContent = 'Teklifi Gönder'; }
 
+  showToast('Mesajınız alıcıya iletildi', 'Mesajınız başarıyla gönderildi.', t.kategoriLabel, false);
+  document.getElementById('tk-modal-foot-detail').style.display = 'flex';
+  document.getElementById('tk-modal-foot-compose').style.display = 'none';
+  document.getElementById('cmp-mesaj').value = '';
+  openTeklifModal(currentTeklifId);
+  renderInbox();
   showToast('Mesajınız alıcıya iletildi', 'Mesajınız başarıyla gönderildi.', t.kategoriLabel, false);
   document.getElementById('tk-modal-foot-detail').style.display = 'flex';
   document.getElementById('tk-modal-foot-compose').style.display = 'none';
@@ -4902,7 +4937,7 @@ async function openTeklifDetail(idx) {
     </div>` : ''}
     <div id="chat-section">
       <div style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin-bottom:8px">Mesajlar</div>
-      <div id="chat-messages" style="min-height:60px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px">
+      <div id="chat-messages" style="min-height:60px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto">
         <div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Yükleniyor...</div>
       </div>
       <div style="display:flex;gap:8px">
@@ -4912,12 +4947,20 @@ async function openTeklifDetail(idx) {
     </div>
   `;
 
-  // Supabase'den mesajları yükle
-  if (x.conversationId) {
-    loadChatMessages(x.conversationId);
-    subscribeToChatMessages(x.conversationId);
+  // Offers tablosundan güncel conversation_id al
+  const { data: offerData } = await _sb
+    .from('offers')
+    .select('conversation_id')
+    .eq('id', x.id)
+    .single();
+
+  const convId = offerData?.conversation_id || x.conversationId;
+
+  if (convId) {
+    loadChatMessages(convId);
+    subscribeToChatMessages(convId);
   } else {
-    document.getElementById('chat-messages').innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Henüz mesaj yok. İlk mesajı gönderin.</div>';
+    document.getElementById('chat-messages').innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Henüz mesaj yok. Satıcı size yanıt verdiğinde burada görünecek.</div>';
   }
 }
 
@@ -4974,14 +5017,22 @@ async function sendChatMessage(idx) {
   const u = loadUser();
   if (!u) { go('login'); return; }
 
-  // conversation yoksa oluştur
-  let convId = x.conversationId;
+  // offers tablosundan güncel conversation_id al
+  const { data: offerData } = await _sb
+    .from('offers')
+    .select('conversation_id')
+    .eq('id', x.id)
+    .single();
+
+  let convId = offerData?.conversation_id;
+
+  // Conversation yoksa oluştur (alıcı ilk mesajı gönderiyorsa)
   if (!convId) {
     const { data: conv, error } = await _sb
       .from('conversations')
       .insert({
         buyer_id: u.id,
-        seller_id: u.id, // Demo: gerçekte satıcının ID'si olacak
+        seller_id: u.id, // Satıcı ID'si bilinmiyor, şimdilik aynı
         listing_id: x.id,
         listing_title: x.baslik
       })
@@ -4990,8 +5041,7 @@ async function sendChatMessage(idx) {
 
     if (error) { showToast('Hata', error.message, null, true); return; }
     convId = conv.id;
-    x.conversationId = convId;
-    saveBuyerTeklifler(arr);
+    await _sb.from('offers').update({ conversation_id: convId }).eq('id', x.id);
     subscribeToChatMessages(convId);
   }
 
