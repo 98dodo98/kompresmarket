@@ -3614,34 +3614,29 @@ async function submitTeklif(kategori, kategoriLabel, formId, baslikPrefix) {
   }
 
   const u = loadUser();
+  if (!u) { go('login'); return; }
+
   const baslik = baslikPrefix + ' Teklif İsteği';
 
-  // Supabase'e kaydet
-  if (u) {
-    const { error } = await _sb.from('offers').insert({
-      user_id: u.id,
-      kategori,
-      kategori_label: kategoriLabel,
-      baslik,
-      aciklama,
-      fields,
-      iletisim
-    });
-    if (error) {
-      showToast('Hata', error.message, null, true);
-      return;
-    }
-  }
+  const btn = form.closest('.page')?.querySelector('.btn-teklif');
+  if (btn) { btn.disabled = true; btn.textContent = 'Gönderiliyor...'; }
 
-  // Satıcı inbox için lokal kaydet
-  const teklif = {
-    id: 't-' + Date.now() + '-' + Math.random().toString(36).slice(2,7),
-    kategori, kategoriLabel, baslik, fields, aciklama, iletisim,
-    tarih: Date.now(), okundu: false
-  };
-  const arr = loadTeklifler();
-  arr.unshift(teklif);
-  saveTeklifler(arr);
+  const { error } = await _sb.from('offers').insert({
+    user_id: u.id,
+    kategori,
+    kategori_label: kategoriLabel,
+    baslik,
+    aciklama,
+    fields,
+    iletisim
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Teklif İsteği Oluştur'; }
+
+  if (error) {
+    showToast('Hata', error.message, null, true);
+    return;
+  }
 
   form.querySelectorAll('[data-k]').forEach(inp => {
     if (inp.tagName === 'SELECT') inp.selectedIndex = 0;
@@ -3654,7 +3649,7 @@ async function submitTeklif(kategori, kategoriLabel, formId, baslikPrefix) {
   const ozet = Object.entries(fields).slice(0,2).map(([k,v]) => k+': '+v).join(' • ');
   showToast(
     'Teklif isteği gönderildi',
-    'Tüm ücretli ' + kategoriLabel.toLowerCase() + ' satıcılarına bildirim iletildi. ' + (ozet ? '('+ozet+')' : ''),
+    'Tüm satıcılara bildirim iletildi. ' + (ozet ? '('+ozet+')' : ''),
     kategoriLabel,
     false
   );
