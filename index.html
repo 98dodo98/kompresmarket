@@ -2820,6 +2820,24 @@ body {
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
+<!-- ===== YENİ ŞİFRE BELİRLEME SAYFASI ===== -->
+<div class="page" id="p-reset-password">
+  <div class="reg-wrap">
+    <div class="reg-box" style="max-width:420px">
+      <div class="reg-hdr">
+        <p class="reg-title">Yeni Şifre Belirle</p>
+        <p class="reg-sub">Hesabınız için yeni bir şifre girin</p>
+      </div>
+      <div class="reg-form">
+        <div class="field"><label>Yeni Şifre</label><input type="password" id="reset-pw" placeholder="En az 6 karakter"></div>
+        <div class="field"><label>Yeni Şifre (Tekrar)</label><input type="password" id="reset-pw2" placeholder="Şifrenizi tekrar girin"></div>
+        <div id="reset-error" style="display:none;font-size:12px;color:#c44;margin-bottom:12px;padding:9px 12px;background:#fff0f0;border-radius:var(--radius);border:1px solid #f5c6c6"></div>
+        <button class="btn-reg" onclick="submitResetPassword()">Şifremi Güncelle</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ===== GİRİŞ SAYFASI ===== -->
 <div class="page" id="p-login">
   <div class="reg-wrap">
@@ -2833,7 +2851,27 @@ body {
         <div class="field"><label>Şifre</label><input type="password" id="l-pw" placeholder="Şifreniz" onkeydown="if(event.key==='Enter')submitLogin()"></div>
         <div id="login-error" style="display:none;font-size:12px;color:#c44;margin-bottom:12px;padding:9px 12px;background:#fff0f0;border-radius:var(--radius);border:1px solid #f5c6c6"></div>
         <button class="btn-reg" onclick="submitLogin()">Giriş Yap</button>
-        <p class="reg-terms" style="margin-top:14px">Hesabınız yok mu? <a onclick="go('register')" style="color:var(--accent);cursor:pointer;text-decoration:underline">Üye Ol</a></p>
+        <p class="reg-terms" style="margin-top:14px">Şifrenizi mi unuttunuz? <a onclick="go('forgot-password')" style="color:var(--accent);cursor:pointer;text-decoration:underline">Şifremi Sıfırla</a></p>
+        <p class="reg-terms" style="margin-top:8px">Hesabınız yok mu? <a onclick="go('register')" style="color:var(--accent);cursor:pointer;text-decoration:underline">Üye Ol</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ŞİFRE SIFIRLAMA SAYFASI ===== -->
+<div class="page" id="p-forgot-password">
+  <div class="reg-wrap">
+    <div class="reg-box" style="max-width:420px">
+      <div class="reg-hdr">
+        <p class="reg-title">Şifremi Sıfırla</p>
+        <p class="reg-sub">E-posta adresinizi girin, şifre sıfırlama bağlantısı gönderelim</p>
+      </div>
+      <div class="reg-form">
+        <div class="field"><label>E-posta</label><input type="email" id="forgot-mail" placeholder="ahmet@firma.com"></div>
+        <div id="forgot-success" style="display:none;font-size:12px;color:#2a7a2a;margin-bottom:12px;padding:9px 12px;background:#f0fff0;border-radius:var(--radius);border:1px solid #c6f5c6"></div>
+        <div id="forgot-error" style="display:none;font-size:12px;color:#c44;margin-bottom:12px;padding:9px 12px;background:#fff0f0;border-radius:var(--radius);border:1px solid #f5c6c6"></div>
+        <button class="btn-reg" onclick="submitForgotPassword()">Sıfırlama Bağlantısı Gönder</button>
+        <p class="reg-terms" style="margin-top:14px"><a onclick="go('login')" style="color:var(--accent);cursor:pointer;text-decoration:underline">← Giriş sayfasına dön</a></p>
       </div>
     </div>
   </div>
@@ -3431,6 +3469,10 @@ async function checkSession() {
 
 // Auth state değişince nav güncelle
 _sb.auth.onAuthStateChange((event, session) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    go('reset-password');
+    return;
+  }
   if (session) {
     _memStore[USER_KEY] = JSON.stringify(sessionToUser(session));
   } else {
@@ -4056,6 +4098,71 @@ function demoLogin(role) {
 }
 window.demoLogin = demoLogin;
 
+async function submitForgotPassword() {
+  const mail = (document.getElementById('forgot-mail')?.value || '').trim();
+  const errEl = document.getElementById('forgot-error');
+  const sucEl = document.getElementById('forgot-success');
+  errEl.style.display = 'none';
+  sucEl.style.display = 'none';
+
+  if (!isValidMail(mail)) {
+    errEl.textContent = 'Geçerli bir e-posta adresi girin.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.querySelector('#p-forgot-password .btn-reg');
+  if (btn) { btn.disabled = true; btn.textContent = 'Gönderiliyor...'; }
+
+  const { error } = await _sb.auth.resetPasswordForEmail(mail, {
+    redirectTo: window.location.origin + window.location.pathname + '#reset-password'
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Sıfırlama Bağlantısı Gönder'; }
+
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+  } else {
+    sucEl.textContent = mail + ' adresine şifre sıfırlama bağlantısı gönderildi. Lütfen e-postanızı kontrol edin.';
+    sucEl.style.display = 'block';
+    document.getElementById('forgot-mail').value = '';
+  }
+}
+async function submitResetPassword() {
+  const pw  = (document.getElementById('reset-pw')?.value || '').trim();
+  const pw2 = (document.getElementById('reset-pw2')?.value || '').trim();
+  const errEl = document.getElementById('reset-error');
+  errEl.style.display = 'none';
+
+  if (pw.length < 6) {
+    errEl.textContent = 'Şifre en az 6 karakter olmalıdır.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (pw !== pw2) {
+    errEl.textContent = 'Şifreler eşleşmiyor.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.querySelector('#p-reset-password .btn-reg');
+  if (btn) { btn.disabled = true; btn.textContent = 'Güncelleniyor...'; }
+
+  const { error } = await _sb.auth.updateUser({ password: pw });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Şifremi Güncelle'; }
+
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+  } else {
+    showToast('Şifre güncellendi', 'Yeni şifrenizle giriş yapabilirsiniz.', null, false);
+    go('login');
+  }
+}
+window.submitResetPassword = submitResetPassword;
+
 async function submitLogin() {
   const mail = (document.getElementById('l-mail')?.value || '').trim();
   const pw   = (document.getElementById('l-pw')?.value || '').trim();
@@ -4093,6 +4200,8 @@ async function submitLogin() {
   }
 
   const u = sessionToUser(data.session);
+  _memStore[USER_KEY] = JSON.stringify(u);
+  updateNav();
   document.getElementById('l-mail').value = '';
   document.getElementById('l-pw').value = '';
   showToast('Hoş geldiniz!', u.ad + ' ' + u.soyad + ' olarak giriş yapıldı.', u.role === 'seller' ? 'Satıcı' : 'Alıcı', false);
@@ -4153,6 +4262,13 @@ async function submitRegister(type) {
   if (error) {
     showToast('Hata', error.message.includes('already') ? 'Bu e-posta adresi zaten kayıtlı.' : error.message, null, true);
     return;
+  }
+
+  // Session hemen gelmediyse bekle
+  const session = data.session;
+  if (session) {
+    _memStore[USER_KEY] = JSON.stringify(sessionToUser(session));
+    updateNav();
   }
 
   showToast('Hoş geldiniz!', ad + ', hesabınız başarıyla oluşturuldu.', type === 'seller' ? 'Satıcı' : 'Alıcı', false);
