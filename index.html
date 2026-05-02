@@ -1239,7 +1239,16 @@ body {
 }
 
 .photo-drop:hover { border-color: var(--accent); background: rgba(201,74,30,.03); }
-.photo-drop.dragover { border-color: var(--accent); background: rgba(201,74,30,.06); }
+.inbox-item.unread { border-left: 3px solid var(--accent); background: rgba(201,74,30,.03); }
+.inbox-item.unread .inbox-title { font-weight: 700; }
+.notif-item { padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .15s; display: flex; gap: 10px; align-items: flex-start; }
+.notif-item:hover { background: var(--bg2); }
+.notif-item.unread { background: rgba(201,74,30,.04); border-left: 3px solid var(--accent); }
+.notif-item.unread .notif-title { font-weight: 600; }
+.notif-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-top: 5px; flex-shrink: 0; }
+.notif-dot.read { background: var(--border); }
+.notif-title { font-size: 13px; color: var(--text); margin-bottom: 2px; }
+.notif-sub { font-size: 11px; color: var(--muted); font-family: var(--mono); }
 .ilan-edit-btn { font-size:12px; font-family:var(--font); color:var(--accent); background:transparent; border:none; cursor:pointer; padding:4px 0; font-weight:500; }
 .ilan-edit-btn:hover { text-decoration:underline; }
 .photo-thumb { position:relative; border-radius:var(--radius); overflow:hidden; aspect-ratio:1; background:var(--bg2); }
@@ -2102,6 +2111,17 @@ body {
     <button class="nav-link" id="nav-buyer-dashboard-btn" style="display:none" onclick="goBuyerDashboard()">Alıcı Panelim</button>
   </div>
   <div class="nav-spacer"></div>
+  <button id="nav-notif-btn" style="display:none;position:relative;background:none;border:none;cursor:pointer;padding:6px;color:var(--text);margin-right:4px" onclick="toggleNotifPanel()">
+    <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a6 6 0 00-6 6v3l-1.5 2.5h15L16 11V8a6 6 0 00-6-6zM8.5 17a1.5 1.5 0 003 0"/></svg>
+    <span id="nav-notif-badge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;background:var(--accent);color:#fff;border-radius:8px;font-size:10px;font-family:var(--mono);font-weight:700;line-height:16px;text-align:center;padding:0 4px">0</span>
+  </button>
+  <div id="notif-panel" style="display:none;position:absolute;top:calc(var(--nav-h) - 4px);right:80px;width:320px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:1000;overflow:hidden">
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:13px;font-weight:600;color:var(--text)">Bildirimler</span>
+      <button onclick="markAllNotifsRead()" style="font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:var(--font)">Tümünü okundu say</button>
+    </div>
+    <div id="notif-list" style="max-height:320px;overflow-y:auto"></div>
+  </div>
   <div class="nav-actions" id="nav-actions">
     <button class="btn-ghost" id="btn-login">Üye Girişi</button>
     <button class="btn-accent" id="btn-register">Üye Ol</button>
@@ -2158,8 +2178,8 @@ body {
       <div class="section-label">Öne çıkan ilanlar</div>
     </div>
     <div class="cards-grid">
-      <div class="listing-card" onclick="go('detail-vidali')">
-        <div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div>
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div>
         <div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">GA 15 Vidalı Kompresör</div><div class="card-specs"><span class="spec-tag">15 kW</span><span class="spec-tag">2.4 m³/dk</span><span class="spec-tag">8 bar</span></div><div class="card-foot"><span class="card-price">₺ 185.000</span><span class="card-cta">Detay →</span></div></div>
       </div>
       <div class="listing-card" onclick="go('detail-vidali')">
@@ -2270,8 +2290,8 @@ body {
         <select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select>
       </div>
       <div class="cards-grid" id="komp-cards-grid">
-        <!-- Pistonlu -->
-        <div class="listing-card komp-card" data-tip="pistonlu" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Abac</div><div class="card-name">B6000 Pistonlu Kompresör</div><div class="card-specs"><span class="spec-tag">3 kW</span><span class="spec-tag">0.38 m³/dk</span><span class="spec-tag">10 bar</span></div><div class="card-foot"><span class="card-price">₺ 14.500</span><span class="card-cta">Detay →</span></div></div></div>
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div><div class="card-body"><div class="card-brand">Abac</div><div class="card-name">B6000 Pistonlu Kompresör</div><div class="card-specs"><span class="spec-tag">3 kW</span><span class="spec-tag">0.38 m³/dk</span><span class="spec-tag">10 bar</span></div><div class="card-foot"><span class="card-price">₺ 14.500</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card komp-card" data-tip="pistonlu" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-used">2. El</span></div><div class="card-body"><div class="card-brand">Fini</div><div class="card-name">Nuair VBY 200 Pistonlu</div><div class="card-specs"><span class="spec-tag">4 kW</span><span class="spec-tag">0.56 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 9.200</span><span class="card-cta">Detay →</span></div></div></div>
         <!-- Vidalı -->
         <div class="listing-card komp-card" data-tip="vidali" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">GA 15 Vidalı Kompresör</div><div class="card-specs"><span class="spec-tag">15 kW</span><span class="spec-tag">2.4 m³/dk</span><span class="spec-tag">8 bar</span></div><div class="card-foot"><span class="card-price">₺ 185.000</span><span class="card-cta">Detay →</span></div></div></div>
@@ -2348,7 +2368,8 @@ body {
         <select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select>
       </div>
       <div class="cards-grid">
-        <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">GA 15 Vidalı Kompresör</div><div class="card-specs"><span class="spec-tag">15 kW</span><span class="spec-tag">2.4 m³/dk</span><span class="spec-tag">8 bar</span></div><div class="card-foot"><span class="card-price">₺ 185.000</span><span class="card-cta">Detay →</span></div></div></div>
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">GA 15 Vidalı Kompresör</div><div class="card-specs"><span class="spec-tag">15 kW</span><span class="spec-tag">2.4 m³/dk</span><span class="spec-tag">8 bar</span></div><div class="card-foot"><span class="card-price">₺ 185.000</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-used">2. El</span></div><div class="card-body"><div class="card-brand">Kaeser</div><div class="card-name">SM 11 Vidalı Kompresör</div><div class="card-specs"><span class="spec-tag">11 kW</span><span class="spec-tag">1.6 m³/dk</span><span class="spec-tag">10 bar</span></div><div class="card-foot"><span class="card-price">₺ 72.000</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Ingersoll Rand</div><div class="card-name">R11i Paket Kompresör</div><div class="card-specs"><span class="spec-tag">11 kW</span><span class="spec-tag">1.5 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 148.500</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-used">2. El</span></div><div class="card-body"><div class="card-brand">CompAir</div><div class="card-name">L22 Vidalı Kompresör</div><div class="card-specs"><span class="spec-tag">22 kW</span><span class="spec-tag">3.5 m³/dk</span><span class="spec-tag">8 bar</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div>
@@ -2376,7 +2397,8 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Pistonlu Kompresörler</span><span class="listing-count">— 63 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select></div>
       <div class="cards-grid">
-        <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Abac</div><div class="card-name">B6000 Pistonlu Kompresör</div><div class="card-specs"><span class="spec-tag">3 kW</span><span class="spec-tag">0.38 m³/dk</span><span class="spec-tag">10 bar</span></div><div class="card-foot"><span class="card-price">₺ 14.500</span><span class="card-cta">Detay →</span></div></div></div>
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div><div class="card-body"><div class="card-brand">Abac</div><div class="card-name">B6000 Pistonlu Kompresör</div><div class="card-specs"><span class="spec-tag">3 kW</span><span class="spec-tag">0.38 m³/dk</span><span class="spec-tag">10 bar</span></div><div class="card-foot"><span class="card-price">₺ 14.500</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-used">2. El</span></div><div class="card-body"><div class="card-brand">Fini</div><div class="card-name">Nuair VBY 200</div><div class="card-specs"><span class="spec-tag">4 kW</span><span class="spec-tag">0.56 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 9.200</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Balma</div><div class="card-name">Shark 50 Pistonlu</div><div class="card-specs"><span class="spec-tag">2.2 kW</span><span class="spec-tag">0.26 m³/dk</span><span class="spec-tag">8 bar</span></div><div class="card-foot"><span class="card-price">₺ 8.800</span><span class="card-cta">Detay →</span></div></div></div>
       </div>
@@ -2388,21 +2410,27 @@ body {
 <div class="page" id="p-paletli">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Paletli Kompresörler</span></div>
   <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn active">Paletli</button><button class="sub-btn" onclick="go('turbo')">Turbo</button><button class="sub-btn" onclick="go('yagsiz')">Yağsız</button><button class="sub-btn teklif" onclick="go('komp-teklif')">+ Teklif Al</button></div>
-  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="0" max="25" value="10"><div class="f-range-row"><span>0</span><span>0–10 m³/dk</span><span>25</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="1" max="160" value="45"><div class="f-range-row"><span>1</span><span>1–45 kW</span><span>160</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Mattei</label><span class="f-count">12</span></div><div class="f-row"><input type="checkbox"><label>Diğer</label><span class="f-count">8</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Paletli Kompresörler</span><span class="listing-count">— 20 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div><div class="cards-grid"><div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Mattei</div><div class="card-name">Maxima 11 Paletli Kompresör</div><div class="card-specs"><span class="spec-tag">11 kW</span><span class="spec-tag">1.7 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 168.000</span><span class="card-cta">Detay →</span></div></div></div></div></div></div>
+  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="0" max="25" value="10"><div class="f-range-row"><span>0</span><span>0–10 m³/dk</span><span>25</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="1" max="160" value="45"><div class="f-range-row"><span>1</span><span>1–45 kW</span><span>160</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Mattei</label><span class="f-count">12</span></div><div class="f-row"><input type="checkbox"><label>Diğer</label><span class="f-count">8</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Paletli Kompresörler</span><span class="listing-count">— 20 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div><div class="cards-grid">
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div><div class="card-body"><div class="card-brand">Mattei</div><div class="card-name">Maxima 11 Paletli Kompresör</div><div class="card-specs"><span class="spec-tag">11 kW</span><span class="spec-tag">1.7 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 168.000</span><span class="card-cta">Detay →</span></div></div></div></div></div></div>
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <div class="page" id="p-turbo">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Turbo Kompresörler</span></div>
   <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn" onclick="go('paletli')">Paletli</button><button class="sub-btn active">Turbo</button><button class="sub-btn" onclick="go('yagsiz')">Yağsız</button><button class="sub-btn teklif" onclick="go('komp-teklif')">+ Teklif Al</button></div>
-  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="5" max="500" value="100"><div class="f-range-row"><span>5</span><span>5–100 m³/dk</span><span>500</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="30" max="1000" value="250"><div class="f-range-row"><span>30</span><span>30–250 kW</span><span>1000</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Atlas Copco</label><span class="f-count">6</span></div><div class="f-row"><input type="checkbox"><label>Siemens</label><span class="f-count">4</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Turbo Kompresörler</span><span class="listing-count">— 10 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div><div class="cards-grid"><div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">ZH 355 Turbo Kompresör</div><div class="card-specs"><span class="spec-tag">355 kW</span><span class="spec-tag">62 m³/dk</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div></div></div></div>
+  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="5" max="500" value="100"><div class="f-range-row"><span>5</span><span>5–100 m³/dk</span><span>500</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="30" max="1000" value="250"><div class="f-range-row"><span>30</span><span>30–250 kW</span><span>1000</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Atlas Copco</label><span class="f-count">6</span></div><div class="f-row"><input type="checkbox"><label>Siemens</label><span class="f-count">4</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Turbo Kompresörler</span><span class="listing-count">— 10 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div><div class="cards-grid">
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">ZH 355 Turbo Kompresör</div><div class="card-specs"><span class="spec-tag">355 kW</span><span class="spec-tag">62 m³/dk</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div></div></div></div>
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <div class="page" id="p-yagsiz">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Yağsız Kompresörler</span></div>
   <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn" onclick="go('paletli')">Paletli</button><button class="sub-btn" onclick="go('turbo')">Turbo</button><button class="sub-btn active">Yağsız</button><button class="sub-btn teklif" onclick="go('komp-teklif')">+ Teklif Al</button></div>
-  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="0" max="20" value="5"><div class="f-range-row"><span>0</span><span>0–5 m³/dk</span><span>20</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="1" max="200" value="30"><div class="f-range-row"><span>1</span><span>1–30 kW</span><span>200</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Atlas Copco</label><span class="f-count">9</span></div><div class="f-row"><input type="checkbox"><label>Ingersoll Rand</label><span class="f-count">5</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Yağsız Kompresörler</span><span class="listing-count">— 14 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div><div class="cards-grid"><div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">LFx 1.5 Yağsız Kompresör</div><div class="card-specs"><span class="spec-tag">1.5 kW</span><span class="spec-tag">0.14 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 42.000</span><span class="card-cta">Detay →</span></div></div></div></div></div></div>
+  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="0" max="20" value="5"><div class="f-range-row"><span>0</span><span>0–5 m³/dk</span><span>20</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="1" max="200" value="30"><div class="f-range-row"><span>1</span><span>1–30 kW</span><span>200</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Atlas Copco</label><span class="f-count">9</span></div><div class="f-row"><input type="checkbox"><label>Ingersoll Rand</label><span class="f-count">5</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Yağsız Kompresörler</span><span class="listing-count">— 14 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div><div class="cards-grid">
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">LFx 1.5 Yağsız Kompresör</div><div class="card-specs"><span class="spec-tag">1.5 kW</span><span class="spec-tag">0.14 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 42.000</span><span class="card-cta">Detay →</span></div></div></div></div></div></div>
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
@@ -2452,7 +2480,8 @@ body {
         <select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select>
       </div>
       <div class="cards-grid" id="kuru-cards-grid">
-        <div class="listing-card kuru-card" data-tip="gazli" onclick="go('detail-kurutucu')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Beko</div><div class="card-name">DFID 170 Soğutmalı Kurutucu</div><div class="card-specs"><span class="spec-tag">2.8 m³/dk</span><span class="spec-tag">R-410A</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div>
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div><div class="card-body"><div class="card-brand">Beko</div><div class="card-name">DFID 170 Soğutmalı Kurutucu</div><div class="card-specs"><span class="spec-tag">2.8 m³/dk</span><span class="spec-tag">R-410A</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card kuru-card" data-tip="gazli" onclick="go('detail-kurutucu')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">FD 60 Soğutmalı Kurutucu</div><div class="card-specs"><span class="spec-tag">9.5 m³/dk</span><span class="spec-tag">R-134a</span></div><div class="card-foot"><span class="card-price">₺ 38.000</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card kuru-card" data-tip="gazli" onclick="go('detail-kurutucu')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-used">2. El</span></div><div class="card-body"><div class="card-brand">Kaeser</div><div class="card-name">TD 51 Soğutmalı Kurutucu</div><div class="card-specs"><span class="spec-tag">8.5 m³/dk</span><span class="spec-tag">R-407C</span></div><div class="card-foot"><span class="card-price">₺ 22.000</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card kuru-card" data-tip="kimyasal" onclick="go('detail-kurutucu')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">CD 20+ Adsorpsiyonlu Kurutucu</div><div class="card-specs"><span class="spec-tag">2.1 m³/dk</span><span class="spec-tag">Silikajel</span></div><div class="card-foot"><span class="card-price">₺ 54.000</span><span class="card-cta">Detay →</span></div></div></div>
@@ -2479,7 +2508,8 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Gazlı Kurutucular</span><span class="listing-count">— 44 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
       <div class="cards-grid">
-        <div class="listing-card" onclick="go('detail-kurutucu')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Beko</div><div class="card-name">DFID 170 Soğutmalı Kurutucu</div><div class="card-specs"><span class="spec-tag">2.8 m³/dk</span><span class="spec-tag">R-410A</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div>
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div><div class="card-body"><div class="card-brand">Beko</div><div class="card-name">DFID 170 Soğutmalı Kurutucu</div><div class="card-specs"><span class="spec-tag">2.8 m³/dk</span><span class="spec-tag">R-410A</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-kurutucu')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">FD 60 Soğutmalı Kurutucu</div><div class="card-specs"><span class="spec-tag">9.5 m³/dk</span><span class="spec-tag">R-134a</span></div><div class="card-foot"><span class="card-price">₺ 38.000</span><span class="card-cta">Detay →</span></div></div></div>
       </div>
     </div>
@@ -2500,7 +2530,8 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Kimyasal Kurutucular</span><span class="listing-count">— 27 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
       <div class="cards-grid">
-        <div class="listing-card" onclick="go('detail-kurutucu')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">CD 20+ Adsorpsiyonlu Kurutucu</div><div class="card-specs"><span class="spec-tag">2.1 m³/dk</span><span class="spec-tag">Silikajel</span></div><div class="card-foot"><span class="card-price">₺ 54.000</span><span class="card-cta">Detay →</span></div></div></div>
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">CD 20+ Adsorpsiyonlu Kurutucu</div><div class="card-specs"><span class="spec-tag">2.1 m³/dk</span><span class="spec-tag">Silikajel</span></div><div class="card-foot"><span class="card-price">₺ 54.000</span><span class="card-cta">Detay →</span></div></div></div>
       </div>
     </div>
   </div>
@@ -2522,7 +2553,8 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Basınçlı Gazlar İçin Filtreler</span><span class="listing-count">— 58 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
       <div class="cards-grid">
-        <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">DD 62+ Kaba Filtre</div><div class="card-specs"><span class="spec-tag">10 m³/dk</span><span class="spec-tag">Kaba Filtre</span><span class="spec-tag">16 bar</span></div><div class="card-foot"><span class="card-price">₺ 6.800</span><span class="card-cta">Detay →</span></div></div></div>
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">DD 62+ Kaba Filtre</div><div class="card-specs"><span class="spec-tag">10 m³/dk</span><span class="spec-tag">Kaba Filtre</span><span class="spec-tag">16 bar</span></div><div class="card-foot"><span class="card-price">₺ 6.800</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Kaeser</div><div class="card-name">E-SFC 25 Aktif Karbon Filtre</div><div class="card-specs"><span class="spec-tag">4 m³/dk</span><span class="spec-tag">Aktif Karbon</span></div><div class="card-foot"><span class="card-price">₺ 9.200</span><span class="card-cta">Detay →</span></div></div></div>
       </div>
     </div>
@@ -2544,7 +2576,8 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Diğer Aksesuarlar</span><span class="listing-count">— 34 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
       <div class="cards-grid">
-        <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Parker</div><div class="card-name">Basınç Regülatörü 1/2"</div><div class="card-specs"><span class="spec-tag">16 bar</span><span class="spec-tag">Hava</span></div><div class="card-foot"><span class="card-price">₺ 1.200</span><span class="card-cta">Detay →</span></div></div></div>
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div><div class="card-body"><div class="card-brand">Parker</div><div class="card-name">Basınç Regülatörü 1/2"</div><div class="card-specs"><span class="spec-tag">16 bar</span><span class="spec-tag">Hava</span></div><div class="card-foot"><span class="card-price">₺ 1.200</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Festo</div><div class="card-name">Manuel Hava Kilidi 3/4"</div><div class="card-specs"><span class="spec-tag">10 bar</span></div><div class="card-foot"><span class="card-price">₺ 580</span><span class="card-cta">Detay →</span></div></div></div>
       </div>
     </div>
@@ -2566,7 +2599,8 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Endüstriyel Gaz Jeneratörleri</span><span class="listing-count">— 31 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
       <div class="cards-grid">
-        <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Parker</div><div class="card-name">Nitrogen Generator NG 35</div><div class="card-specs"><span class="spec-tag">Azot</span><span class="spec-tag">35 m³/saat</span><span class="spec-tag">99.9%</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div>
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div><div class="card-body"><div class="card-brand">Parker</div><div class="card-name">Nitrogen Generator NG 35</div><div class="card-specs"><span class="spec-tag">Azot</span><span class="spec-tag">35 m³/saat</span><span class="spec-tag">99.9%</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div>
       </div>
     </div>
   </div>
@@ -2607,7 +2641,8 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Yedek Parça</span><span class="listing-count">— 215 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
       <div class="cards-grid">
-        <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">Hava Filtresi 1614727400</div><div class="card-specs"><span class="spec-tag">OEM</span><span class="spec-tag">GA 11–22</span></div><div class="card-foot"><span class="card-price">₺ 1.450</span><span class="card-cta">Detay →</span></div></div></div>
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">Hava Filtresi 1614727400</div><div class="card-specs"><span class="spec-tag">OEM</span><span class="spec-tag">GA 11–22</span></div><div class="card-foot"><span class="card-price">₺ 1.450</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Kaeser</div><div class="card-name">Yağ Filtresi 6.4360.0</div><div class="card-specs"><span class="spec-tag">OEM</span><span class="spec-tag">SM / SK Serisi</span></div><div class="card-foot"><span class="card-price">₺ 820</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-used">Aftermarket</span></div><div class="card-body"><div class="card-brand">CompAir</div><div class="card-name">Separator Filtre 98262-114</div><div class="card-specs"><span class="spec-tag">Aftermarket</span><span class="spec-tag">L Series</span></div><div class="card-foot"><span class="card-price">₺ 2.100</span><span class="card-cta">Detay →</span></div></div></div>
       </div>
@@ -2810,7 +2845,8 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Tüm İlanlar</span><span class="listing-count">— 1.240 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select></div>
       <div class="cards-grid">
-        <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">GA 15 Vidalı Kompresör</div><div class="card-specs"><span class="spec-tag">15 kW</span><span class="spec-tag">2.4 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 185.000</span><span class="card-cta">Detay →</span></div></div></div>
+        <div style="padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;grid-column:1/-1">Henüz ilan bulunmuyor.</div>
+      </div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">GA 15 Vidalı Kompresör</div><div class="card-specs"><span class="spec-tag">15 kW</span><span class="spec-tag">2.4 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 185.000</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-kurutucu')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Beko</div><div class="card-name">DFID 170 Soğutmalı Kurutucu</div><div class="card-specs"><span class="spec-tag">2.8 m³/dk</span><span class="spec-tag">R-410A</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-used">2. El</span></div><div class="card-body"><div class="card-brand">Kaeser</div><div class="card-name">SM 11 Vidalı Kompresör</div><div class="card-specs"><span class="spec-tag">11 kW</span><span class="spec-tag">1.6 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 72.000</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Parker</div><div class="card-name">DD 62+ Kaba Filtre</div><div class="card-specs"><span class="spec-tag">10 m³/dk</span><span class="spec-tag">Filtre</span></div><div class="card-foot"><span class="card-price">₺ 6.800</span><span class="card-cta">Detay →</span></div></div></div>
@@ -3007,41 +3043,23 @@ body {
       <div id="dash-main">
         <div class="dash-head"><p class="dash-title">Genel Bakış</p><p class="dash-sub">Pnömatik Makine A.Ş. — Satıcı Hesabı</p></div>
         <div class="metrics-row">
-          <div class="metric-card"><p class="metric-lbl">Aktif İlan</p><p class="metric-val">24</p><p class="metric-delta">+3 bu ay</p></div>
-          <div class="metric-card"><p class="metric-lbl">İlan Görüntüleme</p><p class="metric-val">1.847</p><p class="metric-delta">+12% geçen ay</p></div>
+          <div class="metric-card"><p class="metric-lbl">Aktif İlan</p><p class="metric-val">0</p><p class="metric-delta" style="color:var(--muted)">Henüz ilan yok</p></div>
+          <div class="metric-card"><p class="metric-lbl">İlan Görüntüleme</p><p class="metric-val">0</p><p class="metric-delta" style="color:var(--muted)">Henüz ilan yok</p></div>
           <div class="metric-card" style="cursor:pointer" onclick="showDashFromCard('teklifler')"><p class="metric-lbl">Teklif İsteği</p><p class="metric-val" id="metric-teklif">4</p><p class="metric-delta">Son 7 günde</p></div>
-          <div class="metric-card"><p class="metric-lbl">Abonelik</p><p class="metric-val" style="font-size:16px">Aylık</p><p class="metric-delta" style="color:var(--muted)">₺ 990/ay</p></div>
+          <div class="metric-card"><p class="metric-lbl">Üyelik</p><p class="metric-val" style="font-size:16px">Satıcı</p><p class="metric-delta" style="color:var(--muted)">Ücretsiz</p></div>
         </div>
         <div class="dash-section">
           <div class="dash-section-head"><p class="dash-section-title">Son İlanlar</p><button class="btn-small" onclick="showDash('ilan-ver')">+ Yeni İlan</button></div>
-          <table class="ilan-table">
-            <thead><tr><th>İlan Başlığı</th><th>Kategori</th><th>Fiyat</th><th>Görüntüleme</th><th>Durum</th></tr></thead>
-            <tbody>
-              <tr><td>Atlas Copco GA 15 Vidalı</td><td>Vidalı Kompresör</td><td style="font-family:var(--mono)">₺ 185.000</td><td style="font-family:var(--mono)">342</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-              <tr><td>Kaeser SM 11 — 2. El</td><td>Vidalı Kompresör</td><td style="font-family:var(--mono)">₺ 72.000</td><td style="font-family:var(--mono)">218</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-              <tr><td>Beko DFID 170 Kurutucu</td><td>Gazlı Kurutucu</td><td style="font-family:var(--mono)">İletişim</td><td style="font-family:var(--mono)">155</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-              <tr><td>Atlas Copco DD 62+ Filtre</td><td>Filtre</td><td style="font-family:var(--mono)">₺ 6.800</td><td style="font-family:var(--mono)">88</td><td><span class="status-pill status-pending">Beklemede</span></td></tr>
-              <tr><td>V-Kayış Seti GA Serisi</td><td>Yedek Parça</td><td style="font-family:var(--mono)">₺ 1.200</td><td style="font-family:var(--mono)">44</td><td><span class="status-pill status-draft">Taslak</span></td></tr>
-            </tbody>
-          </table>
+          <div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">Henüz ilan bulunmuyor. <span style="color:var(--accent);cursor:pointer" onclick="showDash('ilan-ver')">İlan ver →</span></div>
         </div>
       </div>
 
       <!-- İlanlarım -->
       <div id="dash-ilanlarim" style="display:none">
-        <div class="dash-head"><p class="dash-title">İlanlarım</p><p class="dash-sub">24 aktif ilan</p></div>
+        <div class="dash-head"><p class="dash-title">İlanlarım</p><p class="dash-sub">İlanlarınız</p></div>
         <div class="dash-section">
           <div class="dash-section-head"><p class="dash-section-title">Tüm İlanlar</p><button class="btn-small" onclick="showDash('ilan-ver')">+ Yeni İlan</button></div>
-          <table class="ilan-table">
-            <thead><tr><th>İlan Başlığı</th><th>Kategori</th><th>Fiyat</th><th>Görüntüleme</th><th>Durum</th><th></th></tr></thead>
-            <tbody>
-              <tr><td>Atlas Copco GA 15 Vidalı</td><td>Vidalı Kompresör</td><td style="font-family:var(--mono)">₺ 185.000</td><td style="font-family:var(--mono)">342</td><td><span class="status-pill status-active">Aktif</span></td><td><button class="ilan-edit-btn" data-title="Atlas Copco GA 15 Vidalı" data-kategori="Vidalı Kompresör" data-fiyat="185000" data-durum="aktif">Düzenle</button></td></tr>
-              <tr><td>Kaeser SM 11 — 2. El</td><td>Vidalı Kompresör</td><td style="font-family:var(--mono)">₺ 72.000</td><td style="font-family:var(--mono)">218</td><td><span class="status-pill status-active">Aktif</span></td><td><button class="ilan-edit-btn" data-title="Kaeser SM 11 — 2. El" data-kategori="Vidalı Kompresör" data-fiyat="72000" data-durum="aktif">Düzenle</button></td></tr>
-              <tr><td>Beko DFID 170 Kurutucu</td><td>Gazlı Kurutucu</td><td style="font-family:var(--mono)">İletişim</td><td style="font-family:var(--mono)">155</td><td><span class="status-pill status-active">Aktif</span></td><td><button class="ilan-edit-btn" data-title="Beko DFID 170 Kurutucu" data-kategori="Gazlı Kurutucu" data-fiyat="" data-durum="aktif">Düzenle</button></td></tr>
-              <tr><td>Atlas Copco DD 62+ Filtre</td><td>Filtre</td><td style="font-family:var(--mono)">₺ 6.800</td><td style="font-family:var(--mono)">88</td><td><span class="status-pill status-pending">Beklemede</span></td><td><button class="ilan-edit-btn" data-title="Atlas Copco DD 62+ Filtre" data-kategori="Filtre" data-fiyat="6800" data-durum="beklemede">Düzenle</button></td></tr>
-              <tr><td>V-Kayış Seti GA Serisi</td><td>Yedek Parça</td><td style="font-family:var(--mono)">₺ 1.200</td><td style="font-family:var(--mono)">44</td><td><span class="status-pill status-draft">Taslak</span></td><td><button class="ilan-edit-btn" data-title="V-Kayış Seti GA Serisi" data-kategori="Yedek Parça" data-fiyat="1200" data-durum="taslak">Düzenle</button></td></tr>
-            </tbody>
-          </table>
+          <div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">Henüz ilan bulunmuyor. <span style="color:var(--accent);cursor:pointer" onclick="showDash('ilan-ver')">İlan ver →</span></div>
         </div>
       </div>
 
@@ -3546,24 +3564,6 @@ function showDashFromCard(section) {
 const TEKLIF_KEY = 'km_teklifler_v1';
 
 // Önceden simüle edilmiş 4 örnek (sayaç ilk açılışta 4 olsun)
-const SEED_TEKLIFLER = [
-  {id:'seed-1', kategori:'komp', kategoriLabel:'Kompresör', baslik:'Kompresör Teklif İsteği',
-    fields:{Tip:'Vidalı', Kapasite:'4.5 m³/dk', Güç:'30 kW', Basınç:'8 bar'},
-    aciklama:'Tekstil fabrikası için sürekli çalışacak kompresör. Yedek parça desteği önemli.',
-    iletisim:'aliveli@tekstil.com', tarih:Date.now()-1000*60*60*24*2, okundu:false},
-  {id:'seed-2', kategori:'kuru', kategoriLabel:'Kurutucu', baslik:'Kurutucu Teklif İsteği',
-    fields:{Tip:'Gazlı (Soğutmalı)', Kapasite:'3.0 m³/dk'},
-    aciklama:'Mevcut Atlas Copco GA 22 ile uyumlu, +3°C çiy noktası yeterli.',
-    iletisim:'satinalma@otomotiv.com.tr', tarih:Date.now()-1000*60*60*24*4, okundu:false},
-  {id:'seed-3', kategori:'borulama', kategoriLabel:'Borulama', baslik:'Basınçlı Gaz Borulama Teklif İsteği',
-    fields:{Konum:'Kocaeli, Gebze OSB', Boru:'DN50 / 180 m', Basınç:'8 bar', Gaz:'Basınçlı hava'},
-    aciklama:'Yeni hat çekilecek, mevcut kompresör odasından üretim alanına. Anahtar teslim.',
-    iletisim:'+90 532 000 00 00', tarih:Date.now()-1000*60*60*24*5, okundu:false},
-  {id:'seed-4', kategori:'servis', kategoriLabel:'Servis', baslik:'Servis Teklif İsteği',
-    fields:{Tip:'Arıza Onarımı', Ekipman:'Kaeser SM 11 (2017)', Konum:'Bursa, Nilüfer OSB'},
-    aciklama:'Aşırı ısınma uyarısı veriyor, acil bakım gerekiyor.',
-    iletisim:'mehmet@yedekparca.com', tarih:Date.now()-1000*60*60*24*6, okundu:false}
-];
 
 async function loadTeklifler() {
   const { data, error } = await _sb
@@ -3571,7 +3571,7 @@ async function loadTeklifler() {
     .select('*')
     .order('created_at', { ascending: false });
 
-  if (error || !data?.length) return SEED_TEKLIFLER.slice();
+  if (error || !data?.length) return [];
 
   // Alıcı profillerini çek
   const userIds = [...new Set(data.map(x => x.user_id).filter(Boolean))];
@@ -4487,6 +4487,8 @@ function updateNav() {
   if (buyerDashBtn) buyerDashBtn.style.display = (u && u.verified && u.role === 'buyer') ? 'inline-flex' : 'none';
 
   if (u && u.verified) {
+    loadNotifications();
+    subscribeToNotifications();
     // Giriş yapılmış: login/register/demo butonlarını gizle
     const bl = document.getElementById('btn-login');
     const br = document.getElementById('btn-register');
@@ -4566,6 +4568,9 @@ async function logout() {
   closeUserMenu();
   await _sb.auth.signOut();
   clearUser();
+  _notifications = [];
+  if (_notifSubscription) { _notifSubscription.unsubscribe(); _notifSubscription = null; }
+  updateNotifBadge();
   updateNav();
   showToast('Çıkış yapıldı', 'Hesabınızdan başarıyla çıkış yaptınız.', null, false);
   go('home');
@@ -4623,6 +4628,106 @@ function filterKomp(tip, btn) {
 }
 window.filterKomp = filterKomp;
 
+
+// ===== BİLDİRİM SİSTEMİ =====
+var _notifications = [];
+var _notifSubscription = null;
+
+async function loadNotifications() {
+  const u = loadUser();
+  if (!u) return;
+  _notifications = [];
+
+  if (u.role === 'seller') {
+    const { data: offers } = await _sb.from('offers').select('id, baslik, created_at').order('created_at', { ascending: false }).limit(20);
+    if (offers) offers.forEach(o => {
+      _notifications.push({ id: 'offer-'+o.id, type: 'offer', title: 'Yeni Teklif İsteği', sub: o.baslik, time: o.created_at, read: false,
+        action: () => { go('dashboard'); setTimeout(() => showDash('inbox'), 100); }
+      });
+    });
+  }
+
+  const { data: convs } = await _sb.from('conversations').select('id, listing_title').or(`buyer_id.eq.${u.id},seller_id.eq.${u.id}`);
+  if (convs?.length) {
+    const { data: msgs } = await _sb.from('messages').select('id, content, created_at, sender_id, conversation_id')
+      .in('conversation_id', convs.map(c => c.id))
+      .neq('sender_id', u.id)
+      .order('created_at', { ascending: false }).limit(20);
+    if (msgs) msgs.forEach(m => {
+      _notifications.push({ id: 'msg-'+m.id, type: 'message', title: 'Yeni Mesaj', sub: m.content.slice(0,60)+(m.content.length>60?'…':''), time: m.created_at, read: false,
+        action: () => { if (u.role === 'seller') { go('dashboard'); setTimeout(() => showDash('inbox'), 100); } else goBuyerDashboard(); }
+      });
+    });
+  }
+
+  _notifications.sort((a, b) => new Date(b.time) - new Date(a.time));
+  renderNotifPanel();
+  updateNotifBadge();
+}
+
+function renderNotifPanel() {
+  const list = document.getElementById('notif-list');
+  if (!list) return;
+  if (!_notifications.length) {
+    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Bildirim yok</div>';
+    return;
+  }
+  list.innerHTML = _notifications.slice(0,15).map((n, i) => `
+    <div class="notif-item ${n.read?'':'unread'}" onclick="clickNotif(${i})">
+      <div class="notif-dot ${n.read?'read':''}"></div>
+      <div>
+        <div class="notif-title">${escapeHtml(n.title)}</div>
+        <div class="notif-sub">${escapeHtml(n.sub)} • ${timeAgo(new Date(n.time))}</div>
+      </div>
+    </div>`).join('');
+}
+
+function updateNotifBadge() {
+  const u = loadUser();
+  const btn = document.getElementById('nav-notif-btn');
+  const badge = document.getElementById('nav-notif-badge');
+  if (!btn || !badge) return;
+  if (!u) { btn.style.display = 'none'; return; }
+  btn.style.display = 'flex';
+  const count = _notifications.filter(n => !n.read).length;
+  badge.textContent = count > 99 ? '99+' : count;
+  badge.style.display = count > 0 ? 'inline-block' : 'none';
+}
+
+function toggleNotifPanel() {
+  const panel = document.getElementById('notif-panel');
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) renderNotifPanel();
+}
+
+function clickNotif(idx) {
+  _notifications[idx].read = true;
+  document.getElementById('notif-panel').style.display = 'none';
+  renderNotifPanel();
+  updateNotifBadge();
+  if (_notifications[idx].action) _notifications[idx].action();
+}
+
+function markAllNotifsRead() {
+  _notifications.forEach(n => n.read = true);
+  renderNotifPanel();
+  updateNotifBadge();
+}
+
+function subscribeToNotifications() {
+  const u = loadUser();
+  if (!u || _notifSubscription) return;
+  _notifSubscription = _sb.channel('notif-' + u.id)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'offers' }, () => loadNotifications())
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, () => loadNotifications())
+    .subscribe();
+}
+
+window.toggleNotifPanel = toggleNotifPanel;
+window.clickNotif = clickNotif;
+window.markAllNotifsRead = markAllNotifsRead;
 
 function applyFilters(btn) {
   const panel = btn.closest('.filter-panel');
