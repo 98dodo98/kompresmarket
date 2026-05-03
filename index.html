@@ -143,7 +143,8 @@ body {
 .btn-accent:hover { background: var(--accent2); }
 
 /* ========== PAGE SYSTEM ========== */
-.page { display: none; }
+.page { display: none !important; }
+.page.active { display: block !important; }
 .page.active { display: block; }
 
 /* ========== HERO ========== */
@@ -1240,6 +1241,16 @@ body {
 
 .photo-drop:hover { border-color: var(--accent); background: rgba(201,74,30,.03); }
 .photo-drop.dragover { border-color: var(--accent); background: rgba(201,74,30,.06); }
+.notif-item { padding: 12px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background .15s; display: flex; gap: 10px; align-items: flex-start; }
+.notif-item:hover { background: var(--bg2); }
+.notif-item.unread { background: rgba(201,74,30,.04); border-left: 3px solid var(--accent); }
+.notif-item.unread .notif-title { font-weight: 600; }
+.notif-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-top: 5px; flex-shrink: 0; }
+.notif-dot.read { background: var(--border); }
+.notif-title { font-size: 13px; color: var(--text); margin-bottom: 2px; }
+.notif-sub { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+.inbox-item.unread { border-left: 3px solid var(--accent); background: rgba(201,74,30,.03); }
+.inbox-item.unread .inbox-title { font-weight: 700; }
 .ilan-edit-btn { font-size:12px; font-family:var(--font); color:var(--accent); background:transparent; border:none; cursor:pointer; padding:4px 0; font-weight:500; }
 .ilan-edit-btn:hover { text-decoration:underline; }
 .photo-thumb { position:relative; border-radius:var(--radius); overflow:hidden; aspect-ratio:1; background:var(--bg2); }
@@ -1996,11 +2007,13 @@ body {
   .cat-btn { font-size: 12px; padding: 8px 12px; white-space: nowrap; flex-shrink: 0; }
 
   /* Listing */
-  .listing-wrap { flex-direction: column; gap: 0; }
-  .filter-panel { width: 100%; border-right: none; border-bottom: 1px solid var(--border); padding: 16px; }
-  .listing-main { padding: 16px; }
+  .listing-wrap { display: flex !important; flex-direction: column; gap: 0; }
+  .filter-panel { width: 100% !important; border-right: none; border-bottom: 1px solid var(--border); padding: 14px 16px; position: static; max-height: none; overflow: visible; }
+  .filter-panel .f-range { width: 100%; }
+  .listing-main { padding: 12px 16px; }
   .cards-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
   .listing-header { flex-direction: column; gap: 8px; align-items: flex-start; }
+  .listing-sort { width: 100%; }
 
   /* Cards */
   .listing-card .card-thumb { height: 120px; }
@@ -2009,10 +2022,18 @@ body {
   .spec-tag { font-size: 10px; padding: 2px 6px; }
 
   /* Detail sayfası */
-  .detail-wrap { flex-direction: column; padding: 16px; gap: 16px; }
-  .detail-main { min-width: 0; }
-  .detail-aside { width: 100%; position: static; }
-  .gallery-main { height: 220px; }
+  .detail-layout { grid-template-columns: 1fr !important; padding: 12px !important; gap: 12px; }
+  .detail-right { width: 100%; }
+  .detail-img { height: 200px; margin-bottom: 12px; }
+  .spec-row { flex-wrap: wrap; gap: 4px; }
+  .spec-k { font-size: 12px; }
+  .spec-v { font-size: 12px; text-align: right; }
+  .price-card { padding: 14px; }
+  .price-val { font-size: 28px !important; }
+  .btn-contact-main { width: 100%; }
+  .btn-save-list { width: 100%; }
+  .seller-card { padding: 14px; }
+  .detail-back { padding: 10px 16px; font-size: 13px; }
 
   /* Dashboard */
   .dashboard-wrap { grid-template-columns: 1fr; }
@@ -2064,6 +2085,10 @@ body {
   .metrics-row { grid-template-columns: 1fr !important; }
   .hero-title { font-size: 26px; }
   .cat-grid { grid-template-columns: 1fr 1fr; }
+  .detail-layout { padding: 10px !important; }
+  .spec-v { max-width: 55%; word-break: break-word; }
+  .listing-card .card-thumb { height: 140px; }
+  .card-price { font-size: 14px; }
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -2088,6 +2113,17 @@ body {
     <button class="nav-link" id="nav-buyer-dashboard-btn" style="display:none" onclick="goBuyerDashboard()">Alıcı Panelim</button>
   </div>
   <div class="nav-spacer"></div>
+  <button id="nav-notif-btn" style="display:none;position:relative;background:none;border:none;cursor:pointer;padding:6px;color:var(--text);margin-right:4px" onclick="toggleNotifPanel()">
+    <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a6 6 0 00-6 6v3l-1.5 2.5h15L16 11V8a6 6 0 00-6-6zM8.5 17a1.5 1.5 0 003 0"/></svg>
+    <span id="nav-notif-badge" style="display:none;position:absolute;top:2px;right:2px;min-width:16px;height:16px;background:var(--accent);color:#fff;border-radius:8px;font-size:10px;font-family:var(--mono);font-weight:700;line-height:16px;text-align:center;padding:0 4px">0</span>
+  </button>
+  <div id="notif-panel" style="display:none;position:absolute;top:calc(var(--nav-h) - 4px);right:80px;width:320px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,.12);z-index:1000;overflow:hidden">
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:13px;font-weight:600;color:var(--text)">Bildirimler</span>
+      <button onclick="markAllNotifsRead()" style="font-size:11px;color:var(--accent);background:none;border:none;cursor:pointer;font-family:var(--font)">Tümünü okundu say</button>
+    </div>
+    <div id="notif-list" style="max-height:320px;overflow-y:auto"></div>
+  </div>
   <div class="nav-actions" id="nav-actions">
     <button class="btn-ghost" id="btn-login">Üye Girişi</button>
     <button class="btn-accent" id="btn-register">Üye Ol</button>
@@ -2172,7 +2208,7 @@ body {
       <div class="section-title">İki taraf için de basit bir süreç</div>
     </div>
     <div class="how-grid">
-      <div class="how-card"><div class="how-num">01</div><div class="how-title">Üye ol</div><div class="how-desc">Alıcılar ücretsiz kayıt olur. Satıcılar aylık abonelik ile sınırsız ilan verebilir.</div></div>
+      <div class="how-card"><div class="how-num">01</div><div class="how-title">Üye ol</div><div class="how-desc">Alıcılar ve satıcılar ücretsiz kayıt olur. Sınırsız ilan verebilir, teklif alabilirsiniz.</div></div>
       <div class="how-card"><div class="how-num">02</div><div class="how-title">İlan ver veya ara</div><div class="how-desc">Satıcılar kategoriye göre detaylı ilan oluşturur. Alıcılar filtrelerle hızlı arama yapar.</div></div>
       <div class="how-card"><div class="how-num">03</div><div class="how-title">Teklif al</div><div class="how-desc">Standart ürün bulamazsanız teklif isteği oluşturun, tüm satıcılara bildirim gitsin.</div></div>
       <div class="how-card"><div class="how-num">04</div><div class="how-title">Doğrudan iletişim</div><div class="how-desc">Komisyon yok. Alıcı ile satıcı doğrudan iletişim kurar, anlaşmayı kendi yapar.</div></div>
@@ -2251,7 +2287,7 @@ body {
       <div class="listing-header">
         <div class="listing-title-row">
           <span class="listing-title" id="komp-list-title">Tüm Kompresörler</span>
-          <span class="listing-count" id="komp-list-count">— 248 ilan</span>
+          <span class="listing-count" id="komp-list-count">— 0 ilan</span>
         </div>
         <select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select>
       </div>
@@ -2330,7 +2366,7 @@ body {
     </div>
     <div class="listing-main">
       <div class="listing-header">
-        <div class="listing-title-row"><span class="listing-title">Vidalı Kompresörler</span><span class="listing-count">— 141 ilan</span></div>
+        <div class="listing-title-row"><span class="listing-title">Vidalı Kompresörler</span><span class="listing-count">— 0 ilan</span></div>
         <select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select>
       </div>
       <div class="cards-grid">
@@ -2360,7 +2396,7 @@ body {
       <button class="f-apply">Uygula</button>
     </div>
     <div class="listing-main">
-      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Pistonlu Kompresörler</span><span class="listing-count">— 63 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select></div>
+      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Pistonlu Kompresörler</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select></div>
       <div class="cards-grid">
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Abac</div><div class="card-name">B6000 Pistonlu Kompresör</div><div class="card-specs"><span class="spec-tag">3 kW</span><span class="spec-tag">0.38 m³/dk</span><span class="spec-tag">10 bar</span></div><div class="card-foot"><span class="card-price">₺ 14.500</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-used">2. El</span></div><div class="card-body"><div class="card-brand">Fini</div><div class="card-name">Nuair VBY 200</div><div class="card-specs"><span class="spec-tag">4 kW</span><span class="spec-tag">0.56 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 9.200</span><span class="card-cta">Detay →</span></div></div></div>
@@ -2374,21 +2410,21 @@ body {
 <div class="page" id="p-paletli">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Paletli Kompresörler</span></div>
   <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn active">Paletli</button><button class="sub-btn" onclick="go('turbo')">Turbo</button><button class="sub-btn" onclick="go('yagsiz')">Yağsız</button><button class="sub-btn teklif" onclick="go('komp-teklif')">+ Teklif Al</button></div>
-  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="0" max="25" value="10"><div class="f-range-row"><span>0</span><span>0–10 m³/dk</span><span>25</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="1" max="160" value="45"><div class="f-range-row"><span>1</span><span>1–45 kW</span><span>160</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Mattei</label><span class="f-count">12</span></div><div class="f-row"><input type="checkbox"><label>Diğer</label><span class="f-count">8</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Paletli Kompresörler</span><span class="listing-count">— 20 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div><div class="cards-grid"><div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Mattei</div><div class="card-name">Maxima 11 Paletli Kompresör</div><div class="card-specs"><span class="spec-tag">11 kW</span><span class="spec-tag">1.7 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 168.000</span><span class="card-cta">Detay →</span></div></div></div></div></div></div>
+  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="0" max="25" value="10"><div class="f-range-row"><span>0</span><span>0–10 m³/dk</span><span>25</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="1" max="160" value="45"><div class="f-range-row"><span>1</span><span>1–45 kW</span><span>160</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Mattei</label><span class="f-count">12</span></div><div class="f-row"><input type="checkbox"><label>Diğer</label><span class="f-count">8</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Paletli Kompresörler</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div><div class="cards-grid"><div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Mattei</div><div class="card-name">Maxima 11 Paletli Kompresör</div><div class="card-specs"><span class="spec-tag">11 kW</span><span class="spec-tag">1.7 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 168.000</span><span class="card-cta">Detay →</span></div></div></div></div></div></div>
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <div class="page" id="p-turbo">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Turbo Kompresörler</span></div>
   <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn" onclick="go('paletli')">Paletli</button><button class="sub-btn active">Turbo</button><button class="sub-btn" onclick="go('yagsiz')">Yağsız</button><button class="sub-btn teklif" onclick="go('komp-teklif')">+ Teklif Al</button></div>
-  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="5" max="500" value="100"><div class="f-range-row"><span>5</span><span>5–100 m³/dk</span><span>500</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="30" max="1000" value="250"><div class="f-range-row"><span>30</span><span>30–250 kW</span><span>1000</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Atlas Copco</label><span class="f-count">6</span></div><div class="f-row"><input type="checkbox"><label>Siemens</label><span class="f-count">4</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Turbo Kompresörler</span><span class="listing-count">— 10 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div><div class="cards-grid"><div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">ZH 355 Turbo Kompresör</div><div class="card-specs"><span class="spec-tag">355 kW</span><span class="spec-tag">62 m³/dk</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div></div></div></div>
+  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="5" max="500" value="100"><div class="f-range-row"><span>5</span><span>5–100 m³/dk</span><span>500</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="30" max="1000" value="250"><div class="f-range-row"><span>30</span><span>30–250 kW</span><span>1000</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Atlas Copco</label><span class="f-count">6</span></div><div class="f-row"><input type="checkbox"><label>Siemens</label><span class="f-count">4</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Turbo Kompresörler</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div><div class="cards-grid"><div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">ZH 355 Turbo Kompresör</div><div class="card-specs"><span class="spec-tag">355 kW</span><span class="spec-tag">62 m³/dk</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div></div></div></div>
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <div class="page" id="p-yagsiz">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Yağsız Kompresörler</span></div>
   <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn" onclick="go('paletli')">Paletli</button><button class="sub-btn" onclick="go('turbo')">Turbo</button><button class="sub-btn active">Yağsız</button><button class="sub-btn teklif" onclick="go('komp-teklif')">+ Teklif Al</button></div>
-  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="0" max="20" value="5"><div class="f-range-row"><span>0</span><span>0–5 m³/dk</span><span>20</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="1" max="200" value="30"><div class="f-range-row"><span>1</span><span>1–30 kW</span><span>200</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Atlas Copco</label><span class="f-count">9</span></div><div class="f-row"><input type="checkbox"><label>Ingersoll Rand</label><span class="f-count">5</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Yağsız Kompresörler</span><span class="listing-count">— 14 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div><div class="cards-grid"><div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">LFx 1.5 Yağsız Kompresör</div><div class="card-specs"><span class="spec-tag">1.5 kW</span><span class="spec-tag">0.14 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 42.000</span><span class="card-cta">Detay →</span></div></div></div></div></div></div>
+  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="0" max="20" value="5"><div class="f-range-row"><span>0</span><span>0–5 m³/dk</span><span>20</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="1" max="200" value="30"><div class="f-range-row"><span>1</span><span>1–30 kW</span><span>200</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Atlas Copco</label><span class="f-count">9</span></div><div class="f-row"><input type="checkbox"><label>Ingersoll Rand</label><span class="f-count">5</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Yağsız Kompresörler</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div><div class="cards-grid"><div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">LFx 1.5 Yağsız Kompresör</div><div class="card-specs"><span class="spec-tag">1.5 kW</span><span class="spec-tag">0.14 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 42.000</span><span class="card-cta">Detay →</span></div></div></div></div></div></div>
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
@@ -2433,7 +2469,7 @@ body {
       <div class="listing-header">
         <div class="listing-title-row">
           <span class="listing-title" id="kuru-list-title">Tüm Kurutucular</span>
-          <span class="listing-count" id="kuru-list-count">— 71 ilan</span>
+          <span class="listing-count" id="kuru-list-count">— 0 ilan</span>
         </div>
         <select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select>
       </div>
@@ -2463,7 +2499,7 @@ body {
       <button class="f-apply">Uygula</button>
     </div>
     <div class="listing-main">
-      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Gazlı Kurutucular</span><span class="listing-count">— 44 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
+      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Gazlı Kurutucular</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
       <div class="cards-grid">
         <div class="listing-card" onclick="go('detail-kurutucu')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Beko</div><div class="card-name">DFID 170 Soğutmalı Kurutucu</div><div class="card-specs"><span class="spec-tag">2.8 m³/dk</span><span class="spec-tag">R-410A</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-kurutucu')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">FD 60 Soğutmalı Kurutucu</div><div class="card-specs"><span class="spec-tag">9.5 m³/dk</span><span class="spec-tag">R-134a</span></div><div class="card-foot"><span class="card-price">₺ 38.000</span><span class="card-cta">Detay →</span></div></div></div>
@@ -2484,7 +2520,7 @@ body {
       <button class="f-apply">Uygula</button>
     </div>
     <div class="listing-main">
-      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Kimyasal Kurutucular</span><span class="listing-count">— 27 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
+      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Kimyasal Kurutucular</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
       <div class="cards-grid">
         <div class="listing-card" onclick="go('detail-kurutucu')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">CD 20+ Adsorpsiyonlu Kurutucu</div><div class="card-specs"><span class="spec-tag">2.1 m³/dk</span><span class="spec-tag">Silikajel</span></div><div class="card-foot"><span class="card-price">₺ 54.000</span><span class="card-cta">Detay →</span></div></div></div>
       </div>
@@ -2506,7 +2542,7 @@ body {
       <button class="f-apply">Uygula</button>
     </div>
     <div class="listing-main">
-      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Basınçlı Gazlar İçin Filtreler</span><span class="listing-count">— 58 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
+      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Basınçlı Gazlar İçin Filtreler</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
       <div class="cards-grid">
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">DD 62+ Kaba Filtre</div><div class="card-specs"><span class="spec-tag">10 m³/dk</span><span class="spec-tag">Kaba Filtre</span><span class="spec-tag">16 bar</span></div><div class="card-foot"><span class="card-price">₺ 6.800</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Kaeser</div><div class="card-name">E-SFC 25 Aktif Karbon Filtre</div><div class="card-specs"><span class="spec-tag">4 m³/dk</span><span class="spec-tag">Aktif Karbon</span></div><div class="card-foot"><span class="card-price">₺ 9.200</span><span class="card-cta">Detay →</span></div></div></div>
@@ -2528,7 +2564,7 @@ body {
       <button class="f-apply">Uygula</button>
     </div>
     <div class="listing-main">
-      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Diğer Aksesuarlar</span><span class="listing-count">— 34 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
+      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Diğer Aksesuarlar</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
       <div class="cards-grid">
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Parker</div><div class="card-name">Basınç Regülatörü 1/2"</div><div class="card-specs"><span class="spec-tag">16 bar</span><span class="spec-tag">Hava</span></div><div class="card-foot"><span class="card-price">₺ 1.200</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Festo</div><div class="card-name">Manuel Hava Kilidi 3/4"</div><div class="card-specs"><span class="spec-tag">10 bar</span></div><div class="card-foot"><span class="card-price">₺ 580</span><span class="card-cta">Detay →</span></div></div></div>
@@ -2550,7 +2586,7 @@ body {
       <button class="f-apply">Uygula</button>
     </div>
     <div class="listing-main">
-      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Endüstriyel Gaz Jeneratörleri</span><span class="listing-count">— 31 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
+      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Endüstriyel Gaz Jeneratörleri</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
       <div class="cards-grid">
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Parker</div><div class="card-name">Nitrogen Generator NG 35</div><div class="card-specs"><span class="spec-tag">Azot</span><span class="spec-tag">35 m³/saat</span><span class="spec-tag">99.9%</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div>
       </div>
@@ -2591,7 +2627,7 @@ body {
       <button class="f-apply">Uygula</button>
     </div>
     <div class="listing-main">
-      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Yedek Parça</span><span class="listing-count">— 215 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
+      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Yedek Parça</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
       <div class="cards-grid">
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">Hava Filtresi 1614727400</div><div class="card-specs"><span class="spec-tag">OEM</span><span class="spec-tag">GA 11–22</span></div><div class="card-foot"><span class="card-price">₺ 1.450</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Kaeser</div><div class="card-name">Yağ Filtresi 6.4360.0</div><div class="card-specs"><span class="spec-tag">OEM</span><span class="spec-tag">SM / SK Serisi</span></div><div class="card-foot"><span class="card-price">₺ 820</span><span class="card-cta">Detay →</span></div></div></div>
@@ -2617,7 +2653,7 @@ body {
           <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
           <div class="field"><label>Detaylı Açıklama</label><textarea class="teklif-area" data-k="Açıklama" placeholder="Projenizle ilgili detayları, tercihlerinizi ve varsa özel koşulları buraya yazın..."></textarea></div>
           <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Bu teklif isteği, platformdaki tüm ücretli satıcılara bildirim olarak iletilecektir. Satıcılar size doğrudan ulaşacaktır.</span></div>
-          <button class="btn-teklif" onclick="submitTeklif('borulama','Borulama','form-borulama','Basınçlı Gaz Borulama')">Teklif İsteği Oluştur</button>
+          <button class="btn-teklif" data-kategori="borulama" data-label="Borulama" data-form="form-borulama" data-baslik="Basınçlı Gaz Borulama">Teklif İsteği Oluştur</button>
         </div>
       </div>
     </div>
@@ -2638,7 +2674,7 @@ body {
           <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
           <div class="field"><label>Detaylı Açıklama</label><textarea class="teklif-area" data-k="Açıklama" placeholder="Serbest yazın: montaj gereksinimleri, mevcut enerji altyapısı, tercihler..."></textarea></div>
           <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Tüm ücretli satıcılara bildirim gönderilir. Komisyon alınmaz.</span></div>
-          <button class="btn-teklif" onclick="submitTeklif('komp','Kompresör','form-komp','Kompresör')">Teklif İsteği Oluştur</button>
+          <button class="btn-teklif" data-kategori="komp" data-label="Kompresör" data-form="form-komp" data-baslik="Kompresör">Teklif İsteği Oluştur</button>
         </div>
       </div>
     </div>
@@ -2658,7 +2694,7 @@ body {
           <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
           <div class="field"><label>Detaylı Açıklama</label><textarea class="teklif-area" data-k="Açıklama" placeholder="Çalışma sıcaklığı, basıncı, kullanım amacı, mevcut kompresör modeli vb..."></textarea></div>
           <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Tüm ücretli satıcılara bildirim gönderilir.</span></div>
-          <button class="btn-teklif" onclick="submitTeklif('kuru','Kurutucu','form-kuru','Kurutucu')">Teklif İsteği Oluştur</button>
+          <button class="btn-teklif" data-kategori="kuru" data-label="Kurutucu" data-form="form-kuru" data-baslik="Kurutucu">Teklif İsteği Oluştur</button>
         </div>
       </div>
     </div>
@@ -2680,7 +2716,7 @@ body {
           <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
           <div class="field"><label>İhtiyaç Açıklaması</label><textarea class="teklif-area" data-k="Açıklama" rows="5" placeholder="İstediğiniz gibi yazın: belirtiler, yapılması istenen işlemler, aciliyet durumu, bütçe..."></textarea></div>
           <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Bu servis teklif isteği platformdaki tüm ücretli satıcılara iletilecektir.</span></div>
-          <button class="btn-teklif" onclick="submitTeklif('servis','Servis','form-servis','Servis')">Teklif İsteği Oluştur</button>
+          <button class="btn-teklif" data-kategori="servis" data-label="Servis" data-form="form-servis" data-baslik="Servis">Teklif İsteği Oluştur</button>
         </div>
       </div>
     </div>
@@ -2794,7 +2830,7 @@ body {
       <button class="f-apply">Uygula</button>
     </div>
     <div class="listing-main">
-      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Tüm İlanlar</span><span class="listing-count">— 1.240 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select></div>
+      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Tüm İlanlar</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select></div>
       <div class="cards-grid">
         <div class="listing-card" onclick="go('detail-vidali')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Atlas Copco</div><div class="card-name">GA 15 Vidalı Kompresör</div><div class="card-specs"><span class="spec-tag">15 kW</span><span class="spec-tag">2.4 m³/dk</span></div><div class="card-foot"><span class="card-price">₺ 185.000</span><span class="card-cta">Detay →</span></div></div></div>
         <div class="listing-card" onclick="go('detail-kurutucu')"><div class="card-thumb"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg><span class="card-badge badge-new">Yeni</span></div><div class="card-body"><div class="card-brand">Beko</div><div class="card-name">DFID 170 Soğutmalı Kurutucu</div><div class="card-specs"><span class="spec-tag">2.8 m³/dk</span><span class="spec-tag">R-410A</span></div><div class="card-foot"><span class="card-price-contact">İletişime geçiniz</span><span class="card-cta">Detay →</span></div></div></div>
@@ -2804,6 +2840,24 @@ body {
     </div>
   </div>
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
+</div>
+
+<!-- ===== YENİ ŞİFRE BELİRLEME SAYFASI ===== -->
+<div class="page" id="p-reset-password">
+  <div class="reg-wrap">
+    <div class="reg-box" style="max-width:420px">
+      <div class="reg-hdr">
+        <p class="reg-title">Yeni Şifre Belirle</p>
+        <p class="reg-sub">Hesabınız için yeni bir şifre girin</p>
+      </div>
+      <div class="reg-form">
+        <div class="field"><label>Yeni Şifre</label><input type="password" id="reset-pw" placeholder="En az 6 karakter"></div>
+        <div class="field"><label>Yeni Şifre (Tekrar)</label><input type="password" id="reset-pw2" placeholder="Şifrenizi tekrar girin"></div>
+        <div id="reset-error" style="display:none;font-size:12px;color:#c44;margin-bottom:12px;padding:9px 12px;background:#fff0f0;border-radius:var(--radius);border:1px solid #f5c6c6"></div>
+        <button class="btn-reg" onclick="submitResetPassword()">Şifremi Güncelle</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ===== GİRİŞ SAYFASI ===== -->
@@ -2819,7 +2873,27 @@ body {
         <div class="field"><label>Şifre</label><input type="password" id="l-pw" placeholder="Şifreniz" onkeydown="if(event.key==='Enter')submitLogin()"></div>
         <div id="login-error" style="display:none;font-size:12px;color:#c44;margin-bottom:12px;padding:9px 12px;background:#fff0f0;border-radius:var(--radius);border:1px solid #f5c6c6"></div>
         <button class="btn-reg" onclick="submitLogin()">Giriş Yap</button>
-        <p class="reg-terms" style="margin-top:14px">Hesabınız yok mu? <a onclick="go('register')" style="color:var(--accent);cursor:pointer;text-decoration:underline">Üye Ol</a></p>
+        <p class="reg-terms" style="margin-top:14px">Şifrenizi mi unuttunuz? <a onclick="go('forgot-password')" style="color:var(--accent);cursor:pointer;text-decoration:underline">Şifremi Sıfırla</a></p>
+        <p class="reg-terms" style="margin-top:8px">Hesabınız yok mu? <a onclick="go('register')" style="color:var(--accent);cursor:pointer;text-decoration:underline">Üye Ol</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ŞİFRE SIFIRLAMA SAYFASI ===== -->
+<div class="page" id="p-forgot-password">
+  <div class="reg-wrap">
+    <div class="reg-box" style="max-width:420px">
+      <div class="reg-hdr">
+        <p class="reg-title">Şifremi Sıfırla</p>
+        <p class="reg-sub">E-posta adresinizi girin, şifre sıfırlama bağlantısı gönderelim</p>
+      </div>
+      <div class="reg-form">
+        <div class="field"><label>E-posta</label><input type="email" id="forgot-mail" placeholder="ahmet@firma.com"></div>
+        <div id="forgot-success" style="display:none;font-size:12px;color:#2a7a2a;margin-bottom:12px;padding:9px 12px;background:#f0fff0;border-radius:var(--radius);border:1px solid #c6f5c6"></div>
+        <div id="forgot-error" style="display:none;font-size:12px;color:#c44;margin-bottom:12px;padding:9px 12px;background:#fff0f0;border-radius:var(--radius);border:1px solid #f5c6c6"></div>
+        <button class="btn-reg" onclick="submitForgotPassword()">Sıfırlama Bağlantısı Gönder</button>
+        <p class="reg-terms" style="margin-top:14px"><a onclick="go('login')" style="color:var(--accent);cursor:pointer;text-decoration:underline">← Giriş sayfasına dön</a></p>
       </div>
     </div>
   </div>
@@ -2868,26 +2942,8 @@ body {
           <div class="field"><label>Şifre</label><input type="password" id="s-pw" placeholder="En az 6 karakter"></div>
           <div class="field"><label>Şifre (Tekrar)</label><input type="password" id="s-pw2" placeholder="Şifrenizi tekrar girin"></div>
         </div>
-        <p style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;font-family:var(--mono)">Plan Seçin</p>
-        <div class="plan-grid">
-          <div class="plan-card selected" onclick="selectPlan(this)" data-plan="Aylık">
-            <p class="plan-name">Aylık</p>
-            <p class="plan-price">₺ 990 / ay</p>
-            <p class="plan-feats">Sınırsız ilan<br>Tüm kategoriler<br>Teklif bildirimleri<br>İstediğin zaman iptal</p>
-          </div>
-          <div class="plan-card" onclick="selectPlan(this)" data-plan="Yıllık">
-            <p class="plan-name">Yıllık</p>
-            <p class="plan-price">₺ 790 / ay</p>
-            <p class="plan-feats">Sınırsız ilan<br>Tüm kategoriler<br>Teklif bildirimleri<br>2 ay ücretsiz</p>
-          </div>
-        </div>
-        <div class="field"><label>Kart Numarası (Stripe)</label><input type="text" id="s-card" placeholder="**** **** **** ****"></div>
-        <div class="field-row">
-          <div class="field"><label>Son Kullanma</label><input type="text" id="s-exp" placeholder="AA/YY"></div>
-          <div class="field"><label>CVV</label><input type="text" id="s-cvv" placeholder="***"></div>
-        </div>
         <button class="btn-reg" onclick="submitRegister('seller')">Satıcı Hesabı Oluştur</button>
-        <p class="reg-terms">Stripe üzerinden güvenli ödeme. İstediğiniz zaman iptal edebilirsiniz.<br><u>Kullanım Koşulları</u> ve <u>Gizlilik Politikası</u>'nı kabul etmiş olursunuz.</p>
+        <p class="reg-terms">Üyelik şu an tamamen ücretsizdir.<br><u>Kullanım Koşulları</u> ve <u>Gizlilik Politikası</u>'nı kabul etmiş olursunuz.</p>
       </div>
     </div>
   </div>
@@ -3281,7 +3337,7 @@ body {
 </div>
 
 <!-- ===== TEKLİF DETAY MODALI ===== -->
-<div class="tk-modal" id="teklif-detail-modal" onclick="if(event.target===this){this.classList.remove('open');document.body.style.overflow=''}">
+<div class="tk-modal" id="teklif-detail-modal" onclick="if(event.target===this){this.classList.remove('open');document.body.style.overflow='';if(_chatSubscription){_chatSubscription.unsubscribe();_chatSubscription=null;}}">
   <div class="tk-modal-card" style="max-width:500px">
     <div class="tk-modal-head">
       <div class="tk-modal-head-l">
@@ -3291,8 +3347,9 @@ body {
       <button class="tk-modal-x" onclick="document.getElementById('teklif-detail-modal').classList.remove('open');document.body.style.overflow=''">×</button>
     </div>
     <div style="padding:20px 22px" id="teklif-detail-content"></div>
-    <div class="tk-modal-foot" style="display:flex;justify-content:flex-end">
-      <button class="tk-btn tk-btn-primary" onclick="document.getElementById('teklif-detail-modal').classList.remove('open');document.body.style.overflow=''">Kapat</button>
+    <div class="tk-modal-foot" style="display:flex;justify-content:space-between">
+      <button class="tk-btn tk-btn-danger" onclick="deleteBuyerTeklif()">Sil</button>
+      <button class="tk-btn tk-btn-primary" onclick="document.getElementById('teklif-detail-modal').classList.remove('open');document.body.style.overflow='';if(_chatSubscription){_chatSubscription.unsubscribe();_chatSubscription=null;}">Kapat</button>
     </div>
   </div>
 </div>
@@ -3435,6 +3492,10 @@ async function checkSession() {
 
 // Auth state değişince nav güncelle
 _sb.auth.onAuthStateChange((event, session) => {
+  if (event === 'PASSWORD_RECOVERY') {
+    go('reset-password');
+    return;
+  }
   if (session) {
     _memStore[USER_KEY] = JSON.stringify(sessionToUser(session));
   } else {
@@ -3464,12 +3525,13 @@ function go(page, addHistory = true) {
   if (el) {
     el.classList.add('active');
     window.scrollTo(0, 0);
-    if (addHistory) { try { history.pushState({ page }, '', '#' + page); } catch(e) {} }
+    if (addHistory) {
+      try { history.pushState({ page }, '', '#' + page); } catch(e) {}
+    }
   }
 }
 window.go = go;
 
-// İleri/geri buton desteği
 window.addEventListener('popstate', function(e) {
   const page = e.state?.page || 'home';
   go(page, false);
@@ -3495,9 +3557,7 @@ function showDash(section) {
   if (typeof event !== 'undefined' && event && event.currentTarget && event.currentTarget.classList) {
     event.currentTarget.classList.add('active');
   }
-  if (section === 'teklifler') {
-    reloadTekliflerFromDB().then(() => { renderInbox(); refreshBadge(); });
-  }
+  if (section === 'teklifler') renderInbox();
 }
 
 function showDashFromCard(section) {
@@ -3505,119 +3565,54 @@ function showDashFromCard(section) {
   showDash(section);
 }
 
-/* ===== TEKLİF SİSTEMİ — Supabase tabanlı ===== */
-// NOT: Supabase'de şu tabloların oluşturulmuş olması gerekir:
-//
-// CREATE TABLE teklifler (
-//   id TEXT PRIMARY KEY,
-//   alici_id UUID REFERENCES auth.users(id),
-//   kategori TEXT, kategori_label TEXT, baslik TEXT,
-//   fields JSONB, aciklama TEXT, iletisim TEXT,
-//   tarih BIGINT, okundu BOOLEAN DEFAULT false, yanitlandi BOOLEAN DEFAULT false
-// );
-// ALTER TABLE teklifler ENABLE ROW LEVEL SECURITY;
-// CREATE POLICY "herkes okuyabilir" ON teklifler FOR SELECT USING (true);
-// CREATE POLICY "alici yazabilir" ON teklifler FOR INSERT WITH CHECK (auth.uid() = alici_id OR alici_id IS NULL);
-// CREATE POLICY "alici guncelleyebilir" ON teklifler FOR UPDATE USING (auth.uid() = alici_id);
-//
-// CREATE TABLE teklif_mesajlar (
-//   id TEXT PRIMARY KEY,
-//   teklif_id TEXT REFERENCES teklifler(id) ON DELETE CASCADE,
-//   satici_id UUID,
-//   satici_firma TEXT,
-//   mesaj TEXT,
-//   tarih BIGINT
-// );
-// ALTER TABLE teklif_mesajlar ENABLE ROW LEVEL SECURITY;
-// CREATE POLICY "herkes okuyabilir" ON teklif_mesajlar FOR SELECT USING (true);
-// CREATE POLICY "herkes yazabilir" ON teklif_mesajlar FOR INSERT WITH CHECK (true);
+/* ===== TEKLİF SİSTEMİ — kategorize edilmiş teklif gönderimi ===== */
+const TEKLIF_KEY = 'km_teklifler_v1';
 
-const TEKLIF_KEY = 'km_teklifler_v1'; // offline cache için hâlâ kullanıyoruz
+// Önceden simüle edilmiş 4 örnek (sayaç ilk açılışta 4 olsun)
 
-// Seed datayı bir kez Supabase'e yükle (tablo boşsa)
-const SEED_TEKLIFLER = [
-  {id:'seed-1', kategori:'komp', kategoriLabel:'Kompresör', baslik:'Kompresör Teklif İsteği',
-    fields:{Tip:'Vidalı', Kapasite:'4.5 m³/dk', Güç:'30 kW', Basınç:'8 bar'},
-    aciklama:'Tekstil fabrikası için sürekli çalışacak kompresör. Yedek parça desteği önemli.',
-    iletisim:'aliveli@tekstil.com', tarih:Date.now()-1000*60*60*24*2, okundu:false},
-  {id:'seed-2', kategori:'kuru', kategoriLabel:'Kurutucu', baslik:'Kurutucu Teklif İsteği',
-    fields:{Tip:'Gazlı (Soğutmalı)', Kapasite:'3.0 m³/dk'},
-    aciklama:'Mevcut Atlas Copco GA 22 ile uyumlu, +3°C çiy noktası yeterli.',
-    iletisim:'satinalma@otomotiv.com.tr', tarih:Date.now()-1000*60*60*24*4, okundu:false},
-  {id:'seed-3', kategori:'borulama', kategoriLabel:'Borulama', baslik:'Basınçlı Gaz Borulama Teklif İsteği',
-    fields:{Konum:'Kocaeli, Gebze OSB', Boru:'DN50 / 180 m', Basınç:'8 bar', Gaz:'Basınçlı hava'},
-    aciklama:'Yeni hat çekilecek, mevcut kompresör odasından üretim alanına. Anahtar teslim.',
-    iletisim:'+90 532 000 00 00', tarih:Date.now()-1000*60*60*24*5, okundu:false},
-  {id:'seed-4', kategori:'servis', kategoriLabel:'Servis', baslik:'Servis Teklif İsteği',
-    fields:{Tip:'Arıza Onarımı', Ekipman:'Kaeser SM 11 (2017)', Konum:'Bursa, Nilüfer OSB'},
-    aciklama:'Aşırı ısınma uyarısı veriyor, acil bakım gerekiyor.',
-    iletisim:'mehmet@yedekparca.com', tarih:Date.now()-1000*60*60*24*6, okundu:false}
-];
 
-// ---- Supabase yardımcı fonksiyonları ----
+async function loadTeklifler() {
+  const { data, error } = await _sb
+    .from('offers')
+    .select('*')
+    .order('created_at', { ascending: false });
 
-async function sbLoadTeklifler() {
-  try {
-    const { data, error } = await _sb
-      .from('teklifler')
-      .select('*, teklif_mesajlar(*)')
-      .order('tarih', { ascending: false });
-    if (error) throw error;
-    // Supabase satırlarını eski format'a dönüştür
-    return data.map(row => ({
-      id: row.id,
-      kategori: row.kategori,
-      kategoriLabel: row.kategori_label,
-      baslik: row.baslik,
-      fields: row.fields || {},
-      aciklama: row.aciklama || '',
-      iletisim: row.iletisim || '',
-      tarih: row.tarih,
-      okundu: row.okundu,
-      yanitlandi: row.yanitlandi,
-      alici_id: row.alici_id,
-      responses: (row.teklif_mesajlar || []).map(m => ({
-        id: m.id,
-        tarih: m.tarih,
-        mesaj: m.mesaj,
-        satici: m.satici_firma
-      })).sort((a,b) => a.tarih - b.tarih)
-    }));
-  } catch(e) {
-    console.warn('Supabase teklifler yüklenemedi, cache kullanılıyor:', e);
-    // Cache'ten dön
-    try { const r = _get(TEKLIF_KEY); return r ? JSON.parse(r) : SEED_TEKLIFLER.slice(); } catch(_) { return SEED_TEKLIFLER.slice(); }
+  if (error || !data?.length) return [];
+
+  // Alıcı profillerini çek
+  const userIds = [...new Set(data.map(x => x.user_id).filter(Boolean))];
+  let profileMap = {};
+  if (userIds.length) {
+    const { data: profiles } = await _sb
+      .from('profiles')
+      .select('id, ad, soyad, firma, adres')
+      .in('id', userIds);
+    if (profiles) profiles.forEach(p => profileMap[p.id] = p);
   }
+
+  return data.map(x => ({
+    id: x.id,
+    kategori: x.kategori,
+    kategoriLabel: x.kategori_label,
+    baslik: x.baslik,
+    fields: x.fields || {},
+    aciklama: x.aciklama || '',
+    iletisim: x.iletisim || '',
+    tarih: new Date(x.created_at).getTime(),
+    okundu: _readItemIds.has(x.id),
+    yanitlandi: !!x.conversation_id,
+    conversationId: x.conversation_id,
+    alici: profileMap[x.user_id] || null
+  })).filter(x => {
+    // Dismissed olan ama conversation_id'si olan (mesajlaşma var) teklifleri göster
+    const dismissed = _readItemIds.has('dismissed-' + x.id);
+    if (!dismissed) return true;
+    return !!x.conversationId; // mesaj varsa göster
+  });
 }
 
-async function sbSeedIfEmpty() {
-  try {
-    const { count } = await _sb.from('teklifler').select('*', { count: 'exact', head: true });
-    if (count === 0) {
-      const rows = SEED_TEKLIFLER.map(t => ({
-        id: t.id, kategori: t.kategori, kategori_label: t.kategoriLabel,
-        baslik: t.baslik, fields: t.fields, aciklama: t.aciklama,
-        iletisim: t.iletisim, tarih: t.tarih, okundu: t.okundu, yanitlandi: false,
-        alici_id: null
-      }));
-      await _sb.from('teklifler').insert(rows);
-    }
-  } catch(e) { console.warn('Seed yüklenemedi:', e); }
-}
-
-// Geriye dönük uyumluluk için senkron cache wrapper'ları
-function loadTeklifler() {
-  try { const r = _get(TEKLIF_KEY); return r ? JSON.parse(r) : SEED_TEKLIFLER.slice(); } catch(e) { return SEED_TEKLIFLER.slice(); }
-}
 function saveTeklifler(arr) {
   _set(TEKLIF_KEY, JSON.stringify(arr));
-}
-
-// Supabase'den yükle ve cache'i güncelle
-async function reloadTekliflerFromDB() {
-  const arr = await sbLoadTeklifler();
-  saveTeklifler(arr);
-  return arr;
 }
 
 async function submitTeklif(kategori, kategoriLabel, formId, baslikPrefix) {
@@ -3641,62 +3636,45 @@ async function submitTeklif(kategori, kategoriLabel, formId, baslikPrefix) {
   }
 
   const u = loadUser();
-  const teklif = {
-    id: 't-' + Date.now() + '-' + Math.random().toString(36).slice(2,7),
-    kategori, kategoriLabel,
-    baslik: baslikPrefix + ' Teklif İsteği',
-    fields, aciklama, iletisim,
-    tarih: Date.now(),
-    okundu: false
-  };
+  if (!u) { go('login'); return; }
 
-  // Supabase'e yaz
-  try {
-    const { error } = await _sb.from('teklifler').insert({
-      id: teklif.id,
-      kategori: teklif.kategori,
-      kategori_label: teklif.kategoriLabel,
-      baslik: teklif.baslik,
-      fields: teklif.fields,
-      aciklama: teklif.aciklama,
-      iletisim: teklif.iletisim,
-      tarih: teklif.tarih,
-      okundu: false,
-      yanitlandi: false,
-      alici_id: u ? u.id : null
-    });
-    if (error) throw error;
-  } catch(e) {
-    showToast('Bağlantı hatası', 'Teklif gönderilemedi: ' + e.message, kategoriLabel, true);
+  const baslik = baslikPrefix + ' Teklif İsteği';
+
+  const btn = form.closest('.page')?.querySelector('.btn-teklif');
+  if (btn) { btn.disabled = true; btn.textContent = 'Gönderiliyor...'; }
+
+  const { error } = await _sb.from('offers').insert({
+    user_id: u.id,
+    kategori,
+    kategori_label: kategoriLabel,
+    baslik,
+    aciklama,
+    fields,
+    iletisim
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Teklif İsteği Oluştur'; }
+
+  if (error) {
+    showToast('Hata', error.message, null, true);
     return;
   }
 
-  // Form temizleme
   form.querySelectorAll('[data-k]').forEach(inp => {
     if (inp.tagName === 'SELECT') inp.selectedIndex = 0;
     else inp.value = '';
   });
 
-  // Alıcı teklif geçmişine ekle (local cache)
-  const localTeklif = {...teklif, responses: []};
-  const arr = loadTeklifler();
-  arr.unshift(localTeklif);
-  saveTeklifler(arr);
-
-  const buyerArr = loadBuyerTeklifler();
-  buyerArr.unshift(localTeklif);
-  saveBuyerTeklifler(buyerArr);
   updateBuyerBadges();
+  refreshBadge();
 
   const ozet = Object.entries(fields).slice(0,2).map(([k,v]) => k+': '+v).join(' • ');
   showToast(
     'Teklif isteği gönderildi',
-    'Tüm ücretli ' + kategoriLabel.toLowerCase() + ' satıcılarına bildirim iletildi. ' + (ozet ? '('+ozet+')' : ''),
+    'Tüm satıcılara bildirim iletildi. ' + (ozet ? '('+ozet+')' : ''),
     kategoriLabel,
     false
   );
-
-  refreshBadge();
 }
 
 function showToast(title, msg, kategoriLabel, isError) {
@@ -3737,11 +3715,12 @@ function filterInbox(f, btn) {
   renderInbox();
 }
 
-function renderInbox() {
+async function renderInbox() {
   const list = document.getElementById('inbox-list');
   const titleEl = document.getElementById('inbox-count-title');
   if (!list) return;
-  const arr = loadTeklifler();
+  list.innerHTML = '<div class="inbox-empty">Yükleniyor...</div>';
+  const arr = await loadTeklifler();
   const filtered = inboxFilter === 'all' ? arr : arr.filter(t => t.kategori === inboxFilter);
   if (titleEl) titleEl.textContent = 'Gelen İstekler — ' + filtered.length + ' kayıt';
   if (filtered.length === 0) {
@@ -3771,11 +3750,12 @@ function renderInbox() {
 /* ===== Teklif Detay Modal ===== */
 let currentTeklifId = null;
 
-function openTeklifModal(id) {
-  const arr = loadTeklifler();
+async function openTeklifModal(id) {
+  const arr = await loadTeklifler();
   const t = arr.find(x => x.id === id);
   if (!t) return;
   currentTeklifId = id;
+  markItemRead(id, 'offer');
 
   // Foot durumunu detay'a sıfırla
   const fd = document.getElementById('tk-modal-foot-detail');
@@ -3821,6 +3801,15 @@ function openTeklifModal(id) {
     html += `<div class="tk-section"><div class="tk-section-lbl">Detaylı Açıklama</div><div class="tk-desc-box">${escapeHtml(t.aciklama)}</div></div>`;
   }
 
+  // Alıcı bilgileri
+  if (t.alici && (t.alici.ad || t.alici.firma)) {
+    html += '<div class="tk-section"><div class="tk-section-lbl">Alıcı Bilgileri</div><div class="tk-spec-grid">';
+    if (t.alici.ad || t.alici.soyad) html += `<div class="tk-spec-cell"><div class="tk-spec-k">Ad Soyad</div><div class="tk-spec-v">${escapeHtml((t.alici.ad+' '+t.alici.soyad).trim())}</div></div>`;
+    if (t.alici.firma) html += `<div class="tk-spec-cell"><div class="tk-spec-k">Firma</div><div class="tk-spec-v">${escapeHtml(t.alici.firma)}</div></div>`;
+    if (t.alici.adres) html += `<div class="tk-spec-cell"><div class="tk-spec-k">Adres</div><div class="tk-spec-v">${escapeHtml(t.alici.adres)}</div></div>`;
+    html += '</div></div>';
+  }
+
   if (t.iletisim) {
     const c = t.iletisim.trim();
     const isMail = /@/.test(c);
@@ -3856,6 +3845,55 @@ function openTeklifModal(id) {
 
   body.innerHTML = html;
 
+  // Mesaj geçmişini ve chat input'u yükle
+  const { data: msgs } = await _sb
+    .from('messages')
+    .select('*')
+    .eq('conversation_id', t.conversationId || '')
+    .order('created_at', { ascending: true });
+
+  // Satıcı chat bölümü
+  const u = loadUser();
+  let chatHtml = '<div class="tk-section"><div class="tk-section-lbl">Mesajlar</div>';
+  chatHtml += `<div id="seller-chat-messages" style="display:flex;flex-direction:column;gap:8px;margin:8px 0;max-height:220px;overflow-y:auto;padding:4px">`;
+
+  if (msgs?.length) {
+    msgs.forEach(m => {
+      const isMe = m.sender_id === u?.id;
+      const dt2 = new Date(m.created_at);
+      chatHtml += `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};gap:2px">
+        <div style="max-width:80%;padding:8px 12px;border-radius:12px;font-size:13px;background:${isMe?'var(--accent)':'var(--bg2)'};color:${isMe?'#fff':'var(--text)'};line-height:1.5">${escapeHtml(m.content)}</div>
+        <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">${isMe?'Siz':'Alıcı'} • ${dt2.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>
+      </div>`;
+    });
+  } else {
+    chatHtml += '<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px">Henüz mesaj yok.</div>';
+  }
+
+  chatHtml += '</div>';
+
+  // Chat input
+  chatHtml += `<div style="display:flex;gap:8px;margin-top:8px">
+    <input type="text" id="seller-chat-input" placeholder="Mesaj yaz..." 
+      style="flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none"
+      onkeydown="if(event.key==='Enter')sendSellerMessage()">
+    <button onclick="sendSellerMessage()" style="padding:9px 16px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:13px;cursor:pointer;font-family:var(--font)">Gönder</button>
+  </div></div>`;
+
+  body.innerHTML += chatHtml;
+
+  // Realtime subscription
+  if (_chatSubscription) { _chatSubscription.unsubscribe(); _chatSubscription = null; }
+  if (t.conversationId) {
+    _chatSubscription = _sb
+      .channel('seller-chat-' + t.conversationId)
+      .on('postgres_changes', {
+        event: 'INSERT', schema: 'public', table: 'messages',
+        filter: 'conversation_id=eq.' + t.conversationId
+      }, () => reloadSellerChat(t.conversationId))
+      .subscribe();
+  }
+
   // Okunmadı yap butonu metni
   document.getElementById('tk-btn-read').textContent = t.okundu ? 'Okunmadı yap' : 'Okundu yap';
 
@@ -3869,37 +3907,49 @@ function openTeklifModal(id) {
 function closeTeklifModal() {
   document.getElementById('tk-modal').classList.remove('open');
   document.body.style.overflow = '';
+  if (_chatSubscription) { _chatSubscription.unsubscribe(); _chatSubscription = null; }
   currentTeklifId = null;
 }
 
-function toggleReadCurrent() {
+async function toggleReadCurrent() {
   if (!currentTeklifId) return;
-  const arr = loadTeklifler();
+  const arr = await loadTeklifler();
   const t = arr.find(x => x.id === currentTeklifId);
   if (!t) return;
-  t.okundu = !t.okundu;
-  saveTeklifler(arr);
+  if (_readItemIds.has(currentTeklifId)) {
+    unmarkItemRead(currentTeklifId);
+  } else {
+    markItemRead(currentTeklifId, 'offer');
+  }
+  const isRead = _readItemIds.has(currentTeklifId);
+  document.getElementById('tk-btn-read').textContent = isRead ? 'Okunmadı yap' : 'Okundu yap';
   refreshBadge();
-  document.getElementById('tk-btn-read').textContent = t.okundu ? 'Okunmadı yap' : 'Okundu yap';
   renderInbox();
 }
 
-function deleteCurrentTeklif() {
+async function deleteCurrentTeklif() {
   if (!currentTeklifId) return;
-  if (!confirm('Bu teklif isteğini silmek istediğinize emin misiniz?')) return;
-  let arr = loadTeklifler();
-  arr = arr.filter(x => x.id !== currentTeklifId);
-  saveTeklifler(arr);
+  if (!confirm('Bu teklif isteğini gelen kutunuzdan kaldırmak istediğinize emin misiniz?')) return;
+  // Sadece okundu olarak işaretle, gerçek silme yapma
+  await markItemRead(currentTeklifId, 'offer');
+  // Satıcı inbox'ından gizlemek için dismissed listesine ekle
+  const u = loadUser();
+  if (u) {
+    await _sb.from('read_items').upsert({
+      user_id: u.id, item_id: 'dismissed-' + currentTeklifId, item_type: 'dismissed'
+    }, { onConflict: 'user_id,item_id' });
+    _readItemIds.add('dismissed-' + currentTeklifId);
+  }
   refreshBadge();
   closeTeklifModal();
   renderInbox();
-  showToast('Silindi', 'Teklif isteği listeden kaldırıldı.', null, false);
+  showToast('Kaldırıldı', 'Teklif isteği gelen kutunuzdan kaldırıldı.', null, false);
 }
 
 /* ===== Yanıt yazma (compose) ===== */
-function openCompose() {
+async function openCompose() {
   if (!currentTeklifId) return;
-  const arr = loadTeklifler();
+  const arr = await loadTeklifler();
   const t = arr.find(x => x.id === currentTeklifId);
   if (!t) return;
 
@@ -3961,76 +4011,149 @@ function closeCompose() {
   }
 }
 
+async function sendSellerMessage() {
+  const input = document.getElementById('seller-chat-input');
+  if (!input) return;
+  const content = input.value.trim();
+  if (!content || !currentTeklifId) return;
+  const u = loadUser();
+  if (!u) return;
+
+  // conversation_id al
+  const { data: offerData } = await _sb
+    .from('offers').select('conversation_id, user_id').eq('id', currentTeklifId).single();
+
+  let convId = offerData?.conversation_id;
+
+  // yoksa oluştur
+  if (!convId) {
+    const { data: conv, error } = await _sb.from('conversations').insert({
+      seller_id: u.id,
+      buyer_id: offerData?.user_id || u.id,
+      listing_id: currentTeklifId,
+      listing_title: ''
+    }).select().single();
+    if (error) { showToast('Hata', error.message, null, true); return; }
+    convId = conv.id;
+    await _sb.from('offers').update({ conversation_id: convId }).eq('id', currentTeklifId);
+    if (_chatSubscription) _chatSubscription.unsubscribe();
+    _chatSubscription = _sb.channel('seller-chat-' + convId)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + convId },
+        () => reloadSellerChat(convId)).subscribe();
+  }
+
+  input.value = '';
+  const { error } = await _sb.from('messages').insert({
+    conversation_id: convId, sender_id: u.id, content
+  });
+  if (error) showToast('Hata', error.message, null, true);
+  else reloadSellerChat(convId);
+}
+
+async function reloadSellerChat(convId) {
+  const el = document.getElementById('seller-chat-messages');
+  if (!el) return;
+  const u = loadUser();
+  const { data: msgs } = await _sb.from('messages').select('*')
+    .eq('conversation_id', convId).order('created_at', { ascending: true });
+  if (!msgs?.length) return;
+  el.innerHTML = msgs.map(m => {
+    const isMe = m.sender_id === u?.id;
+    const dt2 = new Date(m.created_at);
+    return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};gap:2px">
+      <div style="max-width:80%;padding:8px 12px;border-radius:12px;font-size:13px;background:${isMe?'var(--accent)':'var(--bg2)'};color:${isMe?'#fff':'var(--text)'};line-height:1.5">${escapeHtml(m.content)}</div>
+      <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">${isMe?'Siz':'Alıcı'} • ${dt2.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>
+    </div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+window.sendSellerMessage = sendSellerMessage;
+window.reloadSellerChat = reloadSellerChat;
+
+var _sendingCompose = false;
 async function sendCompose() {
-  if (!currentTeklifId) return;
+  if (!currentTeklifId || _sendingCompose) return;
+  _sendingCompose = true;
   const mesaj = (document.getElementById('cmp-mesaj')?.value || '').trim();
 
   if (!mesaj) {
     showToast('Mesaj boş', 'Lütfen alıcıya iletmek istediğiniz mesajı yazın.', null, true);
     document.getElementById('cmp-mesaj')?.focus();
+    _sendingCompose = false;
     return;
   }
+
+  const arr = await loadTeklifler();
+  const t = arr.find(x => x.id === currentTeklifId);
+  if (!t) { _sendingCompose = false; return; }
 
   const u = loadUser();
-  const sendBtn = document.querySelector('#tk-modal-foot-compose .btn-accent');
-  if (sendBtn) { sendBtn.disabled = true; sendBtn.textContent = 'Gönderiliyor...'; }
+  if (!u) { _sendingCompose = false; return; }
 
-  const arr = loadTeklifler();
-  const t = arr.find(x => x.id === currentTeklifId);
-  if (!t) return;
+  const btn = document.querySelector('.tk-btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Gönderiliyor...'; }
 
-  const yanit = {
-    id: 'r-' + Date.now() + '-' + Math.random().toString(36).slice(2,6),
-    tarih: Date.now(),
-    mesaj,
-    satici: (u && u.firma) ? u.firma : (u && u.ad ? u.ad + ' ' + (u.soyad||'') : 'Satıcı')
-  };
+  // Offers tablosundan buyer_id'yi al
+  const { data: offerData } = await _sb
+    .from('offers')
+    .select('user_id, conversation_id')
+    .eq('id', currentTeklifId)
+    .single();
 
-  // Supabase'e mesajı yaz
-  try {
-    const { error: msgErr } = await _sb.from('teklif_mesajlar').insert({
-      id: yanit.id,
-      teklif_id: currentTeklifId,
-      satici_id: u ? u.id : null,
-      satici_firma: yanit.satici,
-      mesaj: yanit.mesaj,
-      tarih: yanit.tarih
-    });
-    if (msgErr) throw msgErr;
+  let conversationId = offerData?.conversation_id;
+  const buyerId = offerData?.user_id;
 
-    // Teklifi yanitlandi=true olarak güncelle
-    const { error: updErr } = await _sb.from('teklifler').update({
-      yanitlandi: true,
-      okundu: true
-    }).eq('id', currentTeklifId);
-    if (updErr) throw updErr;
+  // Conversation yoksa oluştur
+  if (!conversationId && buyerId) {
+    const { data: conv, error: convErr } = await _sb
+      .from('conversations')
+      .insert({
+        seller_id: u.id,
+        buyer_id: buyerId,
+        listing_id: currentTeklifId,
+        listing_title: t.baslik
+      })
+      .select()
+      .single();
 
-  } catch(e) {
-    if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Gönder'; }
-    showToast('Gönderme hatası', 'Mesaj iletilemedi: ' + e.message, null, true);
-    return;
+    if (convErr) {
+      showToast('Hata', 'Konuşma oluşturulamadı: ' + convErr.message, null, true);
+      if (btn) { btn.disabled = false; btn.textContent = 'Teklifi Gönder'; }
+      return;
+    }
+
+    if (conv) {
+      conversationId = conv.id;
+      // offers tablosunu güncelle
+      await _sb.from('offers').update({ conversation_id: conversationId }).eq('id', currentTeklifId);
+    }
   }
 
-  if (sendBtn) { sendBtn.disabled = false; sendBtn.textContent = 'Gönder'; }
+  // Mesajı Supabase'e kaydet
+  if (conversationId) {
+    const { error: msgErr } = await _sb
+      .from('messages')
+      .insert({
+        conversation_id: conversationId,
+        sender_id: u.id,
+        content: mesaj
+      });
 
-  // Local cache'i güncelle
-  if (!t.responses) t.responses = [];
-  t.responses.push(yanit);
-  t.yanitlandi = true;
-  t.okundu = true;
-  saveTeklifler(arr);
-  refreshBadge();
+    if (msgErr) {
+      showToast('Hata', 'Mesaj gönderilemedi: ' + msgErr.message, null, true);
+      if (btn) { btn.disabled = false; btn.textContent = 'Teklifi Gönder'; }
+      return;
+    }
+  }
 
-  showToast(
-    'Mesajınız alıcıya iletildi',
-    (t.iletisim ? t.iletisim + ' adresine ' : '') + 'mesajınız başarıyla gönderildi.',
-    t.kategoriLabel,
-    false
-  );
+  if (btn) { btn.disabled = false; btn.textContent = 'Teklifi Gönder'; }
 
-  // Foot'u resetle ve detay görünümüne dön
+  showToast('Mesajınız alıcıya iletildi', 'Mesajınız başarıyla gönderildi.', t.kategoriLabel, false);
   document.getElementById('tk-modal-foot-detail').style.display = 'flex';
   document.getElementById('tk-modal-foot-compose').style.display = 'none';
+  document.getElementById('cmp-mesaj').value = '';
+  _sendingCompose = false;
   openTeklifModal(currentTeklifId);
   renderInbox();
 }
@@ -4063,8 +4186,8 @@ function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-function refreshBadge() {
-  const arr = loadTeklifler();
+async function refreshBadge() {
+  const arr = await loadTeklifler();
   const unread = arr.filter(t => !t.okundu).length;
   const badge = document.getElementById('sb-badge');
   if (badge) {
@@ -4146,6 +4269,71 @@ function demoLogin(role) {
 }
 window.demoLogin = demoLogin;
 
+async function submitForgotPassword() {
+  const mail = (document.getElementById('forgot-mail')?.value || '').trim();
+  const errEl = document.getElementById('forgot-error');
+  const sucEl = document.getElementById('forgot-success');
+  errEl.style.display = 'none';
+  sucEl.style.display = 'none';
+
+  if (!isValidMail(mail)) {
+    errEl.textContent = 'Geçerli bir e-posta adresi girin.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.querySelector('#p-forgot-password .btn-reg');
+  if (btn) { btn.disabled = true; btn.textContent = 'Gönderiliyor...'; }
+
+  const { error } = await _sb.auth.resetPasswordForEmail(mail, {
+    redirectTo: window.location.origin + window.location.pathname + '#reset-password'
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Sıfırlama Bağlantısı Gönder'; }
+
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+  } else {
+    sucEl.textContent = mail + ' adresine şifre sıfırlama bağlantısı gönderildi. Lütfen e-postanızı kontrol edin.';
+    sucEl.style.display = 'block';
+    document.getElementById('forgot-mail').value = '';
+  }
+}
+async function submitResetPassword() {
+  const pw  = (document.getElementById('reset-pw')?.value || '').trim();
+  const pw2 = (document.getElementById('reset-pw2')?.value || '').trim();
+  const errEl = document.getElementById('reset-error');
+  errEl.style.display = 'none';
+
+  if (pw.length < 6) {
+    errEl.textContent = 'Şifre en az 6 karakter olmalıdır.';
+    errEl.style.display = 'block';
+    return;
+  }
+  if (pw !== pw2) {
+    errEl.textContent = 'Şifreler eşleşmiyor.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  const btn = document.querySelector('#p-reset-password .btn-reg');
+  if (btn) { btn.disabled = true; btn.textContent = 'Güncelleniyor...'; }
+
+  const { error } = await _sb.auth.updateUser({ password: pw });
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Şifremi Güncelle'; }
+
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+  } else {
+    showToast('Şifre güncellendi', 'Yeni şifrenizle giriş yapabilirsiniz.', null, false);
+    go('login');
+  }
+}
+window.submitResetPassword = submitResetPassword;
+
 async function submitLogin() {
   const mail = (document.getElementById('l-mail')?.value || '').trim();
   const pw   = (document.getElementById('l-pw')?.value || '').trim();
@@ -4183,6 +4371,8 @@ async function submitLogin() {
   }
 
   const u = sessionToUser(data.session);
+  _memStore[USER_KEY] = JSON.stringify(u);
+  updateNav();
   document.getElementById('l-mail').value = '';
   document.getElementById('l-pw').value = '';
   showToast('Hoş geldiniz!', u.ad + ' ' + u.soyad + ' olarak giriş yapıldı.', u.role === 'seller' ? 'Satıcı' : 'Alıcı', false);
@@ -4197,7 +4387,9 @@ async function submitRegister(type) {
   const mail  = (document.getElementById(prefix+'-mail')?.value || '').trim();
   const firma = (document.getElementById(prefix+'-firma')?.value || '').trim();
   const adres = (document.getElementById(prefix+'-adres')?.value || '').trim();
-  const pw    = (document.getElementById(prefix+'-pw')?.value || '').trim();
+  const pw = type === 'seller'
+    ? (document.getElementById('s-pw')?.value || '').trim()
+    : (document.getElementById('b-pw')?.value || '').trim();
 
   [prefix+'-ad', prefix+'-soyad', prefix+'-mail'].forEach(i => setErr(i, false));
 
@@ -4211,8 +4403,10 @@ async function submitRegister(type) {
     const pw2 = (document.getElementById('s-pw2')?.value || '').trim();
     if (pw.length < 6) { setErr('s-pw', true); hasErr = true; }
     else if (pw !== pw2) { setErr('s-pw', true); setErr('s-pw2', true); hasErr = true; }
+  } else {
+    const bpw = (document.getElementById('b-pw')?.value || '').trim();
+    if (bpw.length < 6) { setErr('b-pw', true); hasErr = true; }
   }
-  if (type === 'buyer' && pw.length < 6) { setErr('b-pw', true); hasErr = true; }
 
   if (hasErr) {
     showToast('Eksik bilgi', 'Lütfen tüm zorunlu alanları doldurun.', null, true);
@@ -4239,6 +4433,13 @@ async function submitRegister(type) {
   if (error) {
     showToast('Hata', error.message.includes('already') ? 'Bu e-posta adresi zaten kayıtlı.' : error.message, null, true);
     return;
+  }
+
+  // Session hemen gelmediyse bekle
+  const session = data.session;
+  if (session) {
+    _memStore[USER_KEY] = JSON.stringify(sessionToUser(session));
+    updateNav();
   }
 
   showToast('Hoş geldiniz!', ad + ', hesabınız başarıyla oluşturuldu.', type === 'seller' ? 'Satıcı' : 'Alıcı', false);
@@ -4309,6 +4510,10 @@ function updateNav() {
   if (buyerDashBtn) buyerDashBtn.style.display = (u && u.verified && u.role === 'buyer') ? 'inline-flex' : 'none';
 
   if (u && u.verified) {
+    loadReadItems().then(() => {
+      loadNotifications();
+      subscribeToNotifications();
+    });
     // Giriş yapılmış: login/register/demo butonlarını gizle
     const bl = document.getElementById('btn-login');
     const br = document.getElementById('btn-register');
@@ -4388,6 +4593,10 @@ async function logout() {
   closeUserMenu();
   await _sb.auth.signOut();
   clearUser();
+  _notifications = [];
+  _readItemIds.clear();
+  if (_notifSubscription) { _notifSubscription.unsubscribe(); _notifSubscription = null; }
+  updateNotifBadge();
   updateNav();
   showToast('Çıkış yapıldı', 'Hesabınızdan başarıyla çıkış yaptınız.', null, false);
   go('home');
@@ -4445,6 +4654,139 @@ function filterKomp(tip, btn) {
 }
 window.filterKomp = filterKomp;
 
+
+// ===== BİLDİRİM SİSTEMİ =====
+var _notifications = [];
+var _notifSubscription = null;
+var _readItemIds = new Set(); // Supabase'den yüklenir
+
+async function loadReadItems() {
+  const u = loadUser();
+  if (!u) return;
+  const { data } = await _sb.from('read_items').select('item_id').eq('user_id', u.id);
+  if (data) data.forEach(r => _readItemIds.add(r.item_id));
+}
+
+async function markItemRead(itemId, itemType) {
+  const u = loadUser();
+  if (!u || _readItemIds.has(itemId)) return;
+  _readItemIds.add(itemId);
+  await _sb.from('read_items').upsert({ user_id: u.id, item_id: itemId, item_type: itemType }, { onConflict: 'user_id,item_id' });
+}
+
+async function unmarkItemRead(itemId) {
+  const u = loadUser();
+  if (!u) return;
+  _readItemIds.delete(itemId);
+  await _sb.from('read_items').delete().eq('user_id', u.id).eq('item_id', itemId);
+}
+
+async function loadNotifications() {
+  const u = loadUser();
+  if (!u) return;
+  _notifications = [];
+
+  if (u.role === 'seller') {
+    const { data: offers } = await _sb.from('offers').select('id, baslik, created_at').order('created_at', { ascending: false }).limit(20);
+    if (offers) offers.forEach(o => {
+      _notifications.push({ id: 'offer-'+o.id, type: 'offer', title: 'Yeni Teklif İsteği', sub: o.baslik, time: o.created_at,
+        read: _readItemIds.has('offer-'+o.id),
+        action: function() { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 100); }
+      });
+    });
+  }
+
+  const { data: convs } = await _sb.from('conversations').select('id').or('buyer_id.eq.'+u.id+',seller_id.eq.'+u.id);
+  if (convs && convs.length) {
+    const { data: msgs } = await _sb.from('messages').select('id, content, created_at, sender_id, conversation_id')
+      .in('conversation_id', convs.map(function(c) { return c.id; }))
+      .neq('sender_id', u.id)
+      .order('created_at', { ascending: false }).limit(20);
+    if (msgs) msgs.forEach(function(m) {
+      _notifications.push({ id: 'msg-'+m.id, type: 'message', title: 'Yeni Mesaj',
+        sub: m.content.slice(0,60)+(m.content.length>60?'…':''), time: m.created_at,
+        read: _readItemIds.has('msg-'+m.id),
+        action: function() { if (u.role === 'seller') { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 100); } else goBuyerDashboard(); }
+      });
+    });
+  }
+
+  _notifications.sort(function(a, b) { return new Date(b.time) - new Date(a.time); });
+  renderNotifPanel();
+  updateNotifBadge();
+}
+
+function renderNotifPanel() {
+  var list = document.getElementById('notif-list');
+  if (!list) return;
+  if (!_notifications.length) {
+    list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Bildirim yok</div>';
+    return;
+  }
+  list.innerHTML = _notifications.slice(0,15).map(function(n, i) {
+    var dt = new Date(n.time);
+    return '<div class="notif-item '+(n.read?'':'unread')+'" onclick="clickNotif('+i+')">' +
+      '<div class="notif-dot '+(n.read?'read':'')+'"></div>' +
+      '<div><div class="notif-title">'+escapeHtml(n.title)+'</div>' +
+      '<div class="notif-sub">'+escapeHtml(n.sub)+' • '+timeAgo(dt)+'</div></div></div>';
+  }).join('');
+}
+
+function updateNotifBadge() {
+  var u = loadUser();
+  var btn = document.getElementById('nav-notif-btn');
+  var badge = document.getElementById('nav-notif-badge');
+  if (!btn || !badge) return;
+  if (!u) { btn.style.display = 'none'; return; }
+  btn.style.display = 'flex';
+  var count = _notifications.filter(function(n) { return !n.read; }).length;
+  badge.textContent = count > 99 ? '99+' : count;
+  badge.style.display = count > 0 ? 'inline-block' : 'none';
+}
+
+function toggleNotifPanel() {
+  var panel = document.getElementById('notif-panel');
+  if (!panel) return;
+  var isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'block';
+  if (!isOpen) renderNotifPanel();
+}
+
+function clickNotif(idx) {
+  _notifications[idx].read = true;
+  markItemRead(_notifications[idx].id, _notifications[idx].type);
+  document.getElementById('notif-panel').style.display = 'none';
+  renderNotifPanel();
+  updateNotifBadge();
+  if (_notifications[idx].action) _notifications[idx].action();
+}
+
+function markAllNotifsRead() {
+  _notifications.forEach(function(n) { n.read = true; markItemRead(n.id, n.type); });
+  renderNotifPanel();
+  updateNotifBadge();
+}
+
+function subscribeToNotifications() {
+  var u = loadUser();
+  if (!u || _notifSubscription) return;
+  _notifSubscription = _sb.channel('notif-' + u.id)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'offers' }, function() { loadNotifications(); })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, function() { loadNotifications(); })
+    .subscribe();
+}
+
+document.addEventListener('click', function(e) {
+  var panel = document.getElementById('notif-panel');
+  var btn = document.getElementById('nav-notif-btn');
+  if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+    panel.style.display = 'none';
+  }
+});
+
+window.toggleNotifPanel = toggleNotifPanel;
+window.clickNotif = clickNotif;
+window.markAllNotifsRead = markAllNotifsRead;
 
 function applyFilters(btn) {
   const panel = btn.closest('.filter-panel');
@@ -4535,6 +4877,15 @@ document.addEventListener('click', function(e) {
   }
   if (e.target.classList.contains('contact-btn')) {
     openContactModal(e.target.dataset.seller, e.target.dataset.ilan);
+  }
+  // Teklif butonları
+  if (e.target.classList.contains('btn-teklif')) {
+    const btn = e.target;
+    const kategori = btn.dataset.kategori;
+    const kategoriLabel = btn.dataset.label;
+    const formId = btn.dataset.form;
+    const baslik = btn.dataset.baslik;
+    if (kategori && formId) submitTeklif(kategori, kategoriLabel, formId, baslik);
   }
 });
 
@@ -4677,47 +5028,77 @@ function sendContactMessage() {
 const SAVED_KEY = 'km_saved_v1';
 const BUYER_TEKLIF_KEY = 'km_buyer_teklifler_v1';
 
-function loadSaved() {
-  try { return JSON.parse(_get(SAVED_KEY) || '[]'); } catch(e) { return []; }
+// ===== FAVORİLER (Supabase) =====
+async function loadSaved() {
+  const u = loadUser();
+  if (!u) return [];
+  const { data } = await _sb.from('favorites').select('*').eq('user_id', u.id).order('created_at', { ascending: false });
+  return (data || []).map(x => ({ id: x.ilan_id, name: x.ilan_name, brand: x.ilan_brand, price: x.ilan_price, page: x.ilan_page }));
 }
-function saveSavedList(arr) { _set(SAVED_KEY, JSON.stringify(arr)); }
 
-function loadBuyerTeklifler() {
-  try { return JSON.parse(_get(BUYER_TEKLIF_KEY) || '[]'); } catch(e) { return []; }
+async function saveSavedList() {} // artık kullanılmıyor
+
+async function loadBuyerTeklifler() {
+  const u = loadUser();
+  if (!u) return [];
+  const { data } = await _sb.from('offers').select('*').eq('user_id', u.id).order('created_at', { ascending: false });
+  return (data || []).map(x => ({
+    id: x.id,
+    kategori: x.kategori,
+    kategoriLabel: x.kategori_label,
+    baslik: x.baslik,
+    aciklama: x.aciklama,
+    fields: x.fields || {},
+    iletisim: x.iletisim,
+    conversationId: x.conversation_id,
+    tarih: new Date(x.created_at).getTime()
+  }));
 }
-function saveBuyerTeklifler(arr) { _set(BUYER_TEKLIF_KEY, JSON.stringify(arr)); }
 
-function saveIlan(ilan) {
-  if (!loadUser()) { go('login'); return; }
-  const arr = loadSaved();
-  if (arr.find(x => x.id === ilan.id)) {
-    showToast('Zaten kayıtlı', 'Bu ilan zaten listende.', null, false);
+async function saveBuyerTeklifler() {} // artık kullanılmıyor
+
+async function saveIlan(ilan) {
+  const u = loadUser();
+  if (!u) { go('login'); return; }
+  const { error } = await _sb.from('favorites').upsert({
+    user_id: u.id,
+    ilan_id: ilan.id,
+    ilan_name: ilan.name,
+    ilan_brand: ilan.brand || '',
+    ilan_price: ilan.price || '',
+    ilan_page: ilan.page || ''
+  }, { onConflict: 'user_id,ilan_id' });
+  if (error) {
+    showToast('Hata', error.message, null, true);
     return;
   }
-  arr.unshift(ilan);
-  saveSavedList(arr);
   updateBuyerBadges();
   showToast('Favorilere eklendi', ilan.name + ' favori ilanlarına eklendi.', null, false);
 }
 
-function removeSaved(id) {
-  const arr = loadSaved().filter(x => x.id !== id);
-  saveSavedList(arr);
+async function removeSaved(id) {
+  const u = loadUser();
+  if (!u) return;
+  await _sb.from('favorites').delete().eq('user_id', u.id).eq('ilan_id', id);
   updateBuyerBadges();
   renderBuyerSaved();
 }
 
-function updateBuyerBadges() {
-  const saved = loadSaved();
-  const teklifler = loadBuyerTeklifler();
+async function updateBuyerBadges() {
+  const u = loadUser();
+  if (!u) return;
+  const [{ count: sc }, { count: tc }] = await Promise.all([
+    _sb.from('favorites').select('*', { count: 'exact', head: true }).eq('user_id', u.id),
+    _sb.from('offers').select('*', { count: 'exact', head: true }).eq('user_id', u.id)
+  ]);
   const sb = document.getElementById('buyer-saved-badge');
   const tb = document.getElementById('buyer-teklif-badge');
   const ms = document.getElementById('buyer-metric-saved');
   const mt = document.getElementById('buyer-metric-teklif');
-  if (sb) sb.textContent = saved.length;
-  if (tb) tb.textContent = teklifler.length;
-  if (ms) ms.textContent = saved.length;
-  if (mt) mt.textContent = teklifler.length;
+  if (sb) sb.textContent = sc || 0;
+  if (tb) tb.textContent = tc || 0;
+  if (ms) ms.textContent = sc || 0;
+  if (mt) mt.textContent = tc || 0;
 }
 
 function showBuyerDash(section) {
@@ -4733,11 +5114,12 @@ function showBuyerDash(section) {
   if (section === 'main') renderBuyerPreview();
 }
 
-function renderBuyerSaved() {
+async function renderBuyerSaved() {
   const list = document.getElementById('buyer-saved-list');
   const title = document.getElementById('buyer-saved-title');
   if (!list) return;
-  const arr = loadSaved();
+  list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Yükleniyor...</div>';
+  const arr = await loadSaved();
   if (title) title.textContent = 'Favori İlanlar — ' + arr.length + ' ilan';
   if (!arr.length) {
     list.innerHTML = '<div style="padding:32px 18px;text-align:center;color:var(--muted);font-size:13px">Henüz favori ilan yok. İlan sayfalarında "Favorilere Ekle" butonunu kullanın.</div>';
@@ -4750,7 +5132,7 @@ function renderBuyerSaved() {
         <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${escapeHtml(x.brand||'')}${x.price?' • '+escapeHtml(x.price):''}</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <button onclick="go('${escapeHtml(x.page||'ilanlar')}')" style="font-size:12px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;font-family:var(--font)">Görüntüle</button>
+        <button onclick="go('${escapeHtml(x.page||'kompresorler')}')" style="font-size:12px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;font-family:var(--font)">Görüntüle</button>
         <button onclick="removeSaved('${escapeHtml(x.id)}')" style="font-size:12px;padding:6px 12px;border:1px solid #f5c6c6;border-radius:var(--radius);background:transparent;color:#c44;cursor:pointer;font-family:var(--font)">Kaldır</button>
       </div>
     </div>`).join('');
@@ -4760,59 +5142,20 @@ async function renderBuyerTeklifler() {
   const list = document.getElementById('buyer-teklif-list');
   const title = document.getElementById('buyer-teklif-title');
   if (!list) return;
-
-  list.innerHTML = '<div style="padding:24px 18px;text-align:center;color:var(--muted);font-size:13px">Yükleniyor...</div>';
-
-  let arr = [];
-  const u = loadUser();
-  try {
-    if (u && u.id) {
-      const { data, error } = await _sb
-        .from('teklifler')
-        .select('*, teklif_mesajlar(*)')
-        .eq('alici_id', u.id)
-        .order('tarih', { ascending: false });
-      if (error) throw error;
-      arr = data.map(row => ({
-        id: row.id,
-        kategori: row.kategori,
-        kategoriLabel: row.kategori_label,
-        baslik: row.baslik,
-        fields: row.fields || {},
-        aciklama: row.aciklama || '',
-        iletisim: row.iletisim || '',
-        tarih: row.tarih,
-        okundu: row.okundu,
-        yanitlandi: row.yanitlandi,
-        responses: (row.teklif_mesajlar || []).map(m => ({
-          id: m.id, tarih: m.tarih, mesaj: m.mesaj, satici: m.satici_firma
-        })).sort((a,b) => a.tarih - b.tarih)
-      }));
-      saveBuyerTeklifler(arr);
-      updateBuyerBadges();
-    } else {
-      arr = loadBuyerTeklifler();
-    }
-  } catch(e) {
-    arr = loadBuyerTeklifler();
-  }
-
+  list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Yükleniyor...</div>';
+  const arr = await loadBuyerTeklifler();
   if (title) title.textContent = 'Teklif İsteklerim — ' + arr.length + ' istek';
   if (!arr.length) {
     list.innerHTML = '<div style="padding:32px 18px;text-align:center;color:var(--muted);font-size:13px">Henüz teklif isteği göndermediniz.</div>';
     return;
   }
-  list.innerHTML = arr.map((x) => {
+  list.innerHTML = arr.map((x, i) => {
     const dt = new Date(x.tarih);
-    const hasReply = x.responses && x.responses.length > 0;
     return `
-    <div onclick="openBuyerTeklifDetailById('${escapeHtml(x.id)}')" style="padding:14px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background=''">
+    <div onclick="openTeklifDetail(${i})" style="padding:14px 18px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background=''">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
         <span style="font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;padding:3px 8px;border-radius:3px;background:rgba(201,74,30,.1);color:var(--accent)">${escapeHtml(x.kategoriLabel)}</span>
-        <div style="display:flex;gap:8px;align-items:center">
-          ${hasReply ? '<span style="font-size:10px;padding:2px 7px;border-radius:3px;background:#e6f4ea;color:#2d7a3a;font-weight:500">Yanıt var</span>' : ''}
-          <span style="font-size:11px;color:var(--muted);font-family:var(--mono)">${dt.toLocaleDateString('tr-TR')}</span>
-        </div>
+        <span style="font-size:11px;color:var(--muted);font-family:var(--mono)">${dt.toLocaleDateString('tr-TR')}</span>
       </div>
       <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px">${escapeHtml(x.baslik)}</div>
       ${x.aciklama ? `<div style="font-size:12px;color:var(--muted)">${escapeHtml(x.aciklama.slice(0,120))}${x.aciklama.length>120?'…':''}</div>` : ''}
@@ -4820,39 +5163,33 @@ async function renderBuyerTeklifler() {
   }).join('');
 }
 
-function openBuyerTeklifDetailById(id) {
-  const arr = loadBuyerTeklifler();
-  const idx = arr.findIndex(x => x.id === id);
-  if (idx >= 0) openTeklifDetail(idx);
-}
-window.openBuyerTeklifDetailById = openBuyerTeklifDetailById;
+var _currentBuyerTeklifId = null;
 
-function openTeklifDetail(idx) {
-  const arr = loadBuyerTeklifler();
+async function deleteBuyerTeklif() {
+  if (!_currentBuyerTeklifId) return;
+  if (!confirm('Bu teklif isteğini silmek istediğinize emin misiniz?')) return;
+  const { error } = await _sb.from('offers').delete().eq('id', _currentBuyerTeklifId);
+  if (error) { showToast('Hata', error.message, null, true); return; }
+  document.getElementById('teklif-detail-modal').classList.remove('open');
+  document.body.style.overflow = '';
+  if (_chatSubscription) { _chatSubscription.unsubscribe(); _chatSubscription = null; }
+  _currentBuyerTeklifId = null;
+  updateBuyerBadges();
+  renderBuyerTeklifler();
+  showToast('Silindi', 'Teklif isteği silindi.', null, false);
+}
+window.deleteBuyerTeklif = deleteBuyerTeklif;
+
+async function openTeklifDetail(idx) {
+  const arr = await loadBuyerTeklifler();
   const x = arr[idx];
   if (!x) return;
+  _currentBuyerTeklifId = x.id;
   const dt = new Date(x.tarih);
   document.getElementById('teklif-detail-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
 
-  // Satıcı mesajları bölümü
-  let mesajlarHtml = '';
-  if (x.responses && x.responses.length) {
-    mesajlarHtml = `
-    <div style="margin-top:20px">
-      <div style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin-bottom:10px">Satıcı Yanıtları (${x.responses.length})</div>
-      ${x.responses.slice().reverse().map(r => {
-        const rdt = new Date(r.tarih);
-        return `<div style="margin-bottom:10px;padding:12px;background:#f0f7f0;border-left:3px solid #2d7a3a;border-radius:var(--radius)">
-          <div style="font-size:11px;color:#2d7a3a;font-family:var(--mono);margin-bottom:6px;font-weight:500">${escapeHtml(r.satici || 'Satıcı')} — ${rdt.toLocaleDateString('tr-TR')} ${rdt.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</div>
-          <div style="font-size:13px;color:var(--text);white-space:pre-wrap">${escapeHtml(r.mesaj || '')}</div>
-        </div>`;
-      }).join('')}
-    </div>`;
-  } else {
-    mesajlarHtml = '<div style="margin-top:16px;padding:12px;background:var(--bg2);border-radius:var(--radius);font-size:13px;color:var(--muted);text-align:center">Henüz satıcı yanıtı yok.</div>';
-  }
-
+  // Temel içeriği göster
   document.getElementById('teklif-detail-content').innerHTML = `
     <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center">
       <span style="font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.6px;padding:4px 10px;border-radius:3px;background:rgba(201,74,30,.1);color:var(--accent)">${escapeHtml(x.kategoriLabel)}</span>
@@ -4864,25 +5201,125 @@ function openTeklifDetail(idx) {
       <div style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin-bottom:6px">Açıklama</div>
       <div style="font-size:13px;color:var(--text);line-height:1.6;padding:12px;background:var(--bg2);border-radius:var(--radius)">${escapeHtml(x.aciklama)}</div>
     </div>` : ''}
-    ${x.fields && Object.keys(x.fields).length ? `
-    <div style="margin-bottom:16px">
-      <div style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin-bottom:8px">Form Detayları</div>
-      ${Object.entries(x.fields).map(([k,v]) => v ? `
-        <div style="display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px">
-          <span style="color:var(--muted);min-width:120px;font-family:var(--mono);font-size:11px">${escapeHtml(k)}</span>
-          <span style="color:var(--text)">${escapeHtml(v)}</span>
-        </div>` : '').join('')}
-    </div>` : ''}
-    ${mesajlarHtml}
+    <div id="chat-section">
+      <div style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);margin-bottom:8px">Mesajlar</div>
+      <div id="chat-messages" style="min-height:60px;margin-bottom:12px;display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto">
+        <div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Yükleniyor...</div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <input type="text" id="chat-input" placeholder="Mesaj yaz..." style="flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none" onkeydown="if(event.key==='Enter')sendChatMessage(${idx})">
+        <button onclick="sendChatMessage(${idx})" style="padding:9px 16px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:13px;cursor:pointer;font-family:var(--font)">Gönder</button>
+      </div>
+    </div>
   `;
+
+  // Offers tablosundan güncel conversation_id al
+  const { data: offerData } = await _sb
+    .from('offers')
+    .select('conversation_id')
+    .eq('id', x.id)
+    .single();
+
+  const convId = offerData?.conversation_id || x.conversationId;
+
+  if (convId) {
+    loadChatMessages(convId);
+    subscribeToChatMessages(convId);
+  } else {
+    document.getElementById('chat-messages').innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Henüz mesaj yok. Satıcı size yanıt verdiğinde burada görünecek.</div>';
+  }
 }
+
+var _chatSubscription = null;
+
+function subscribeToChatMessages(conversationId) {
+  if (_chatSubscription) _chatSubscription.unsubscribe();
+  _chatSubscription = _sb
+    .channel('messages-' + conversationId)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: 'conversation_id=eq.' + conversationId
+    }, () => loadChatMessages(conversationId))
+    .subscribe();
+}
+
+async function loadChatMessages(conversationId) {
+  const el = document.getElementById('chat-messages');
+  if (!el) return;
+  const u = loadUser();
+  const { data, error } = await _sb
+    .from('messages')
+    .select('*')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: true });
+
+  if (error || !data?.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">Henüz mesaj yok.</div>';
+    return;
+  }
+
+  el.innerHTML = data.map(m => {
+    const isMe = m.sender_id === u?.id;
+    const dt = new Date(m.created_at);
+    return `<div style="display:flex;flex-direction:column;align-items:${isMe?'flex-end':'flex-start'};gap:2px">
+      <div style="max-width:80%;padding:8px 12px;border-radius:12px;font-size:13px;background:${isMe?'var(--accent)':'var(--bg2)'};color:${isMe?'#fff':'var(--text)'};line-height:1.5">${escapeHtml(m.content)}</div>
+      <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">${dt.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>
+    </div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+async function sendChatMessage(idx) {
+  const input = document.getElementById('chat-input');
+  if (!input) return;
+  const content = input.value.trim();
+  if (!content) return;
+
+  const arr = await loadBuyerTeklifler();
+  const x = arr[idx];
+  if (!x) return;
+  const u = loadUser();
+  if (!u) { go('login'); return; }
+
+  // offers tablosundan güncel conversation_id al
+  const { data: offerData } = await _sb
+    .from('offers')
+    .select('conversation_id')
+    .eq('id', x.id)
+    .single();
+
+  let convId = offerData?.conversation_id;
+
+  // Conversation yoksa - satıcının henüz yanıt vermediği demek
+  // Alıcı mesaj gönderemez, satıcının önce yanıt vermesi gerekir
+  if (!convId) {
+    showToast('Bilgi', 'Satıcı henüz size yanıt vermedi. Satıcı size teklif gönderdiğinde buradan konuşabilirsiniz.', null, false);
+    return;
+  }
+
+  input.value = '';
+  const { error } = await _sb.from('messages').insert({
+    conversation_id: convId,
+    sender_id: u.id,
+    content
+  });
+
+  if (error) showToast('Hata', error.message, null, true);
+  else loadChatMessages(convId);
+}
+
 window.openTeklifDetail = openTeklifDetail;
+window.sendChatMessage = sendChatMessage;
+window.loadChatMessages = loadChatMessages;
 
 
-function renderBuyerPreview() {
+
+async function renderBuyerPreview() {
   const el = document.getElementById('buyer-saved-preview');
   if (!el) return;
-  const arr = loadSaved();
+  const arr = await loadSaved();
   if (!arr.length) {
     el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center">Henüz favori ilan yok. İlan sayfalarında "Favorilere Ekle" butonunu kullanın.</div>';
     return;
@@ -4893,27 +5330,35 @@ function renderBuyerPreview() {
         <div style="font-size:13px;font-weight:500;color:var(--text)">${escapeHtml(x.name)}</div>
         <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${escapeHtml(x.brand||'')}${x.price?' • '+escapeHtml(x.price):''}</div>
       </div>
-      <span style="font-size:12px;color:var(--accent);cursor:pointer" onclick="go('${escapeHtml(x.page||'ilanlar')}')">Görüntüle →</span>
+      <span style="font-size:12px;color:var(--accent);cursor:pointer" onclick="go('${escapeHtml(x.page||'kompresorler')}')">Görüntüle →</span>
     </div>`).join('');
 }
 
-function loadBuyerProfile() {
+async function loadBuyerProfile() {
   const u = loadUser();
   if (!u) return;
+  // Supabase'den profil çek
+  const { data } = await _sb.from('profiles').select('*').eq('id', u.id).single();
+  const p = data || u;
   const f = (id, val) => { const el = document.getElementById(id); if (el) el.value = val||''; };
-  f('bp-ad', u.ad); f('bp-soyad', u.soyad);
-  f('bp-mail', u.mail); f('bp-firma', u.firma); f('bp-adres', u.adres);
+  f('bp-ad', p.ad); f('bp-soyad', p.soyad);
+  f('bp-mail', u.mail); f('bp-firma', p.firma); f('bp-adres', p.adres);
 }
 
-function saveBuyerProfile() {
+async function saveBuyerProfile() {
   const u = loadUser();
   if (!u) return;
-  u.ad    = (document.getElementById('bp-ad')?.value||'').trim();
-  u.soyad = (document.getElementById('bp-soyad')?.value||'').trim();
-  u.mail  = (document.getElementById('bp-mail')?.value||'').trim();
-  u.firma = (document.getElementById('bp-firma')?.value||'').trim();
-  u.adres = (document.getElementById('bp-adres')?.value||'').trim();
-  saveUser(u);
+  const ad    = (document.getElementById('bp-ad')?.value||'').trim();
+  const soyad = (document.getElementById('bp-soyad')?.value||'').trim();
+  const firma = (document.getElementById('bp-firma')?.value||'').trim();
+  const adres = (document.getElementById('bp-adres')?.value||'').trim();
+
+  const { error } = await _sb.from('profiles').upsert({ id: u.id, ad, soyad, firma, adres });
+  if (error) { showToast('Hata', error.message, null, true); return; }
+
+  // Memory'deki user'ı güncelle
+  u.ad = ad; u.soyad = soyad; u.firma = firma; u.adres = adres;
+  _memStore[USER_KEY] = JSON.stringify(u);
   updateNav();
   showToast('Profil güncellendi', 'Bilgilerin başarıyla kaydedildi.', null, false);
 }
@@ -4971,7 +5416,8 @@ document.addEventListener('DOMContentLoaded', () => {
   } else {
     try { history.replaceState({ page: 'home' }, '', '#home'); } catch(e) {}
   }
-  try { sbSeedIfEmpty().then(() => { loadTeklifler(); refreshBadge(); }); } catch(e) {}
+  try { refreshBadge(); } catch(e) {}
+  try { refreshBadge(); } catch(e) {}
   try { updateNav(); } catch(e) {}
   // Eğer doğrulama bekliyorsa ve kullanıcı /verify'e doğrudan gelirse alanları doldur
   const p = loadPending();
