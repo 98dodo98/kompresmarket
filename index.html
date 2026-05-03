@@ -4510,10 +4510,14 @@ function updateNav() {
   if (buyerDashBtn) buyerDashBtn.style.display = (u && u.verified && u.role === 'buyer') ? 'inline-flex' : 'none';
 
   if (u && u.verified) {
-    loadReadItems().then(() => {
-      loadNotifications();
-      subscribeToNotifications();
-    });
+    if (!_notifSubscription) { // sadece bağlı değilse
+      loadReadItems().then(() => {
+        loadNotifications();
+        subscribeToNotifications();
+      });
+    } else {
+      loadNotifications(); // bağlıysa sadece yenile
+    }
     // Giriş yapılmış: login/register/demo butonlarını gizle
     const bl = document.getElementById('btn-login');
     const br = document.getElementById('btn-register');
@@ -4701,14 +4705,20 @@ async function loadNotifications() {
     const { data: msgs } = await _sb.from('messages').select('id, content, created_at, sender_id, conversation_id')
       .in('conversation_id', convs.map(function(c) { return c.id; }))
       .neq('sender_id', u.id)
-      .order('created_at', { ascending: false }).limit(20);
-    if (msgs) msgs.forEach(function(m) {
-      _notifications.push({ id: 'msg-'+m.id, type: 'message', title: 'Yeni Mesaj',
-        sub: m.content.slice(0,60)+(m.content.length>60?'…':''), time: m.created_at,
-        read: _readItemIds.has('msg-'+m.id),
-        action: function() { if (u.role === 'seller') { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 100); } else goBuyerDashboard(); }
+      .order('created_at', { ascending: false }).limit(50);
+    if (msgs) {
+      // Conversation bazında grupla — her conversation için sadece son mesaj
+      var seenConvs = {};
+      msgs.forEach(function(m) {
+        if (seenConvs[m.conversation_id]) return; // aynı conversation'dan ikinci mesajı atla
+        seenConvs[m.conversation_id] = true;
+        _notifications.push({ id: 'msg-'+m.conversation_id, type: 'message', title: 'Yeni Mesaj',
+          sub: m.content.slice(0,60)+(m.content.length>60?'…':''), time: m.created_at,
+          read: _readItemIds.has('msg-'+m.conversation_id),
+          action: function() { if (u.role === 'seller') { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 100); } else goBuyerDashboard(); }
+        });
       });
-    });
+    }
   }
 
   _notifications.sort(function(a, b) { return new Date(b.time) - new Date(a.time); });
@@ -4769,7 +4779,7 @@ function markAllNotifsRead() {
 
 function subscribeToNotifications() {
   var u = loadUser();
-  if (!u || _notifSubscription) return;
+  if (!u || _notifSubscription) return; // zaten bağlıysa çıkma
   _notifSubscription = _sb.channel('notif-' + u.id)
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'offers' }, function() { loadNotifications(); })
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, function() { loadNotifications(); })
