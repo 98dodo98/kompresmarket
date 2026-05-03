@@ -3603,7 +3603,7 @@ async function loadTeklifler() {
     yanitlandi: !!x.conversation_id,
     conversationId: x.conversation_id,
     alici: profileMap[x.user_id] || null
-  }));
+  })).filter(x => !_readItemIds.has('dismissed-' + x.id));
 }
 
 function saveTeklifler(arr) {
@@ -3924,13 +3924,21 @@ async function toggleReadCurrent() {
 
 async function deleteCurrentTeklif() {
   if (!currentTeklifId) return;
-  if (!confirm('Bu teklif isteğini silmek istediğinize emin misiniz?')) return;
-  // Supabase'den sil
-  await _sb.from('offers').delete().eq('id', currentTeklifId);
+  if (!confirm('Bu teklif isteğini gelen kutunuzdan kaldırmak istediğinize emin misiniz?')) return;
+  // Sadece okundu olarak işaretle, gerçek silme yapma
+  await markItemRead(currentTeklifId, 'offer');
+  // Satıcı inbox'ından gizlemek için dismissed listesine ekle
+  const u = loadUser();
+  if (u) {
+    await _sb.from('read_items').upsert({
+      user_id: u.id, item_id: 'dismissed-' + currentTeklifId, item_type: 'dismissed'
+    }, { onConflict: 'user_id,item_id' });
+    _readItemIds.add('dismissed-' + currentTeklifId);
+  }
   refreshBadge();
   closeTeklifModal();
   renderInbox();
-  showToast('Silindi', 'Teklif isteği listeden kaldırıldı.', null, false);
+  showToast('Kaldırıldı', 'Teklif isteği gelen kutunuzdan kaldırıldı.', null, false);
 }
 
 /* ===== Yanıt yazma (compose) ===== */
@@ -4073,10 +4081,10 @@ async function sendCompose() {
 
   const arr = await loadTeklifler();
   const t = arr.find(x => x.id === currentTeklifId);
-  if (!t) return;
+  if (!t) { _sendingCompose = false; return; }
 
   const u = loadUser();
-  if (!u) return;
+  if (!u) { _sendingCompose = false; return; }
 
   const btn = document.querySelector('.tk-btn-primary');
   if (btn) { btn.disabled = true; btn.textContent = 'Gönderiliyor...'; }
