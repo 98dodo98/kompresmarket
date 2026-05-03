@@ -4051,13 +4051,16 @@ async function reloadSellerChat(convId) {
 window.sendSellerMessage = sendSellerMessage;
 window.reloadSellerChat = reloadSellerChat;
 
+var _sendingCompose = false;
 async function sendCompose() {
-  if (!currentTeklifId) return;
+  if (!currentTeklifId || _sendingCompose) return;
+  _sendingCompose = true;
   const mesaj = (document.getElementById('cmp-mesaj')?.value || '').trim();
 
   if (!mesaj) {
     showToast('Mesaj boş', 'Lütfen alıcıya iletmek istediğiniz mesajı yazın.', null, true);
     document.getElementById('cmp-mesaj')?.focus();
+    _sendingCompose = false;
     return;
   }
 
@@ -4130,12 +4133,7 @@ async function sendCompose() {
   document.getElementById('tk-modal-foot-detail').style.display = 'flex';
   document.getElementById('tk-modal-foot-compose').style.display = 'none';
   document.getElementById('cmp-mesaj').value = '';
-  openTeklifModal(currentTeklifId);
-  renderInbox();
-  showToast('Mesajınız alıcıya iletildi', 'Mesajınız başarıyla gönderildi.', t.kategoriLabel, false);
-  document.getElementById('tk-modal-foot-detail').style.display = 'flex';
-  document.getElementById('tk-modal-foot-compose').style.display = 'none';
-  document.getElementById('cmp-mesaj').value = '';
+  _sendingCompose = false;
   openTeklifModal(currentTeklifId);
   renderInbox();
 }
@@ -4574,6 +4572,7 @@ async function logout() {
   await _sb.auth.signOut();
   clearUser();
   _notifications = [];
+  _readNotifIds.clear();
   if (_notifSubscription) { _notifSubscription.unsubscribe(); _notifSubscription = null; }
   updateNotifBadge();
   updateNav();
@@ -4637,6 +4636,7 @@ window.filterKomp = filterKomp;
 // ===== BİLDİRİM SİSTEMİ =====
 var _notifications = [];
 var _notifSubscription = null;
+var _readNotifIds = new Set(); // okunmuş bildirim ID'leri
 
 async function loadNotifications() {
   const u = loadUser();
@@ -4646,7 +4646,8 @@ async function loadNotifications() {
   if (u.role === 'seller') {
     const { data: offers } = await _sb.from('offers').select('id, baslik, created_at').order('created_at', { ascending: false }).limit(20);
     if (offers) offers.forEach(o => {
-      _notifications.push({ id: 'offer-'+o.id, type: 'offer', title: 'Yeni Teklif İsteği', sub: o.baslik, time: o.created_at, read: false,
+      _notifications.push({ id: 'offer-'+o.id, type: 'offer', title: 'Yeni Teklif İsteği', sub: o.baslik, time: o.created_at,
+        read: _readNotifIds.has('offer-'+o.id),
         action: function() { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 100); }
       });
     });
@@ -4660,7 +4661,8 @@ async function loadNotifications() {
       .order('created_at', { ascending: false }).limit(20);
     if (msgs) msgs.forEach(function(m) {
       _notifications.push({ id: 'msg-'+m.id, type: 'message', title: 'Yeni Mesaj',
-        sub: m.content.slice(0,60)+(m.content.length>60?'…':''), time: m.created_at, read: false,
+        sub: m.content.slice(0,60)+(m.content.length>60?'…':''), time: m.created_at,
+        read: _readNotifIds.has('msg-'+m.id),
         action: function() { if (u.role === 'seller') { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 100); } else goBuyerDashboard(); }
       });
     });
@@ -4709,6 +4711,7 @@ function toggleNotifPanel() {
 
 function clickNotif(idx) {
   _notifications[idx].read = true;
+  _readNotifIds.add(_notifications[idx].id);
   document.getElementById('notif-panel').style.display = 'none';
   renderNotifPanel();
   updateNotifBadge();
@@ -4716,7 +4719,7 @@ function clickNotif(idx) {
 }
 
 function markAllNotifsRead() {
-  _notifications.forEach(function(n) { n.read = true; });
+  _notifications.forEach(function(n) { n.read = true; _readNotifIds.add(n.id); });
   renderNotifPanel();
   updateNotifBadge();
 }
