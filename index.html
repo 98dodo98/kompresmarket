@@ -3347,8 +3347,9 @@ body {
       <button class="tk-modal-x" onclick="document.getElementById('teklif-detail-modal').classList.remove('open');document.body.style.overflow=''">×</button>
     </div>
     <div style="padding:20px 22px" id="teklif-detail-content"></div>
-    <div class="tk-modal-foot" style="display:flex;justify-content:flex-end">
-      <button class="tk-btn tk-btn-primary" onclick="document.getElementById('teklif-detail-modal').classList.remove('open');document.body.style.overflow=''">Kapat</button>
+    <div class="tk-modal-foot" style="display:flex;justify-content:space-between">
+      <button class="tk-btn tk-btn-danger" onclick="deleteBuyerTeklif()">Sil</button>
+      <button class="tk-btn tk-btn-primary" onclick="document.getElementById('teklif-detail-modal').classList.remove('open');document.body.style.overflow='';if(_chatSubscription){_chatSubscription.unsubscribe();_chatSubscription=null;}">Kapat</button>
     </div>
   </div>
 </div>
@@ -5149,10 +5150,28 @@ async function renderBuyerTeklifler() {
   }).join('');
 }
 
+var _currentBuyerTeklifId = null;
+
+async function deleteBuyerTeklif() {
+  if (!_currentBuyerTeklifId) return;
+  if (!confirm('Bu teklif isteğini silmek istediğinize emin misiniz?')) return;
+  const { error } = await _sb.from('offers').delete().eq('id', _currentBuyerTeklifId);
+  if (error) { showToast('Hata', error.message, null, true); return; }
+  document.getElementById('teklif-detail-modal').classList.remove('open');
+  document.body.style.overflow = '';
+  if (_chatSubscription) { _chatSubscription.unsubscribe(); _chatSubscription = null; }
+  _currentBuyerTeklifId = null;
+  updateBuyerBadges();
+  renderBuyerTeklifler();
+  showToast('Silindi', 'Teklif isteği silindi.', null, false);
+}
+window.deleteBuyerTeklif = deleteBuyerTeklif;
+
 async function openTeklifDetail(idx) {
   const arr = await loadBuyerTeklifler();
   const x = arr[idx];
   if (!x) return;
+  _currentBuyerTeklifId = x.id;
   const dt = new Date(x.tarih);
   document.getElementById('teklif-detail-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
