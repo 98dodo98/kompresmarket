@@ -3598,8 +3598,8 @@ async function loadTeklifler() {
     aciklama: x.aciklama || '',
     iletisim: x.iletisim || '',
     tarih: new Date(x.created_at).getTime(),
-    okundu: false,
-    yanitlandi: false,
+    okundu: _readItemIds.has(x.id),
+    yanitlandi: !!x.conversation_id,
     conversationId: x.conversation_id,
     alici: profileMap[x.user_id] || null
   }));
@@ -3749,6 +3749,7 @@ async function openTeklifModal(id) {
   const t = arr.find(x => x.id === id);
   if (!t) return;
   currentTeklifId = id;
+  markItemRead(id, 'offer');
 
   // Foot durumunu detay'a sıfırla
   const fd = document.getElementById('tk-modal-foot-detail');
@@ -3909,8 +3910,13 @@ async function toggleReadCurrent() {
   const arr = await loadTeklifler();
   const t = arr.find(x => x.id === currentTeklifId);
   if (!t) return;
-  t.okundu = !t.okundu;
-  document.getElementById('tk-btn-read').textContent = t.okundu ? 'Okunmadı yap' : 'Okundu yap';
+  if (_readItemIds.has(currentTeklifId)) {
+    unmarkItemRead(currentTeklifId);
+  } else {
+    markItemRead(currentTeklifId, 'offer');
+  }
+  const isRead = _readItemIds.has(currentTeklifId);
+  document.getElementById('tk-btn-read').textContent = isRead ? 'Okunmadı yap' : 'Okundu yap';
   refreshBadge();
   renderInbox();
 }
@@ -4490,8 +4496,10 @@ function updateNav() {
   if (buyerDashBtn) buyerDashBtn.style.display = (u && u.verified && u.role === 'buyer') ? 'inline-flex' : 'none';
 
   if (u && u.verified) {
-    loadNotifications();
-    subscribeToNotifications();
+    loadReadItems().then(() => {
+      loadNotifications();
+      subscribeToNotifications();
+    });
     // Giriş yapılmış: login/register/demo butonlarını gizle
     const bl = document.getElementById('btn-login');
     const br = document.getElementById('btn-register');
@@ -4572,7 +4580,7 @@ async function logout() {
   await _sb.auth.signOut();
   clearUser();
   _notifications = [];
-  _readNotifIds.clear();
+  _readItemIds.clear();
   if (_notifSubscription) { _notifSubscription.unsubscribe(); _notifSubscription = null; }
   updateNotifBadge();
   updateNav();
@@ -4636,7 +4644,28 @@ window.filterKomp = filterKomp;
 // ===== BİLDİRİM SİSTEMİ =====
 var _notifications = [];
 var _notifSubscription = null;
-var _readNotifIds = new Set(); // okunmuş bildirim ID'leri
+var _readItemIds = new Set(); // Supabase'den yüklenir
+
+async function loadReadItems() {
+  const u = loadUser();
+  if (!u) return;
+  const { data } = await _sb.from('read_items').select('item_id').eq('user_id', u.id);
+  if (data) data.forEach(r => _readItemIds.add(r.item_id));
+}
+
+async function markItemRead(itemId, itemType) {
+  const u = loadUser();
+  if (!u || _readItemIds.has(itemId)) return;
+  _readItemIds.add(itemId);
+  await _sb.from('read_items').upsert({ user_id: u.id, item_id: itemId, item_type: itemType }, { onConflict: 'user_id,item_id' });
+}
+
+async function unmarkItemRead(itemId) {
+  const u = loadUser();
+  if (!u) return;
+  _readItemIds.delete(itemId);
+  await _sb.from('read_items').delete().eq('user_id', u.id).eq('item_id', itemId);
+}
 
 async function loadNotifications() {
   const u = loadUser();
@@ -4647,7 +4676,7 @@ async function loadNotifications() {
     const { data: offers } = await _sb.from('offers').select('id, baslik, created_at').order('created_at', { ascending: false }).limit(20);
     if (offers) offers.forEach(o => {
       _notifications.push({ id: 'offer-'+o.id, type: 'offer', title: 'Yeni Teklif İsteği', sub: o.baslik, time: o.created_at,
-        read: _readNotifIds.has('offer-'+o.id),
+        read: _readItemIds.has('offer-'+o.id),
         action: function() { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 100); }
       });
     });
@@ -4662,7 +4691,7 @@ async function loadNotifications() {
     if (msgs) msgs.forEach(function(m) {
       _notifications.push({ id: 'msg-'+m.id, type: 'message', title: 'Yeni Mesaj',
         sub: m.content.slice(0,60)+(m.content.length>60?'…':''), time: m.created_at,
-        read: _readNotifIds.has('msg-'+m.id),
+        read: _readItemIds.has('msg-'+m.id),
         action: function() { if (u.role === 'seller') { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 100); } else goBuyerDashboard(); }
       });
     });
@@ -4711,7 +4740,7 @@ function toggleNotifPanel() {
 
 function clickNotif(idx) {
   _notifications[idx].read = true;
-  _readNotifIds.add(_notifications[idx].id);
+  markItemRead(_notifications[idx].id, _notifications[idx].type);
   document.getElementById('notif-panel').style.display = 'none';
   renderNotifPanel();
   updateNotifBadge();
@@ -4719,7 +4748,7 @@ function clickNotif(idx) {
 }
 
 function markAllNotifsRead() {
-  _notifications.forEach(function(n) { n.read = true; _readNotifIds.add(n.id); });
+  _notifications.forEach(function(n) { n.read = true; markItemRead(n.id, n.type); });
   renderNotifPanel();
   updateNotifBadge();
 }
