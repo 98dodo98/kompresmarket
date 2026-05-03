@@ -4739,9 +4739,16 @@ async function openTeklifDetayPage(offerId, role) {
   _detayOfferId = offerId;
   _detayRole = role;
 
-  // Supabase'den teklif verisini çek
-  const { data: offer } = await _sb.from('offers').select('*, profiles(ad, soyad, firma, adres)').eq('id', offerId).single();
+  // Supabase'den teklif verisini çek (join olmadan)
+  const { data: offer } = await _sb.from('offers').select('*').eq('id', offerId).single();
   if (!offer) return;
+
+  // Alıcı profilini ayrı çek
+  let profile = null;
+  if (role === 'seller' && offer.user_id) {
+    const { data: p } = await _sb.from('profiles').select('ad, soyad, firma, adres').eq('id', offer.user_id).single();
+    profile = p;
+  }
 
   // Okundu işaretle
   await markItemRead(offerId, 'offer');
@@ -4787,8 +4794,8 @@ async function openTeklifDetayPage(offerId, role) {
   // Alıcı bilgileri (satıcı için)
   const aliciWrap = document.getElementById('teklif-detay-alici-wrap');
   const aliciEl = document.getElementById('teklif-detay-alici');
-  if (role === 'seller' && offer.profiles) {
-    const p = offer.profiles;
+  if (role === 'seller' && profile) {
+    const p = profile;
     aliciWrap.style.display = 'block';
     aliciEl.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">' +
       (p.ad||p.soyad ? `<div style="padding:10px 14px;border-bottom:1px solid var(--border)"><div style="font-size:10px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;margin-bottom:3px">Ad Soyad</div><div style="font-size:13px;font-weight:500">${escapeHtml((p.ad||'')+' '+(p.soyad||''))}</div></div>` : '') +
