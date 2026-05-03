@@ -3603,7 +3603,12 @@ async function loadTeklifler() {
     yanitlandi: !!x.conversation_id,
     conversationId: x.conversation_id,
     alici: profileMap[x.user_id] || null
-  })).filter(x => !_readItemIds.has('dismissed-' + x.id));
+  })).filter(x => {
+    // Dismissed olan ama conversation_id'si olan (mesajlaşma var) teklifleri göster
+    const dismissed = _readItemIds.has('dismissed-' + x.id);
+    if (!dismissed) return true;
+    return !!x.conversationId; // mesaj varsa göster
+  });
 }
 
 function saveTeklifler(arr) {
@@ -5287,23 +5292,11 @@ async function sendChatMessage(idx) {
 
   let convId = offerData?.conversation_id;
 
-  // Conversation yoksa oluştur (alıcı ilk mesajı gönderiyorsa)
+  // Conversation yoksa - satıcının henüz yanıt vermediği demek
+  // Alıcı mesaj gönderemez, satıcının önce yanıt vermesi gerekir
   if (!convId) {
-    const { data: conv, error } = await _sb
-      .from('conversations')
-      .insert({
-        buyer_id: u.id,
-        seller_id: u.id, // Satıcı ID'si bilinmiyor, şimdilik aynı
-        listing_id: x.id,
-        listing_title: x.baslik
-      })
-      .select()
-      .single();
-
-    if (error) { showToast('Hata', error.message, null, true); return; }
-    convId = conv.id;
-    await _sb.from('offers').update({ conversation_id: convId }).eq('id', x.id);
-    subscribeToChatMessages(convId);
+    showToast('Bilgi', 'Satıcı henüz size yanıt vermedi. Satıcı size teklif gönderdiğinde buradan konuşabilirsiniz.', null, false);
+    return;
   }
 
   input.value = '';
