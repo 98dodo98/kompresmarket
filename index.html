@@ -2117,7 +2117,7 @@ body {
   <div class="nav-actions" id="nav-actions">
     <button class="btn-ghost" id="btn-login">Üye Girişi</button>
     <button class="btn-accent" id="btn-register">Üye Ol</button>
-    <button id="btn-demo-buyer" style="font-size:11px;padding:5px 10px;border-radius:var(--radius);border:1px dashed #3e3e38;color:#555;background:transparent;cursor:pointer;font-family:var(--font)" onclick="demoLogin('muster')">Demo Alıcı</button>
+    <button id="btn-demo-buyer" style="font-size:11px;padding:5px 10px;border-radius:var(--radius);border:1px dashed #3e3e38;color:#555;background:transparent;cursor:pointer;font-family:var(--font)" onclick="demoLogin('buyer')">Demo Alıcı</button>
     <button id="btn-demo-seller" style="font-size:11px;padding:5px 10px;border-radius:var(--radius);border:1px dashed #3e3e38;color:#555;background:transparent;cursor:pointer;font-family:var(--font)" onclick="demoLogin('seller')">Demo Satıcı</button>
   </div>
 </nav>
@@ -2898,7 +2898,7 @@ body {
         <p class="reg-sub">Ücretsiz müşteri üyeliği veya ücretli satıcı hesabı açın</p>
       </div>
       <div class="reg-tabs">
-        <button class="reg-tab active" onclick="switchTab('muster',this)">Müşteri Üyeliği — Ücretsiz</button>
+        <button class="reg-tab active" onclick="switchTab('buyer',this)">Müşteri Üyeliği — Ücretsiz</button>
         <button class="reg-tab" onclick="switchTab('seller',this)">Satıcı Üyeliği — Ücretli</button>
       </div>
 
@@ -2915,7 +2915,7 @@ body {
         <p class="reg-terms" id="b-pw-hint" style="margin-top:-6px;margin-bottom:14px;font-size:11px">Şifreniz en az 6 karakter olmalıdır.</p>
         <div class="field"><label>Firma İsmi <span class="field-opt">isteğe bağlı</span></label><input type="text" id="b-firma" placeholder="Yılmaz Makine A.Ş."></div>
         <div class="field"><label>Adres <span class="field-opt">isteğe bağlı</span></label><input type="text" id="b-adres" placeholder="İstanbul, Türkiye"></div>
-        <button class="btn-reg" onclick="submitRegister('muster')">Üye Ol — Ücretsiz</button>
+        <button class="btn-reg" onclick="submitRegister('buyer')">Üye Ol — Ücretsiz</button>
         <p class="reg-terms">Zaten hesabınız var mı? <a onclick="go('login')" style="color:var(--accent);cursor:pointer;text-decoration:underline">Giriş yapın</a></p>
         <p class="reg-terms">Üye olarak <u>Kullanım Koşulları</u>'nı ve <u>Gizlilik Politikası</u>'nı kabul etmiş olursunuz.</p>
       </div>
@@ -3537,7 +3537,7 @@ function sessionToUser(session) {
     firma: meta.firma || '',
     adres: meta.adres || '',
     plan: meta.plan || null,
-    role: meta.role || 'muster',
+    role: meta.role || 'buyer',
     verified: true
   };
 }
@@ -3601,7 +3601,7 @@ window.addEventListener('popstate', function(e) {
 function switchTab(type, btn) {
   document.querySelectorAll('.reg-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('form-buyer').style.display = type === 'muster' ? 'block' : 'none';
+  document.getElementById('form-buyer').style.display = type === 'buyer' ? 'block' : 'none';
   document.getElementById('form-seller').style.display = type === 'seller' ? 'block' : 'none';
 }
 
@@ -4442,7 +4442,7 @@ async function submitLogin() {
 }
 
 async function submitRegister(type) {
-  const prefix = type === 'muster' ? 'b' : 's';
+  const prefix = type === 'buyer' ? 'b' : 's';
   const ad    = (document.getElementById(prefix+'-ad')?.value || '').trim();
   const soyad = (document.getElementById(prefix+'-soyad')?.value || '').trim();
   const mail  = (document.getElementById(prefix+'-mail')?.value || '').trim();
@@ -4480,7 +4480,7 @@ async function submitRegister(type) {
     plan = sel ? sel.getAttribute('data-plan') : 'Aylık';
   }
 
-  const btn = document.querySelector('#form-' + (type === 'muster' ? 'muster' : 'seller') + ' .btn-reg');
+  const btn = document.querySelector('#form-' + (type === 'buyer' ? 'buyer' : 'seller') + ' .btn-reg');
   if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
 
   const { data, error } = await _sb.auth.signUp({
@@ -4489,7 +4489,7 @@ async function submitRegister(type) {
     options: { data: { ad, soyad, firma, adres, plan, role: type } }
   });
 
-  if (btn) { btn.disabled = false; btn.textContent = type === 'muster' ? 'Üye Ol — Ücretsiz' : 'Satıcı Hesabı Oluştur'; }
+  if (btn) { btn.disabled = false; btn.textContent = type === 'buyer' ? 'Üye Ol — Ücretsiz' : 'Satıcı Hesabı Oluştur'; }
 
   if (error) {
     showToast('Hata', error.message.includes('already') ? 'Bu e-posta adresi zaten kayıtlı.' : error.message, null, true);
@@ -4568,7 +4568,7 @@ function updateNav() {
   const dashBtn = document.getElementById('nav-dashboard-btn');
   const buyerDashBtn = document.getElementById('nav-muster-dashboard-btn');
   if (dashBtn) dashBtn.style.display = (u && u.verified && u.role === 'seller') ? 'inline-flex' : 'none';
-  if (buyerDashBtn) buyerDashBtn.style.display = (u && u.verified && u.role === 'muster') ? 'inline-flex' : 'none';
+  if (buyerDashBtn) buyerDashBtn.style.display = (u && u.verified && u.role === 'buyer') ? 'inline-flex' : 'none';
 
   if (u && u.verified) {
     if (!_notifSubscription) {
@@ -4813,7 +4813,7 @@ async function openTeklifDetayPage(offerId, role) {
   const messagesEl = document.getElementById('teklif-detay-messages');
   const chatTitle = document.getElementById('teklif-detay-chat-title');
 
-  if (role === 'muster') {
+  if (role === 'buyer') {
     // Müşteri: satıcı listesini göster
     if (saticiListEl) saticiListEl.style.display = 'flex';
     if (messagesEl) messagesEl.style.display = 'none';
@@ -4975,7 +4975,7 @@ async function sendTeklifDetayMsg() {
   if (!u) { go('login'); return; }
 
   // Müşteri ise _detaySaticiConvId kullan, satıcı ise _detayConvId
-  let convId = _detayRole === 'muster' ? _detaySaticiConvId : _detayConvId;
+  let convId = _detayRole === 'buyer' ? _detaySaticiConvId : _detayConvId;
 
   // Satıcı ise conversation yoksa oluştur
   if (!convId && _detayRole === 'seller') {
@@ -5057,7 +5057,7 @@ async function openTeklifDetayPageByIdx(idx) {
   const x = arr[idx];
   if (!x) return;
   _currentMusterTeklifId = x.id;
-  openTeklifDetayPage(x.id, 'muster');
+  openTeklifDetayPage(x.id, 'buyer');
 }
 window.openTeklifDetayPageByIdx = openTeklifDetayPageByIdx;
 
@@ -5181,7 +5181,7 @@ function updateNotifBadge() {
   var badgeBuyer = document.getElementById('nav-notif-badge-muster');
   if (badgeBuyer) {
     badgeBuyer.textContent = count > 99 ? '99+' : count;
-    badgeBuyer.style.display = (u && u.role === 'muster' && count > 0) ? 'inline' : 'none';
+    badgeBuyer.style.display = (u && u.role === 'buyer' && count > 0) ? 'inline' : 'none';
   }
 }
 
