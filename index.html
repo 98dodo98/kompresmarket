@@ -4568,13 +4568,11 @@ function updateNav() {
   if (buyerDashBtn) buyerDashBtn.style.display = (u && u.verified && u.role === 'buyer') ? 'inline-flex' : 'none';
 
   if (u && u.verified) {
-    if (!_notifSubscription) { // sadece bağlı değilse
+    if (!_notifSubscription) {
       loadReadItems().then(() => {
         loadNotifications();
         subscribeToNotifications();
       });
-    } else {
-      loadNotifications(); // bağlıysa sadece yenile
     }
     // Giriş yapılmış: login/register/demo butonlarını gizle
     const bl = document.getElementById('btn-login');
@@ -4977,9 +4975,13 @@ async function unmarkItemRead(itemId) {
   await _sb.from('read_items').delete().eq('user_id', u.id).eq('item_id', itemId);
 }
 
+var _loadingNotifs = false;
+
 async function loadNotifications() {
+  if (_loadingNotifs) return;
+  _loadingNotifs = true;
   const u = loadUser();
-  if (!u) return;
+  if (!u) { _loadingNotifs = false; return; }
   _notifications = [];
 
   if (u.role === 'seller') {
@@ -5016,6 +5018,7 @@ async function loadNotifications() {
   _notifications.sort(function(a, b) { return new Date(b.time) - new Date(a.time); });
   renderNotifPanel();
   updateNotifBadge();
+  _loadingNotifs = false;
 }
 
 function renderNotifPanel() {
