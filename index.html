@@ -2127,7 +2127,7 @@ body {
 <div class="mobile-nav-drawer" id="mobile-nav-drawer">
   <button class="mobile-nav-item" onclick="closeMobileNav();go('kompresorler')">İlanlar</button>
   <button class="mobile-nav-item" onclick="closeMobileNav();go('how')">Nasıl Çalışır</button>
-  <button class="mobile-nav-item" onclick="closeMobileNav();go('teklif-al'); setTimeout(() => switchTeklifTab('servis', document.querySelector('[onclick*="servis"]')), 50)">Teklif Al</button>
+  <button class="mobile-nav-item" onclick="closeMobileNav();goTeklifAl('servis')">Teklif Al</button>
   <div style="border-top:1px solid var(--border);margin:8px 0"></div>
   <button class="mobile-nav-item" onclick="closeMobileNav();go('login')" id="mobile-btn-login">Üye Girişi</button>
   <button class="mobile-nav-item" style="color:var(--accent);font-weight:500" onclick="closeMobileNav();go('register')" id="mobile-btn-register">Üye Ol</button>
@@ -2146,7 +2146,7 @@ body {
       <div class="hero-btns">
         <button class="btn-hero-main" onclick="go('kompresorler')">İlanları İncele</button>
         <button class="btn-hero-out" onclick="go('register')">Satıcı Ol — İlan Ver</button>
-        <button class="btn-hero-out" onclick="loadUser()?go('teklif-al'); setTimeout(() => switchTeklifTab('servis', document.querySelector('[onclick*="servis"]')), 50):go('login')" style="border-color:var(--accent);color:var(--accent)">Teklif Al →</button>
+        <button class="btn-hero-out" onclick="goTeklifAl('servis')" style="border-color:var(--accent);color:var(--accent)">Teklif Al →</button>
       </div>
       <div class="hero-stats">
         <div><span class="hero-stat-num">1.240</span><span class="hero-stat-lbl">Aktif İlan</span></div>
@@ -3767,6 +3767,10 @@ async function submitTeklif(kategori, kategoriLabel, formId, baslikPrefix) {
 
   const u = loadUser();
   if (!u) { go('login'); return; }
+  if (u.role === 'seller') {
+    showToast('Bilgi', 'Teklif istekleri sadece müşteri hesapları tarafından oluşturulabilir.', null, true);
+    return;
+  }
 
   const baslik = baslikPrefix + ' Teklif İsteği';
 
@@ -5320,7 +5324,12 @@ window.clickNotif = clickNotif;
 window.markAllNotifsRead = markAllNotifsRead;
 
 function goTeklifAl(tab) {
-  if (!loadUser()) { go('login'); return; }
+  const u = loadUser();
+  if (!u) { go('login'); return; }
+  if (u.role === 'seller') {
+    showToast('Bilgi', 'Teklif istekleri sadece müşteri hesapları tarafından oluşturulabilir.', null, true);
+    return;
+  }
   go('teklif-al');
   setTimeout(() => {
     document.querySelectorAll('.teklif-tab').forEach(b => b.classList.remove('active'));
