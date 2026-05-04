@@ -2160,12 +2160,10 @@ body {
   <div class="cat-strip">
     <button class="cat-btn active" onclick="go('kompresorler')"><span class="cat-icon"></span>Kompresörler</button>
     <button class="cat-btn" onclick="go('kurutucular')"><span class="cat-icon"></span>Kurutucular</button>
-    <button class="cat-btn" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('borulama', document.querySelector('[onclick*="borulama"]')), 50)"><span class="cat-icon"></span>Basınçlı Gaz Borulama</button>
     <button class="cat-btn" onclick="go('filtreler-ana')"><span class="cat-icon"></span>Filtreler</button>
     <button class="cat-btn" onclick="go('jeneratorler')"><span class="cat-icon"></span>Gaz Jeneratörleri</button>
     <button class="cat-btn" onclick="go('aksesuarlar')"><span class="cat-icon"></span>Aksesuarlar</button>
     <button class="cat-btn" onclick="go('yedek-parca')"><span class="cat-icon"></span>Yedek Parça</button>
-    <button class="cat-btn" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('servis', document.querySelector('[onclick*="servis"]')), 50)"><span class="cat-icon"></span>Servis Teklifi Al</button>
   </div>
 
   <div class="feat-section">
@@ -2234,7 +2232,6 @@ body {
     <button class="cat-btn" onclick="go('jeneratorler')"><span class="cat-icon"></span>Gaz Jeneratörleri</button>
     <button class="cat-btn" onclick="go('aksesuarlar')"><span class="cat-icon"></span>Aksesuarlar</button>
     <button class="cat-btn" onclick="go('yedek-parca')"><span class="cat-icon"></span>Yedek Parça</button>
-    <button class="cat-btn" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('servis', document.querySelector('[onclick*="servis"]')), 50)"><span class="cat-icon"></span>Servis Teklifi Al</button>
   </div>
   <div class="sub-strip" id="komp-sub-strip">
     <button class="sub-btn active" onclick="filterKomp('tumu',this)">Tümü</button>
@@ -2864,12 +2861,10 @@ body {
   <div class="cat-strip">
     <button class="cat-btn active" onclick="go('kompresorler')">Kompresörler</button>
     <button class="cat-btn" onclick="go('gazli-kurutucu')">Kurutucular</button>
-    <button class="cat-btn" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('borulama', document.querySelector('[onclick*="borulama"]')), 50)">Borulama</button>
     <button class="cat-btn" onclick="go('filtreler-ana')">Filtreler</button>
     <button class="cat-btn" onclick="go('jeneratorler')">Gaz Jeneratörleri</button>
     <button class="cat-btn" onclick="go('aksesuarlar')">Aksesuarlar</button>
     <button class="cat-btn" onclick="go('yedek-parca')">Yedek Parça</button>
-    <button class="cat-btn" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('servis', document.querySelector('[onclick*="servis"]')), 50)">Servis Teklifi</button>
   </div>
   <div class="listing-wrap">
     <div class="filter-panel">
@@ -3086,7 +3081,7 @@ body {
         <div class="dash-section">
           <div class="dash-section-head"><p class="dash-section-title">Son İlanlar</p><button class="btn-small" onclick="showDash('ilan-ver')">+ Yeni İlan</button></div>
           <table class="ilan-table">
-            <thead><tr><th>İlan Başlığı</th><th>Kategori</th><th>Fiyat</th><th>Görüntüleme</th><th>Durum</th></tr></thead>
+            <thead><tr><th>İlan Başlığı</th><th>Kategori</th><th>Fiyat</th><th>Görüntüleme</th><th>Durum</th></tr></thead><tbody><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Yükleniyor...</td></tr></tbody>
             <tbody>
               <tr><td>Atlas Copco GA 15 Vidalı</td><td>Vidalı Kompresör</td><td style="font-family:var(--mono)">₺ 185.000</td><td style="font-family:var(--mono)">342</td><td><span class="status-pill status-active">Aktif</span></td></tr>
               <tr><td>Kaeser SM 11 — 2. El</td><td>Vidalı Kompresör</td><td style="font-family:var(--mono)">₺ 72.000</td><td style="font-family:var(--mono)">218</td><td><span class="status-pill status-active">Aktif</span></td></tr>
@@ -3104,7 +3099,7 @@ body {
         <div class="dash-section">
           <div class="dash-section-head"><p class="dash-section-title">Tüm İlanlar</p><button class="btn-small" onclick="showDash('ilan-ver')">+ Yeni İlan</button></div>
           <table class="ilan-table">
-            <thead><tr><th>İlan Başlığı</th><th>Kategori</th><th>Fiyat</th><th>Görüntüleme</th><th>Durum</th><th></th></tr></thead>
+            <thead><tr><th>İlan Başlığı</th><th>Kategori</th><th>Fiyat</th><th>Görüntüleme</th><th>Durum</th><th></th></tr></thead><tbody><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">Yükleniyor...</td></tr></tbody>
             <tbody>
               <tr><td>Atlas Copco GA 15 Vidalı</td><td>Vidalı Kompresör</td><td style="font-family:var(--mono)">₺ 185.000</td><td style="font-family:var(--mono)">342</td><td><span class="status-pill status-active">Aktif</span></td><td><button class="ilan-edit-btn" data-title="Atlas Copco GA 15 Vidalı" data-kategori="Vidalı Kompresör" data-fiyat="185000" data-durum="aktif">Düzenle</button></td></tr>
               <tr><td>Kaeser SM 11 — 2. El</td><td>Vidalı Kompresör</td><td style="font-family:var(--mono)">₺ 72.000</td><td style="font-family:var(--mono)">218</td><td><span class="status-pill status-active">Aktif</span></td><td><button class="ilan-edit-btn" data-title="Kaeser SM 11 — 2. El" data-kategori="Vidalı Kompresör" data-fiyat="72000" data-durum="aktif">Düzenle</button></td></tr>
@@ -3127,7 +3122,7 @@ body {
               <div class="form-card-body">
                 <div class="field-row">
                   <div class="field"><label>Ana Kategori</label>
-                    <select id="cat-select" onchange="updateSubCat()">
+                    <select id="ilan-cat" onchange="updateSubCat()">
                       <option value="">Seçiniz...</option>
                       <option value="komp">Kompresörler</option>
                       <option value="kuru">Kurutucular</option>
@@ -3138,7 +3133,7 @@ body {
                     </select>
                   </div>
                   <div class="field"><label>Alt Kategori</label>
-                    <select id="subcat-select"><option>Önce ana kategori seçin</option></select>
+                    <select id="ilan-subcat"><option>Önce ana kategori seçin</option></select>
                   </div>
                 </div>
               </div>
@@ -3147,14 +3142,14 @@ body {
             <div class="form-card">
               <div class="form-card-head"><span class="form-card-num">2</span><p class="form-card-title">Ürün Bilgileri</p></div>
               <div class="form-card-body">
-                <div class="field"><label>İlan Başlığı</label><input type="text" placeholder="Örn: Atlas Copco GA 15 Vidalı Kompresör — 2024 Model"></div>
+                <div class="field"><label>İlan Başlığı *</label><input type="text" id="ilan-baslik" placeholder="Örn: Atlas Copco GA 15 Vidalı Kompresör — 2024 Model"></div>
                 <div class="field-row">
-                  <div class="field"><label>Marka</label><input type="text" placeholder="Atlas Copco"></div>
-                  <div class="field"><label>Model</label><input type="text" placeholder="GA 15"></div>
+                  <div class="field"><label>Marka</label><input type="text" id="ilan-marka" placeholder="Atlas Copco"></div>
+                  <div class="field"><label>Model</label><input type="text" id="ilan-model" placeholder="GA 15"></div>
                 </div>
                 <div class="field-row">
-                  <div class="field"><label>Durum</label><select><option>Yeni</option><option>2. El</option></select></div>
-                  <div class="field"><label>Yıl</label><input type="text" placeholder="2024"></div>
+                  <div class="field"><label>Durum</label><select id="ilan-durum"><option>Yeni</option><option>2. El</option></select></div>
+                  <div class="field"><label>Yıl</label><input type="text" id="ilan-yil" placeholder="2024"></div>
                 </div>
               </div>
             </div>
@@ -3163,16 +3158,11 @@ body {
               <div class="form-card-head"><span class="form-card-num">3</span><p class="form-card-title">Teknik Özellikler</p></div>
               <div class="form-card-body">
                 <div class="field-3">
-                  <div class="field"><label>Kapasite (m³/dk)</label><input type="text" placeholder="2.4"></div>
-                  <div class="field"><label>Motor Gücü (kW)</label><input type="text" placeholder="15"></div>
-                  <div class="field"><label>Maks. Basınç (bar)</label><input type="text" placeholder="8"></div>
+                  <div class="field"><label>Kapasite (m³/dk)</label><input type="text" id="ilan-kapasite" placeholder="2.4"></div>
+                  <div class="field"><label>Motor Gücü (kW)</label><input type="text" id="ilan-guc" placeholder="15"></div>
+                  <div class="field"><label>Maks. Basınç (bar)</label><input type="text" id="ilan-basinc" placeholder="8"></div>
                 </div>
-                <div class="field-3">
-                  <div class="field"><label>En (mm)</label><input type="text" placeholder="1200"></div>
-                  <div class="field"><label>Boy (mm)</label><input type="text" placeholder="680"></div>
-                  <div class="field"><label>Yükseklik (mm)</label><input type="text" placeholder="1050"></div>
-                </div>
-                <div class="field"><label>Ek Teknik Bilgiler</label><textarea rows="3" placeholder="Soğutma tipi, elektrik bağlantısı, yağ kapasitesi, özel özellikler..."></textarea></div>
+                <div class="field"><label>Teknik Bilgiler</label><textarea id="ilan-teknik" rows="3" placeholder="Soğutma tipi, elektrik bağlantısı, yağ kapasitesi, özel özellikler..."></textarea></div>
               </div>
             </div>
 
@@ -3193,13 +3183,14 @@ body {
               <div class="form-card-head"><span class="form-card-num">5</span><p class="form-card-title">Fiyat ve İletişim</p></div>
               <div class="form-card-body">
                 <div class="field-row">
-                  <div class="field"><label>Fiyat (₺)</label><input type="text" placeholder="185000"></div>
-                  <div class="field"><label>Fiyat Gösterimi</label><select><option>Fiyatı Göster</option><option>İletişime Geçiniz</option></select></div>
+                  <div class="field"><label>Fiyat (₺)</label><input type="text" id="ilan-fiyat" placeholder="185000"></div>
+                  <div class="field"><label>Fiyat Gösterimi</label><select id="ilan-fiyat-tip"><option>Fiyatı Göster</option><option>İletişime Geçiniz</option></select></div>
                 </div>
-                <div class="field"><label>İlan Açıklaması</label><textarea rows="4" placeholder="Ürün hakkında ek bilgiler, teslim koşulları, garanti, montaj seçenekleri..."></textarea></div>
+                <div class="field"><label>İlan Açıklaması</label><textarea id="ilan-aciklama" rows="4" placeholder="Ürün hakkında ek bilgiler, teslim koşulları, garanti, montaj seçenekleri..."></textarea></div>
+                <div id="ilan-publish-error" style="display:none;color:#c44;font-size:12px;margin-bottom:10px"></div>
                 <div class="form-submit-row">
-                  <button class="btn-draft">Taslak Kaydet</button>
-                  <button class="btn-publish">İlanı Yayınla</button>
+                  <button class="btn-draft" onclick="publishIlan('taslak')">Taslak Kaydet</button>
+                  <button class="btn-publish" onclick="publishIlan('aktif')">İlanı Yayınla</button>
                 </div>
               </div>
             </div>
@@ -3633,11 +3624,132 @@ const subcats = {
   yp: ['Hava Filtresi','Yağ Filtresi','Separator Filtre','V-Kayış','Solenoid Valf','Diğer Yedek Parça']
 };
 
+var _ilanPhotos = [];
+
 function updateSubCat() {
-  const v = document.getElementById('cat-select').value;
-  const sel = document.getElementById('subcat-select');
-  sel.innerHTML = v ? subcats[v].map(s=>`<option>${s}</option>`).join('') : '<option>Önce ana kategori seçin</option>';
+  const cat = document.getElementById('ilan-cat')?.value;
+  const sub = document.getElementById('ilan-subcat');
+  if (!sub) return;
+  const opts = {
+    komp: ['Vidalı', 'Pistonlu', 'Paletli', 'Turbo', 'Yağsız'],
+    kuru: ['Gazlı (Soğutmalı)', 'Kimyasal (Adsorpsiyonlu)'],
+    filtre: ['Hava Filtresi', 'Yağ Filtresi', 'Yağ Ayırıcı', 'Kömür Filtresi'],
+    aksesuar: ['Basınç Regülatörü', 'Nem Tutucu', 'Aftercooler', 'Manifold', 'Diğer'],
+    jenerator: ['Azot', 'Oksijen', 'Hidrojen', 'Diğer'],
+    yp: ['Kompresör', 'Kurutucu', 'Filtre', 'Diğer']
+  };
+  const list = opts[cat] || [];
+  sub.innerHTML = list.length
+    ? list.map(o => `<option>${o}</option>`).join('')
+    : '<option>Önce ana kategori seçin</option>';
 }
+
+async function publishIlan(status) {
+  const u = loadUser();
+  if (!u) { go('login'); return; }
+  const errEl = document.getElementById('ilan-publish-error');
+  if (errEl) errEl.style.display = 'none';
+
+  const baslik = (document.getElementById('ilan-baslik')?.value || '').trim();
+  const kategori = document.getElementById('ilan-cat')?.value;
+
+  if (!baslik) {
+    if (errEl) { errEl.textContent = 'İlan başlığı zorunludur.'; errEl.style.display = 'block'; }
+    return;
+  }
+  if (!kategori) {
+    if (errEl) { errEl.textContent = 'Lütfen bir kategori seçin.'; errEl.style.display = 'block'; }
+    return;
+  }
+
+  const btn = document.querySelector(status === 'aktif' ? '.btn-publish' : '.btn-draft');
+  if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
+
+  const fiyatRaw = (document.getElementById('ilan-fiyat')?.value || '').replace(/\D/g, '');
+
+  const { error } = await _sb.from('listings').insert({
+    seller_id: u.id,
+    kategori,
+    alt_kategori: document.getElementById('ilan-subcat')?.value || '',
+    baslik,
+    marka: document.getElementById('ilan-marka')?.value || '',
+    model: document.getElementById('ilan-model')?.value || '',
+    durum: document.getElementById('ilan-durum')?.value || 'Yeni',
+    yil: document.getElementById('ilan-yil')?.value || '',
+    kapasite: document.getElementById('ilan-kapasite')?.value || '',
+    guc: document.getElementById('ilan-guc')?.value || '',
+    basinc: document.getElementById('ilan-basinc')?.value || '',
+    teknik_aciklama: document.getElementById('ilan-teknik')?.value || '',
+    fiyat: fiyatRaw ? parseInt(fiyatRaw) : null,
+    fiyat_gosterim: document.getElementById('ilan-fiyat-tip')?.value || 'Fiyatı Göster',
+    aciklama: document.getElementById('ilan-aciklama')?.value || '',
+    photos: JSON.stringify(_ilanPhotos || []),
+    status
+  });
+
+  if (btn) { btn.disabled = false; btn.textContent = status === 'aktif' ? 'İlanı Yayınla' : 'Taslak Kaydet'; }
+
+  if (error) {
+    if (errEl) { errEl.textContent = 'Hata: ' + error.message; errEl.style.display = 'block'; }
+    return;
+  }
+
+  ['ilan-baslik','ilan-marka','ilan-model','ilan-yil','ilan-kapasite','ilan-guc','ilan-basinc','ilan-teknik','ilan-fiyat','ilan-aciklama'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  const catEl = document.getElementById('ilan-cat');
+  if (catEl) catEl.value = '';
+  _ilanPhotos = [];
+
+  showToast(
+    status === 'aktif' ? 'İlan yayınlandı!' : 'Taslak kaydedildi',
+    baslik + (status === 'aktif' ? ' ilanınız yayında.' : ' taslak olarak kaydedildi.'),
+    null, false
+  );
+  showDash('ilanlarim');
+  loadSellerListings();
+}
+window.publishIlan = publishIlan;
+window.updateSubCat = updateSubCat;
+
+async function loadSellerListings() {
+  const u = loadUser();
+  if (!u) return;
+  const { data } = await _sb.from('listings').select('*').eq('seller_id', u.id).order('created_at', { ascending: false });
+  
+  // İlanlarım tablosunu güncelle
+  const table1 = document.querySelector('#dash-main .ilan-table tbody');
+  const table2 = document.querySelector('#dash-ilanlarim .ilan-table tbody');
+  
+  const renderRows = (listings) => {
+    if (!listings?.length) return '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">Henüz ilan yok. <a onclick="showDash(\'ilan-ver\')" style="color:var(--accent);cursor:pointer">İlan ver →</a></td></tr>';
+    return listings.map(l => `
+      <tr>
+        <td>${escapeHtml(l.baslik)}</td>
+        <td>${escapeHtml(l.alt_kategori || l.kategori || '')}</td>
+        <td style="font-family:var(--mono)">${l.fiyat_gosterim === 'İletişime Geçiniz' ? 'İletişim' : (l.fiyat ? '₺ ' + l.fiyat.toLocaleString('tr-TR') : '-')}</td>
+        <td style="font-family:var(--mono)">-</td>
+        <td><span class="status-pill ${l.status === 'aktif' ? 'status-active' : l.status === 'taslak' ? 'status-draft' : 'status-pending'}">${l.status === 'aktif' ? 'Aktif' : l.status === 'taslak' ? 'Taslak' : 'Beklemede'}</span></td>
+        <td><button class="ilan-edit-btn" onclick="deleteListingById('${l.id}')" style="color:#c44;border-color:#f5c6c6">Sil</button></td>
+      </tr>`).join('');
+  };
+  
+  if (table1) table1.innerHTML = renderRows(data?.slice(0, 5));
+  if (table2) table2.innerHTML = renderRows(data);
+
+  // Metrik güncelle
+  const aktif = data?.filter(l => l.status === 'aktif').length || 0;
+  const metricEl = document.getElementById('metric-ilan');
+  if (metricEl) metricEl.textContent = aktif;
+}
+
+async function deleteListingById(id) {
+  if (!confirm('Bu ilanı silmek istediğinize emin misiniz?')) return;
+  await _sb.from('listings').delete().eq('id', id);
+  loadSellerListings();
+  showToast('Silindi', 'İlan kaldırıldı.', null, false);
+}
+window.deleteListingById = deleteListingById;
 
 function go(page, addHistory = true) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -4650,6 +4762,7 @@ function updateNav() {
         subscribeToNotifications();
       });
     }
+    if (u.role === 'seller') loadSellerListings();
     // Giriş yapılmış: login/register/demo butonlarını gizle
     const bl = document.getElementById('btn-login');
     const br = document.getElementById('btn-register');
