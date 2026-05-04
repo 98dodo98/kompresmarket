@@ -5036,7 +5036,10 @@ async function deleteTeklifDetay() {
     showToast('Kaldırıldı', 'Teklif gelen kutunuzdan kaldırıldı.', null, false);
     setTimeout(() => {
       go('dashboard');
-      setTimeout(() => showDash('teklifler'), 200);
+      setTimeout(async () => {
+        showDash('teklifler');
+        await renderInbox();
+      }, 200);
     }, 100);
   } else {
     // Müşteri: gerçekten sil
