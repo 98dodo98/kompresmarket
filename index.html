@@ -4738,6 +4738,7 @@ async function openTeklifDetayPage(offerId, role) {
 
   // Okundu işaretle
   await markItemRead(offerId, 'offer');
+  updateBuyerBadges();
 
   const dt = new Date(offer.created_at);
   const u = loadUser();
@@ -5095,10 +5096,16 @@ function markAllNotifsRead() {
 
 function subscribeToNotifications() {
   var u = loadUser();
-  if (!u || _notifSubscription) return; // zaten bağlıysa çıkma
+  if (!u || _notifSubscription) return;
   _notifSubscription = _sb.channel('notif-' + u.id)
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'offers' }, function() { loadNotifications(); })
-    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, function() { loadNotifications(); })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'offers' }, function() {
+      _loadingNotifs = false; // flag sıfırla ki yeniden çalışabilsin
+      loadNotifications();
+    })
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, function() {
+      _loadingNotifs = false;
+      loadNotifications();
+    })
     .subscribe();
 }
 
@@ -5413,18 +5420,20 @@ async function removeSaved(id) {
 async function updateBuyerBadges() {
   const u = loadUser();
   if (!u) return;
-  const [{ count: sc }, { count: tc }] = await Promise.all([
+  const [{ data: favData, count: sc }, { data: teklifData, count: tc }] = await Promise.all([
     _sb.from('favorites').select('*', { count: 'exact', head: true }).eq('user_id', u.id),
-    _sb.from('offers').select('*', { count: 'exact', head: true }).eq('user_id', u.id)
+    _sb.from('offers').select('id', { count: 'exact' }).eq('user_id', u.id)
   ]);
   const sb = document.getElementById('buyer-saved-badge');
   const tb = document.getElementById('buyer-teklif-badge');
   const ms = document.getElementById('buyer-metric-saved');
   const mt = document.getElementById('buyer-metric-teklif');
   if (sb) sb.textContent = sc || 0;
-  if (tb) tb.textContent = tc || 0;
   if (ms) ms.textContent = sc || 0;
   if (mt) mt.textContent = tc || 0;
+  // Okunmamış teklif sayısı
+  const unreadCount = teklifData ? teklifData.filter(t => !_readItemIds.has(t.id)).length : 0;
+  if (tb) tb.textContent = unreadCount || 0;
 }
 
 function showBuyerDash(section) {
