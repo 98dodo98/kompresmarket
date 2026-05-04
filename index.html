@@ -2111,13 +2111,13 @@ body {
       <svg viewBox="0 0 20 20" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 5h14M3 10h14M3 15h14"/></svg>
     </button>
     <button class="nav-link" id="nav-dashboard-btn" style="display:none;position:relative" onclick="go('dashboard')">Satıcı Paneli <span id="nav-notif-badge" style="display:none;background:var(--accent);color:#fff;border-radius:8px;font-size:10px;font-family:var(--mono);font-weight:700;padding:1px 6px;margin-left:4px">0</span></button>
-    <button class="nav-link" id="nav-buyer-dashboard-btn" style="display:none;position:relative" onclick="goBuyerDashboard()">Alıcı Panelim <span id="nav-notif-badge-buyer" style="display:none;background:var(--accent);color:#fff;border-radius:8px;font-size:10px;font-family:var(--mono);font-weight:700;padding:1px 6px;margin-left:4px">0</span></button>
+    <button class="nav-link" id="nav-muster-dashboard-btn" style="display:none;position:relative" onclick="goMusterDashboard()">Müşteri Panelim <span id="nav-notif-badge-muster" style="display:none;background:var(--accent);color:#fff;border-radius:8px;font-size:10px;font-family:var(--mono);font-weight:700;padding:1px 6px;margin-left:4px">0</span></button>
   </div>
   <div class="nav-spacer"></div>
   <div class="nav-actions" id="nav-actions">
     <button class="btn-ghost" id="btn-login">Üye Girişi</button>
     <button class="btn-accent" id="btn-register">Üye Ol</button>
-    <button id="btn-demo-buyer" style="font-size:11px;padding:5px 10px;border-radius:var(--radius);border:1px dashed #3e3e38;color:#555;background:transparent;cursor:pointer;font-family:var(--font)" onclick="demoLogin('buyer')">Demo Alıcı</button>
+    <button id="btn-demo-buyer" style="font-size:11px;padding:5px 10px;border-radius:var(--radius);border:1px dashed #3e3e38;color:#555;background:transparent;cursor:pointer;font-family:var(--font)" onclick="demoLogin('muster')">Demo Alıcı</button>
     <button id="btn-demo-seller" style="font-size:11px;padding:5px 10px;border-radius:var(--radius);border:1px dashed #3e3e38;color:#555;background:transparent;cursor:pointer;font-family:var(--font)" onclick="demoLogin('seller')">Demo Satıcı</button>
   </div>
 </nav>
@@ -2198,10 +2198,10 @@ body {
       <div class="section-title">İki taraf için de basit bir süreç</div>
     </div>
     <div class="how-grid">
-      <div class="how-card"><div class="how-num">01</div><div class="how-title">Üye ol</div><div class="how-desc">Alıcılar ve satıcılar ücretsiz kayıt olur. Sınırsız ilan verebilir, teklif alabilirsiniz.</div></div>
-      <div class="how-card"><div class="how-num">02</div><div class="how-title">İlan ver veya ara</div><div class="how-desc">Satıcılar kategoriye göre detaylı ilan oluşturur. Alıcılar filtrelerle hızlı arama yapar.</div></div>
+      <div class="how-card"><div class="how-num">01</div><div class="how-title">Üye ol</div><div class="how-desc">Müşteriler ve satıcılar ücretsiz kayıt olur. Sınırsız ilan verebilir, teklif alabilirsiniz.</div></div>
+      <div class="how-card"><div class="how-num">02</div><div class="how-title">İlan ver veya ara</div><div class="how-desc">Satıcılar kategoriye göre detaylı ilan oluşturur. Müşteriler filtrelerle hızlı arama yapar.</div></div>
       <div class="how-card"><div class="how-num">03</div><div class="how-title">Teklif al</div><div class="how-desc">Standart ürün bulamazsanız teklif isteği oluşturun, tüm satıcılara bildirim gitsin.</div></div>
-      <div class="how-card"><div class="how-num">04</div><div class="how-title">Doğrudan iletişim</div><div class="how-desc">Komisyon yok. Alıcı ile satıcı doğrudan iletişim kurar, anlaşmayı kendi yapar.</div></div>
+      <div class="how-card"><div class="how-num">04</div><div class="how-title">Doğrudan iletişim</div><div class="how-desc">Komisyon yok. Müşteri ile satıcı doğrudan iletişim kurar, anlaşmayı kendi yapar.</div></div>
     </div>
   </div>
 
@@ -2895,10 +2895,10 @@ body {
     <div class="reg-box">
       <div class="reg-hdr">
         <p class="reg-title">KompresMarket'e Katılın</p>
-        <p class="reg-sub">Ücretsiz alıcı üyeliği veya ücretli satıcı hesabı açın</p>
+        <p class="reg-sub">Ücretsiz müşteri üyeliği veya ücretli satıcı hesabı açın</p>
       </div>
       <div class="reg-tabs">
-        <button class="reg-tab active" onclick="switchTab('buyer',this)">Alıcı Üyeliği — Ücretsiz</button>
+        <button class="reg-tab active" onclick="switchTab('muster',this)">Müşteri Üyeliği — Ücretsiz</button>
         <button class="reg-tab" onclick="switchTab('seller',this)">Satıcı Üyeliği — Ücretli</button>
       </div>
 
@@ -2915,7 +2915,7 @@ body {
         <p class="reg-terms" id="b-pw-hint" style="margin-top:-6px;margin-bottom:14px;font-size:11px">Şifreniz en az 6 karakter olmalıdır.</p>
         <div class="field"><label>Firma İsmi <span class="field-opt">isteğe bağlı</span></label><input type="text" id="b-firma" placeholder="Yılmaz Makine A.Ş."></div>
         <div class="field"><label>Adres <span class="field-opt">isteğe bağlı</span></label><input type="text" id="b-adres" placeholder="İstanbul, Türkiye"></div>
-        <button class="btn-reg" onclick="submitRegister('buyer')">Üye Ol — Ücretsiz</button>
+        <button class="btn-reg" onclick="submitRegister('muster')">Üye Ol — Ücretsiz</button>
         <p class="reg-terms">Zaten hesabınız var mı? <a onclick="go('login')" style="color:var(--accent);cursor:pointer;text-decoration:underline">Giriş yapın</a></p>
         <p class="reg-terms">Üye olarak <u>Kullanım Koşulları</u>'nı ve <u>Gizlilik Politikası</u>'nı kabul etmiş olursunuz.</p>
       </div>
@@ -3151,7 +3151,7 @@ body {
 
       <!-- Teklif İstekleri (Inbox) -->
       <div id="dash-teklifler" style="display:none">
-        <div class="dash-head"><p class="dash-title">Teklif İstekleri</p><p class="dash-sub">Alıcılardan gelen kategorize edilmiş teklif istekleri</p></div>
+        <div class="dash-head"><p class="dash-title">Teklif İstekleri</p><p class="dash-sub">Müşterilerdan gelen kategorize edilmiş teklif istekleri</p></div>
         <div class="dash-section">
           <div class="dash-section-head"><p class="dash-section-title" id="inbox-count-title">Gelen İstekler</p></div>
           <div class="inbox-filter-row">
@@ -3170,27 +3170,27 @@ body {
 </div>
 
 <!-- ===== ALICI PANELİ ===== -->
-<div class="page" id="p-buyer-dashboard">
+<div class="page" id="p-muster-dashboard">
   <div class="dashboard-wrap">
     <div class="sidebar">
       <p class="sidebar-label">Genel</p>
-      <button class="sidebar-item active" onclick="showBuyerDash('main')">
+      <button class="sidebar-item active" onclick="showMusterDash('main')">
         <svg viewBox="0 0 14 14"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/><rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/></svg>
         Genel Bakış
       </button>
-      <button class="sidebar-item" onclick="showBuyerDash('saved')">
+      <button class="sidebar-item" onclick="showMusterDash('saved')">
         <svg viewBox="0 0 14 14"><path d="M7 1l1.8 3.6L13 5.3l-3 2.9.7 4.1L7 10.4l-3.7 1.9.7-4.1-3-2.9 4.2-.7z" stroke-width="1.2"/></svg>
         Favori İlanlar
-        <span class="sb-badge" id="buyer-saved-badge">0</span>
+        <span class="sb-badge" id="muster-saved-badge">0</span>
       </button>
-      <button class="sidebar-item" onclick="showBuyerDash('teklifler')">
+      <button class="sidebar-item" onclick="showMusterDash('teklifler')">
         <svg viewBox="0 0 14 14"><path d="M7 1a4 4 0 014 4v2l1.5 3H1.5L3 7V5a4 4 0 014-4zM5.5 10a1.5 1.5 0 003 0"/></svg>
         Teklif İsteklerim
-        <span class="sb-badge" id="buyer-teklif-badge">0</span>
+        <span class="sb-badge" id="muster-teklif-badge">0</span>
       </button>
       <div class="sidebar-sep"></div>
       <p class="sidebar-label">Hesap</p>
-      <button class="sidebar-item" onclick="showBuyerDash('profil')">
+      <button class="sidebar-item" onclick="showMusterDash('profil')">
         <svg viewBox="0 0 14 14"><circle cx="7" cy="5" r="3"/><path d="M1 13c0-3 2.7-5 6-5s6 2 6 5"/></svg>
         Profil
       </button>
@@ -3200,23 +3200,23 @@ body {
       </button>
     </div>
 
-    <div class="dash-main" id="buyer-dash-content">
+    <div class="dash-main" id="muster-dash-content">
 
       <!-- Genel Bakış -->
-      <div id="buyer-dash-main">
+      <div id="muster-dash-main">
         <div class="dash-head">
           <p class="dash-title">Genel Bakış</p>
-          <p class="dash-sub" id="buyer-dash-subtitle">Alıcı Hesabı</p>
+          <p class="dash-sub" id="muster-dash-subtitle">Müşteri Hesabı</p>
         </div>
         <div class="metrics-row" style="grid-template-columns:repeat(3,1fr)">
-          <div class="metric-card" style="cursor:pointer" onclick="showBuyerDash('saved')">
+          <div class="metric-card" style="cursor:pointer" onclick="showMusterDash('saved')">
             <p class="metric-lbl">Favori İlan</p>
-            <p class="metric-val" id="buyer-metric-saved">0</p>
+            <p class="metric-val" id="muster-metric-saved">0</p>
             <p class="metric-delta" style="color:var(--muted)">Beğendiğin ilanlar</p>
           </div>
-          <div class="metric-card" style="cursor:pointer" onclick="showBuyerDash('teklifler')">
+          <div class="metric-card" style="cursor:pointer" onclick="showMusterDash('teklifler')">
             <p class="metric-lbl">Teklif İsteği</p>
-            <p class="metric-val" id="buyer-metric-teklif">0</p>
+            <p class="metric-val" id="muster-metric-teklif">0</p>
             <p class="metric-delta" style="color:var(--muted)">Gönderdiğin istekler</p>
           </div>
           <div class="metric-card">
@@ -3230,44 +3230,44 @@ body {
             <p class="dash-section-title">Favori İlanlar</p>
             <button class="btn-small" onclick="go('kompresorler')">İlanlara Git</button>
           </div>
-          <div id="buyer-saved-preview" style="padding:20px 18px;color:var(--muted);font-size:13px;text-align:center">
+          <div id="muster-saved-preview" style="padding:20px 18px;color:var(--muted);font-size:13px;text-align:center">
             Henüz favori ilan yok. İlan sayfalarında "Favorilere Ekle" butonunu kullanın.
           </div>
         </div>
       </div>
 
       <!-- Favori İlanlar -->
-      <div id="buyer-dash-saved" style="display:none">
+      <div id="muster-dash-saved" style="display:none">
         <div class="dash-head">
           <p class="dash-title">Favori İlanlar</p>
           <p class="dash-sub">Beğenip kaydettiğin ilanlar</p>
         </div>
         <div class="dash-section">
           <div class="dash-section-head">
-            <p class="dash-section-title" id="buyer-saved-title">Favori İlanlar</p>
+            <p class="dash-section-title" id="muster-saved-title">Favori İlanlar</p>
             <button class="btn-small" onclick="go('kompresorler')">İlanlara Göz At</button>
           </div>
-          <div id="buyer-saved-list"></div>
+          <div id="muster-saved-list"></div>
         </div>
       </div>
 
       <!-- Teklif İsteklerim -->
-      <div id="buyer-dash-teklifler" style="display:none">
+      <div id="muster-dash-teklifler" style="display:none">
         <div class="dash-head">
           <p class="dash-title">Teklif İsteklerim</p>
           <p class="dash-sub">Platforma gönderdiğin teklif talepleri</p>
         </div>
         <div class="dash-section">
           <div class="dash-section-head">
-            <p class="dash-section-title" id="buyer-teklif-title">Teklif İsteklerim</p>
+            <p class="dash-section-title" id="muster-teklif-title">Teklif İsteklerim</p>
             <button class="btn-small" onclick="go('servis-teklif')">Yeni Teklif İste</button>
           </div>
-          <div id="buyer-teklif-list"></div>
+          <div id="muster-teklif-list"></div>
         </div>
       </div>
 
       <!-- Profil -->
-      <div id="buyer-dash-profil" style="display:none">
+      <div id="muster-dash-profil" style="display:none">
         <div class="dash-head">
           <p class="dash-title">Profilim</p>
           <p class="dash-sub">Hesap bilgilerin</p>
@@ -3291,7 +3291,7 @@ body {
               <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Adres <span style="font-style:italic;text-transform:none;letter-spacing:0;font-weight:400">isteğe bağlı</span></label>
               <input type="text" id="bp-adres" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none">
             </div>
-            <button class="btn-publish" onclick="saveBuyerProfile()">Değişiklikleri Kaydet</button>
+            <button class="btn-publish" onclick="saveMusterProfile()">Değişiklikleri Kaydet</button>
           </div>
         </div>
       </div>
@@ -3306,11 +3306,11 @@ body {
     <div class="section-head">
       <div class="section-label">Platform Rehberi</div>
       <div class="section-title">KompresMarket nasıl çalışır?</div>
-      <div class="section-sub">Alıcılar ve satıcılar için adım adım rehber</div>
+      <div class="section-sub">Müşteriler ve satıcılar için adım adım rehber</div>
     </div>
     <div style="max-width:600px">
       <div class="how-grid" style="grid-template-columns:1fr">
-        <div class="how-card"><div class="how-num">01</div><div class="how-title">Ücretsiz alıcı üyeliği oluşturun</div><div class="how-desc">Ad, soyad ve e-posta ile saniyeler içinde üye olun. E-posta doğrulamasından sonra tüm ilanları görebilir, teklif isteği oluşturabilirsiniz. Kredi kartı gerekmez.</div></div>
+        <div class="how-card"><div class="how-num">01</div><div class="how-title">Ücretsiz müşteri üyeliği oluşturun</div><div class="how-desc">Ad, soyad ve e-posta ile saniyeler içinde üye olun. E-posta doğrulamasından sonra tüm ilanları görebilir, teklif isteği oluşturabilirsiniz. Kredi kartı gerekmez.</div></div>
         <div class="how-card"><div class="how-num">02</div><div class="how-title">İlanları filtreleyin, karşılaştırın</div><div class="how-desc">Kapasite, güç, boyut, marka ve fiyat filtrelerini kullanarak ihtiyacınıza en uygun ekipmanı bulun. Her ilan sayfasında satıcı firma bilgileri, teknik özellikler ve fiyat yer alır.</div></div>
         <div class="how-card"><div class="how-num">03</div><div class="how-title">Bulamazsanız teklif isteği oluşturun</div><div class="how-desc">İhtiyacınızı serbest metin olarak yazın. Teklifleri Oluştur butonuna bastığınızda platformdaki tüm ücretli satıcılara bildirim gider ve satıcılar size doğrudan ulaşır.</div></div>
         <div class="how-card"><div class="how-num">04</div><div class="how-title">Doğrudan iletişim — komisyon yok</div><div class="how-desc">Her ilan sayfasında satıcı firmanın mail ve telefon bilgileri yer alır. KompresMarket araya girmez, komisyon almaz. Anlaşma siz ve satıcı arasında gerçekleşir.</div></div>
@@ -3348,10 +3348,10 @@ body {
           </div>
         </div>
 
-        <!-- Alıcı Bilgileri (satıcı için) -->
+        <!-- Müşteri Bilgileri (satıcı için) -->
         <div id="teklif-detay-alici-wrap" style="display:none;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px">
           <div style="padding:14px 20px;border-bottom:1px solid var(--border)">
-            <span style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono)">Alıcı Bilgileri</span>
+            <span style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono)">Müşteri Bilgileri</span>
           </div>
           <div id="teklif-detay-alici" style="padding:16px 20px"></div>
         </div>
@@ -3369,11 +3369,14 @@ body {
         </div>
       </div>
 
-      <!-- Sağ: Chat -->
+      <!-- Sağ: Satıcı Mesajları -->
       <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;min-height:500px">
         <div style="padding:16px 20px;border-bottom:1px solid var(--border)">
-          <span style="font-size:13px;font-weight:600;color:var(--text)">Mesajlar</span>
+          <span id="teklif-detay-chat-title" style="font-size:13px;font-weight:600;color:var(--text)">Satıcı Teklifleri</span>
         </div>
+        <!-- Satıcı listesi (müşteri için) -->
+        <div id="teklif-detay-satici-list" style="display:none;flex-direction:column;gap:0;overflow-y:auto;max-height:460px"></div>
+        <!-- Chat alanı -->
         <div id="teklif-detay-messages" style="flex:1;padding:16px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;min-height:360px;max-height:460px">
           <div style="text-align:center;color:var(--muted);font-size:13px;padding:32px">Yükleniyor...</div>
         </div>
@@ -3384,7 +3387,7 @@ body {
           <button onclick="sendTeklifDetayMsg()" style="padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:13px;cursor:pointer;font-family:var(--font);font-weight:500">Gönder</button>
         </div>
         <div id="teklif-detay-no-input" style="display:none;padding:14px 16px;border-top:1px solid var(--border);text-align:center;font-size:12px;color:var(--muted)">
-          Satıcı size teklif gönderdiğinde buradan yanıtlayabilirsiniz.
+          Henüz satıcı teklif göndermedi.
         </div>
         <div id="teklif-detay-sil-wrap" style="padding:12px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-start">
           <button onclick="deleteTeklifDetay()" style="padding:7px 14px;border:1px solid #f5c6c6;border-radius:var(--radius);background:transparent;color:#c44;font-size:12px;cursor:pointer;font-family:var(--font)">Sil</button>
@@ -3406,7 +3409,7 @@ body {
     </div>
     <div style="padding:20px 22px" id="teklif-detail-content"></div>
     <div class="tk-modal-foot" style="display:flex;justify-content:space-between">
-      <button class="tk-btn tk-btn-danger" onclick="deleteBuyerTeklif()">Sil</button>
+      <button class="tk-btn tk-btn-danger" onclick="deleteMusterTeklif()">Sil</button>
       <button class="tk-btn tk-btn-primary" onclick="document.getElementById('teklif-detail-modal').classList.remove('open');document.body.style.overflow='';if(_chatSubscription){_chatSubscription.unsubscribe();_chatSubscription=null;}">Kapat</button>
     </div>
   </div>
@@ -3534,7 +3537,7 @@ function sessionToUser(session) {
     firma: meta.firma || '',
     adres: meta.adres || '',
     plan: meta.plan || null,
-    role: meta.role || 'buyer',
+    role: meta.role || 'muster',
     verified: true
   };
 }
@@ -3598,7 +3601,7 @@ window.addEventListener('popstate', function(e) {
 function switchTab(type, btn) {
   document.querySelectorAll('.reg-tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
-  document.getElementById('form-buyer').style.display = type === 'buyer' ? 'block' : 'none';
+  document.getElementById('form-buyer').style.display = type === 'muster' ? 'block' : 'none';
   document.getElementById('form-seller').style.display = type === 'seller' ? 'block' : 'none';
 }
 
@@ -3637,7 +3640,7 @@ async function loadTeklifler() {
 
   if (error || !data?.length) return [];
 
-  // Alıcı profillerini çek
+  // Müşteri profillerini çek
   const userIds = [...new Set(data.map(x => x.user_id).filter(Boolean))];
   let profileMap = {};
   if (userIds.length) {
@@ -3723,7 +3726,7 @@ async function submitTeklif(kategori, kategoriLabel, formId, baslikPrefix) {
     else inp.value = '';
   });
 
-  updateBuyerBadges();
+  updateMusterBadges();
   refreshBadge();
 
   const ozet = Object.entries(fields).slice(0,2).map(([k,v]) => k+': '+v).join(' • ');
@@ -3859,9 +3862,9 @@ async function openTeklifModal(id) {
     html += `<div class="tk-section"><div class="tk-section-lbl">Detaylı Açıklama</div><div class="tk-desc-box">${escapeHtml(t.aciklama)}</div></div>`;
   }
 
-  // Alıcı bilgileri
+  // Müşteri bilgileri
   if (t.alici && (t.alici.ad || t.alici.firma)) {
-    html += '<div class="tk-section"><div class="tk-section-lbl">Alıcı Bilgileri</div><div class="tk-spec-grid">';
+    html += '<div class="tk-section"><div class="tk-section-lbl">Müşteri Bilgileri</div><div class="tk-spec-grid">';
     if (t.alici.ad || t.alici.soyad) html += `<div class="tk-spec-cell"><div class="tk-spec-k">Ad Soyad</div><div class="tk-spec-v">${escapeHtml((t.alici.ad+' '+t.alici.soyad).trim())}</div></div>`;
     if (t.alici.firma) html += `<div class="tk-spec-cell"><div class="tk-spec-k">Firma</div><div class="tk-spec-v">${escapeHtml(t.alici.firma)}</div></div>`;
     if (t.alici.adres) html += `<div class="tk-spec-cell"><div class="tk-spec-k">Adres</div><div class="tk-spec-v">${escapeHtml(t.alici.adres)}</div></div>`;
@@ -3885,7 +3888,7 @@ async function openTeklifModal(id) {
     html += `<button class="tk-contact-btn" onclick="copyToClipboard('${escapeHtml(c).replace(/'/g,"\\'")}')"><svg viewBox="0 0 14 14"><rect x="3" y="3" width="8" height="9" rx="1"/><path d="M5 3V2a1 1 0 011-1h5a1 1 0 011 1v8a1 1 0 01-1 1h-1"/></svg>Kopyala</button>`;
     html += '</div></div>';
   } else {
-    html += '<div class="tk-section"><div class="tk-section-lbl">İletişim</div><div class="tk-desc-box" style="font-style:italic;color:var(--muted)">Alıcı iletişim bilgisi paylaşmamış.</div></div>';
+    html += '<div class="tk-section"><div class="tk-section-lbl">İletişim</div><div class="tk-desc-box" style="font-style:italic;color:var(--muted)">Müşteri iletişim bilgisi paylaşmamış.</div></div>';
   }
 
   // Önceki mesajlar
@@ -3894,7 +3897,7 @@ async function openTeklifModal(id) {
     t.responses.slice().reverse().forEach(r => {
       const rdt = new Date(r.tarih);
       html += `<div class="tk-prev-resp">
-        <div class="tk-prev-resp-h">${rdt.toLocaleDateString('tr-TR')} ${rdt.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} — Alıcıya iletildi</div>
+        <div class="tk-prev-resp-h">${rdt.toLocaleDateString('tr-TR')} ${rdt.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})} — Müşteriye iletildi</div>
         <div style="white-space:pre-wrap">${escapeHtml(r.mesaj || '')}</div>
       </div>`;
     });
@@ -4016,7 +4019,7 @@ async function openCompose() {
   document.getElementById('tk-modal-pill').className = 'tk-modal-pill cat-' + t.kategori;
   document.getElementById('tk-modal-title').textContent = 'Teklif Gönder — ' + t.baslik;
   document.getElementById('tk-modal-meta').textContent =
-    'Alıcı: ' + (t.iletisim || 'Bilinmiyor') + ' • Kategori: ' + t.kategoriLabel;
+    'Müşteri: ' + (t.iletisim || 'Bilinmiyor') + ' • Kategori: ' + t.kategoriLabel;
 
   // Önceki yanıt var mı?
   const lastResp = (t.responses && t.responses.length) ? t.responses[t.responses.length - 1] : null;
@@ -4044,7 +4047,7 @@ async function openCompose() {
 
       <div class="field">
         <label>Mesajınız</label>
-        <textarea id="cmp-mesaj" rows="10" placeholder="Alıcıya iletilecek mesajınızı yazın..."></textarea>
+        <textarea id="cmp-mesaj" rows="10" placeholder="Müşteriye iletilecek mesajınızı yazın..."></textarea>
       </div>
     </div>`;
 
@@ -4136,7 +4139,7 @@ async function sendCompose() {
   const mesaj = (document.getElementById('cmp-mesaj')?.value || '').trim();
 
   if (!mesaj) {
-    showToast('Mesaj boş', 'Lütfen alıcıya iletmek istediğiniz mesajı yazın.', null, true);
+    showToast('Mesaj boş', 'Lütfen müşteriye iletmek istediğiniz mesajı yazın.', null, true);
     document.getElementById('cmp-mesaj')?.focus();
     _sendingCompose = false;
     return;
@@ -4207,7 +4210,7 @@ async function sendCompose() {
 
   if (btn) { btn.disabled = false; btn.textContent = 'Teklifi Gönder'; }
 
-  showToast('Mesajınız alıcıya iletildi', 'Mesajınız başarıyla gönderildi.', t.kategoriLabel, false);
+  showToast('Mesajınız müşteriye iletildi', 'Mesajınız başarıyla gönderildi.', t.kategoriLabel, false);
   document.getElementById('tk-modal-foot-detail').style.display = 'flex';
   document.getElementById('tk-modal-foot-compose').style.display = 'none';
   document.getElementById('cmp-mesaj').value = '';
@@ -4323,7 +4326,7 @@ function demoLogin(role) {
   updateNav();
   showToast('Demo modu', (isSeller ? 'Satıcı' : 'Alıcı') + ' demo hesabıyla giriş yapıldı.', isSeller ? 'Satıcı' : 'Alıcı', false);
   if (isSeller) go('dashboard');
-  else goBuyerDashboard();
+  else goMusterDashboard();
 }
 window.demoLogin = demoLogin;
 
@@ -4435,11 +4438,11 @@ async function submitLogin() {
   document.getElementById('l-pw').value = '';
   showToast('Hoş geldiniz!', u.ad + ' ' + u.soyad + ' olarak giriş yapıldı.', u.role === 'seller' ? 'Satıcı' : 'Alıcı', false);
   if (u.role === 'seller') go('dashboard');
-  else goBuyerDashboard();
+  else goMusterDashboard();
 }
 
 async function submitRegister(type) {
-  const prefix = type === 'buyer' ? 'b' : 's';
+  const prefix = type === 'muster' ? 'b' : 's';
   const ad    = (document.getElementById(prefix+'-ad')?.value || '').trim();
   const soyad = (document.getElementById(prefix+'-soyad')?.value || '').trim();
   const mail  = (document.getElementById(prefix+'-mail')?.value || '').trim();
@@ -4477,7 +4480,7 @@ async function submitRegister(type) {
     plan = sel ? sel.getAttribute('data-plan') : 'Aylık';
   }
 
-  const btn = document.querySelector('#form-' + (type === 'buyer' ? 'buyer' : 'seller') + ' .btn-reg');
+  const btn = document.querySelector('#form-' + (type === 'muster' ? 'muster' : 'seller') + ' .btn-reg');
   if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
 
   const { data, error } = await _sb.auth.signUp({
@@ -4486,7 +4489,7 @@ async function submitRegister(type) {
     options: { data: { ad, soyad, firma, adres, plan, role: type } }
   });
 
-  if (btn) { btn.disabled = false; btn.textContent = type === 'buyer' ? 'Üye Ol — Ücretsiz' : 'Satıcı Hesabı Oluştur'; }
+  if (btn) { btn.disabled = false; btn.textContent = type === 'muster' ? 'Üye Ol — Ücretsiz' : 'Satıcı Hesabı Oluştur'; }
 
   if (error) {
     showToast('Hata', error.message.includes('already') ? 'Bu e-posta adresi zaten kayıtlı.' : error.message, null, true);
@@ -4502,7 +4505,7 @@ async function submitRegister(type) {
 
   showToast('Hoş geldiniz!', ad + ', hesabınız başarıyla oluşturuldu.', type === 'seller' ? 'Satıcı' : 'Alıcı', false);
   if (type === 'seller') go('dashboard');
-  else goBuyerDashboard();
+  else goMusterDashboard();
 }
 
 function showVerifyPage(p) {
@@ -4563,9 +4566,9 @@ function updateNav() {
 
   // Satıcı Paneli nav linki
   const dashBtn = document.getElementById('nav-dashboard-btn');
-  const buyerDashBtn = document.getElementById('nav-buyer-dashboard-btn');
+  const buyerDashBtn = document.getElementById('nav-muster-dashboard-btn');
   if (dashBtn) dashBtn.style.display = (u && u.verified && u.role === 'seller') ? 'inline-flex' : 'none';
-  if (buyerDashBtn) buyerDashBtn.style.display = (u && u.verified && u.role === 'buyer') ? 'inline-flex' : 'none';
+  if (buyerDashBtn) buyerDashBtn.style.display = (u && u.verified && u.role === 'muster') ? 'inline-flex' : 'none';
 
   if (u && u.verified) {
     if (!_notifSubscription) {
@@ -4618,10 +4621,10 @@ function updateNav() {
 function renderUserMenu(u) {
   const m = document.getElementById('user-menu');
   if (!m) return;
-  const roleLabel = u.role === 'seller' ? 'Satıcı Hesabı' : 'Alıcı Hesabı';
+  const roleLabel = u.role === 'seller' ? 'Satıcı Hesabı' : 'Müşteri Hesabı';
   const dashLink = u.role === 'seller'
     ? `<button class="user-menu-item" onclick="closeUserMenu();go('dashboard')"><svg viewBox="0 0 14 14"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/><rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/></svg>Satıcı Paneli</button>`
-    : `<button class="user-menu-item" onclick="closeUserMenu();goBuyerDashboard()"><svg viewBox="0 0 14 14"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/><rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/></svg>Alıcı Panelim</button>`;
+    : `<button class="user-menu-item" onclick="closeUserMenu();goMusterDashboard()"><svg viewBox="0 0 14 14"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/><rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/></svg>Müşteri Panelim</button>`;
   m.innerHTML = `
     <div class="user-menu-info">
       <div class="user-menu-info-n">${escapeHtml(u.ad + ' ' + u.soyad)}</div>
@@ -4718,7 +4721,7 @@ window.filterKomp = filterKomp;
 // ===== TEKLİF DETAY SAYFASI =====
 var _detayConvId = null;
 var _detayOfferId = null;
-var _detayRole = null; // 'seller' veya 'buyer'
+var _detayRole = null; // 'seller' veya 'muster'
 var _detayChatSub = null;
 
 async function openTeklifDetayPage(offerId, role) {
@@ -4729,7 +4732,7 @@ async function openTeklifDetayPage(offerId, role) {
   const { data: offer } = await _sb.from('offers').select('*').eq('id', offerId).single();
   if (!offer) return;
 
-  // Alıcı profilini ayrı çek
+  // Müşteri profilini ayrı çek
   let profile = null;
   if (role === 'seller' && offer.user_id) {
     const { data: p } = await _sb.from('profiles').select('ad, soyad, firma, adres').eq('id', offer.user_id).single();
@@ -4741,7 +4744,7 @@ async function openTeklifDetayPage(offerId, role) {
   if (offer.conversation_id) {
     await markItemRead('msg-' + offer.conversation_id, 'message');
   }
-  updateBuyerBadges();
+  updateMusterBadges();
 
   const dt = new Date(offer.created_at);
   const u = loadUser();
@@ -4781,7 +4784,7 @@ async function openTeklifDetayPage(offerId, role) {
       '<div style="font-size:13px;color:var(--text);line-height:1.6;padding:14px;background:var(--bg2);border-radius:var(--radius)">' + escapeHtml(offer.aciklama) + '</div>';
   } else if (aciklamaEl) aciklamaEl.innerHTML = '';
 
-  // Alıcı bilgileri (satıcı için)
+  // Müşteri bilgileri (satıcı için)
   const aliciWrap = document.getElementById('teklif-detay-alici-wrap');
   const aliciEl = document.getElementById('teklif-detay-alici');
   if (role === 'seller' && profile) {
@@ -4806,35 +4809,133 @@ async function openTeklifDetayPage(offerId, role) {
   _detayConvId = offer.conversation_id;
   const inputWrap = document.getElementById('teklif-detay-input-wrap');
   const noInputWrap = document.getElementById('teklif-detay-no-input');
+  const saticiListEl = document.getElementById('teklif-detay-satici-list');
+  const messagesEl = document.getElementById('teklif-detay-messages');
+  const chatTitle = document.getElementById('teklif-detay-chat-title');
 
-  if (role === 'seller') {
-    // Satıcı her zaman mesaj gönderebilir
+  if (role === 'muster') {
+    // Müşteri: satıcı listesini göster
+    if (saticiListEl) saticiListEl.style.display = 'flex';
+    if (messagesEl) messagesEl.style.display = 'none';
+    if (inputWrap) inputWrap.style.display = 'none';
+    if (noInputWrap) noInputWrap.style.display = 'none';
+    if (chatTitle) chatTitle.textContent = 'Satıcı Teklifleri';
+    await loadSaticiList(offerId);
+  } else {
+    // Satıcı
+    if (saticiListEl) saticiListEl.style.display = 'none';
+    if (messagesEl) messagesEl.style.display = 'flex';
+    if (chatTitle) chatTitle.textContent = 'Mesajlar';
     if (inputWrap) inputWrap.style.display = 'flex';
     if (noInputWrap) noInputWrap.style.display = 'none';
-  } else {
-    // Alıcı sadece conversation varsa gönderebilir
+    await loadTeklifDetayMessages();
+    if (_detayChatSub) { _detayChatSub.unsubscribe(); _detayChatSub = null; }
     if (_detayConvId) {
-      if (inputWrap) inputWrap.style.display = 'flex';
-      if (noInputWrap) noInputWrap.style.display = 'none';
-    } else {
-      if (inputWrap) inputWrap.style.display = 'none';
-      if (noInputWrap) noInputWrap.style.display = 'block';
+      _detayChatSub = _sb.channel('detay-chat-' + _detayConvId)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + _detayConvId },
+          function() { loadTeklifDetayMessages(); })
+        .subscribe();
     }
-  }
-
-  await loadTeklifDetayMessages();
-
-  // Realtime subscription
-  if (_detayChatSub) { _detayChatSub.unsubscribe(); _detayChatSub = null; }
-  if (_detayConvId) {
-    _detayChatSub = _sb.channel('detay-chat-' + _detayConvId)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + _detayConvId },
-        function() { loadTeklifDetayMessages(); })
-      .subscribe();
   }
 
   go('teklif-detay');
 }
+
+var _detaySaticiConvId = null;
+
+async function loadSaticiList(offerId) {
+  const el = document.getElementById('teklif-detay-satici-list');
+  if (!el) return;
+
+  const { data: convs } = await _sb
+    .from('conversations')
+    .select('id, seller_id, created_at')
+    .eq('listing_id', offerId)
+    .order('created_at', { ascending: false });
+
+  if (!convs?.length) {
+    el.innerHTML = '<div style="padding:32px;text-align:center;color:var(--muted);font-size:13px">Henüz satıcı teklif göndermedi.</div>';
+    return;
+  }
+
+  const sellerIds = convs.map(c => c.seller_id).filter(Boolean);
+  let sellerMap = {};
+  if (sellerIds.length) {
+    const { data: profiles } = await _sb.from('profiles').select('id, ad, soyad, firma').in('id', sellerIds);
+    if (profiles) profiles.forEach(p => sellerMap[p.id] = p);
+  }
+
+  const convIds = convs.map(c => c.id);
+  const { data: lastMsgs } = await _sb.from('messages')
+    .select('conversation_id, content, created_at')
+    .in('conversation_id', convIds)
+    .order('created_at', { ascending: false });
+
+  const lastMsgMap = {};
+  if (lastMsgs) lastMsgs.forEach(m => {
+    if (!lastMsgMap[m.conversation_id]) lastMsgMap[m.conversation_id] = m;
+  });
+
+  el.innerHTML = convs.map(c => {
+    const p = sellerMap[c.seller_id] || {};
+    const name = p.firma || ((p.ad||'') + ' ' + (p.soyad||'')).trim() || 'Satıcı';
+    const lastMsg = lastMsgMap[c.id];
+    const isUnread = !_readItemIds.has('msg-' + c.id);
+    return `<div onclick="openSaticiChat('${c.id}', '${escapeHtml(name)}')"
+      style="padding:14px 20px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;gap:12px;align-items:center;background:${isUnread?'rgba(201,74,30,.04)':'var(--bg)'}"
+      onmouseover="this.style.background='var(--bg2)'" onmouseout="this.style.background='${isUnread?'rgba(201,74,30,.04)':'var(--bg)'}'">
+      <div style="width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0">${escapeHtml(name.slice(0,1).toUpperCase())}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;justify-content:space-between;margin-bottom:3px">
+          <span style="font-size:13px;font-weight:${isUnread?'700':'500'};color:var(--text)">${escapeHtml(name)}</span>
+          <span style="font-size:11px;color:var(--muted);font-family:var(--mono)">${lastMsg ? timeAgo(new Date(lastMsg.created_at)) : ''}</span>
+        </div>
+        <div style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${lastMsg ? escapeHtml(lastMsg.content.slice(0,50)) : 'Henüz mesaj yok'}</div>
+      </div>
+      ${isUnread ? '<div style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0"></div>' : ''}
+    </div>`;
+  }).join('');
+}
+
+async function openSaticiChat(convId, saticiName) {
+  _detaySaticiConvId = convId;
+  _detayConvId = convId;
+
+  const saticiListEl = document.getElementById('teklif-detay-satici-list');
+  const messagesEl = document.getElementById('teklif-detay-messages');
+  const inputWrap = document.getElementById('teklif-detay-input-wrap');
+  const chatTitle = document.getElementById('teklif-detay-chat-title');
+
+  if (saticiListEl) saticiListEl.style.display = 'none';
+  if (messagesEl) messagesEl.style.display = 'flex';
+  if (inputWrap) inputWrap.style.display = 'flex';
+  if (chatTitle) chatTitle.innerHTML = `<button onclick="backToSaticiList()" style="background:none;border:none;cursor:pointer;margin-right:8px;color:var(--accent);font-size:13px;font-family:var(--font)">← Geri</button>${escapeHtml(saticiName)}`;
+
+  await markItemRead('msg-' + convId, 'message');
+  await loadTeklifDetayMessages();
+
+  if (_detayChatSub) { _detayChatSub.unsubscribe(); _detayChatSub = null; }
+  _detayChatSub = _sb.channel('muster-chat-' + convId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + convId },
+      function() { loadTeklifDetayMessages(); })
+    .subscribe();
+}
+
+async function backToSaticiList() {
+  if (_detayChatSub) { _detayChatSub.unsubscribe(); _detayChatSub = null; }
+  const saticiListEl = document.getElementById('teklif-detay-satici-list');
+  const messagesEl = document.getElementById('teklif-detay-messages');
+  const inputWrap = document.getElementById('teklif-detay-input-wrap');
+  const chatTitle = document.getElementById('teklif-detay-chat-title');
+  if (saticiListEl) saticiListEl.style.display = 'flex';
+  if (messagesEl) messagesEl.style.display = 'none';
+  if (inputWrap) inputWrap.style.display = 'none';
+  if (chatTitle) chatTitle.textContent = 'Satıcı Teklifleri';
+  await loadSaticiList(_detayOfferId);
+}
+
+window.openSaticiChat = openSaticiChat;
+window.backToSaticiList = backToSaticiList;
 
 async function loadTeklifDetayMessages() {
   const el = document.getElementById('teklif-detay-messages');
@@ -4843,7 +4944,7 @@ async function loadTeklifDetayMessages() {
 
   if (!_detayConvId) {
     el.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:13px;padding:32px">' +
-      (_detayRole === 'seller' ? 'Henüz mesaj yok. Alıcıya teklif gönderin.' : 'Satıcı henüz yanıt vermedi.') + '</div>';
+      (_detayRole === 'seller' ? 'Henüz mesaj yok. Müşteriye teklif gönderin.' : 'Satıcı henüz yanıt vermedi.') + '</div>';
     return;
   }
 
@@ -4859,7 +4960,7 @@ async function loadTeklifDetayMessages() {
     const dt2 = new Date(m.created_at);
     return '<div style="display:flex;flex-direction:column;align-items:' + (isMe?'flex-end':'flex-start') + ';gap:3px">' +
       '<div style="max-width:75%;padding:10px 14px;border-radius:' + (isMe?'16px 16px 4px 16px':'16px 16px 16px 4px') + ';font-size:13px;background:' + (isMe?'var(--accent)':'var(--bg2)') + ';color:' + (isMe?'#fff':'var(--text)') + ';line-height:1.5">' + escapeHtml(m.content) + '</div>' +
-      '<span style="font-size:10px;color:var(--muted);font-family:var(--mono)">' + (isMe?'Siz':'Karşı Taraf') + ' • ' + dt2.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}) + '</span>' +
+      '<span style="font-size:10px;color:var(--muted);font-family:var(--mono)">' + (isMe?'Siz':'Satıcı') + ' • ' + dt2.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'}) + '</span>' +
       '</div>';
   }).join('');
   el.scrollTop = el.scrollHeight;
@@ -4873,7 +4974,8 @@ async function sendTeklifDetayMsg() {
   const u = loadUser();
   if (!u) { go('login'); return; }
 
-  let convId = _detayConvId;
+  // Müşteri ise _detaySaticiConvId kullan, satıcı ise _detayConvId
+  let convId = _detayRole === 'muster' ? _detaySaticiConvId : _detayConvId;
 
   // Satıcı ise conversation yoksa oluştur
   if (!convId && _detayRole === 'seller') {
@@ -4919,42 +5021,43 @@ async function deleteTeklifDetay() {
   if (!u) return;
 
   if (_detayRole === 'seller') {
-    // Satıcı: sadece inbox'tan kaldır
     if (!confirm('Bu teklifi gelen kutunuzdan kaldırmak istediğinize emin misiniz?')) return;
-    await markItemRead(_detayOfferId, 'offer');
-    await _sb.from('read_items').upsert({
-      user_id: u.id, item_id: 'dismissed-' + _detayOfferId, item_type: 'dismissed'
-    }, { onConflict: 'user_id,item_id' });
+    // Lokal olarak dismissed işaretle
     _readItemIds.add('dismissed-' + _detayOfferId);
+    _readItemIds.add(_detayOfferId);
+    // Supabase'e arka planda yaz (hata olsa bile devam et)
+    const u = loadUser();
+    if (u) {
+      _sb.from('read_items').upsert([
+        { user_id: u.id, item_id: _detayOfferId, item_type: 'offer' },
+        { user_id: u.id, item_id: 'dismissed-' + _detayOfferId, item_type: 'dismissed' }
+      ], { onConflict: 'user_id,item_id' }).then(r => {
+        if (r.error) console.warn('dismissed yazılamadı:', r.error.message);
+      });
+    }
     if (_detayChatSub) { _detayChatSub.unsubscribe(); _detayChatSub = null; }
     showToast('Kaldırıldı', 'Teklif gelen kutunuzdan kaldırıldı.', null, false);
     go('dashboard');
-    setTimeout(async () => {
-      showDash('inbox');
-      await renderInbox();
-    }, 100);
+    showDash('inbox');
   } else {
-    // Alıcı: gerçekten sil
+    // Müşteri: gerçekten sil
     if (!confirm('Bu teklif isteğini silmek istediğinize emin misiniz?')) return;
     const { error } = await _sb.from('offers').delete().eq('id', _detayOfferId);
     if (error) { showToast('Hata', error.message, null, true); return; }
     if (_detayChatSub) { _detayChatSub.unsubscribe(); _detayChatSub = null; }
     showToast('Silindi', 'Teklif isteği silindi.', null, false);
-    goBuyerDashboard();
-    setTimeout(async () => {
-      showBuyerDash('teklifler');
-      await renderBuyerTeklifler();
-    }, 100);
+    goMusterDashboard();
+    showMusterDash('teklifler');
   }
 }
 window.deleteTeklifDetay = deleteTeklifDetay;
 
 async function openTeklifDetayPageByIdx(idx) {
-  const arr = await loadBuyerTeklifler();
+  const arr = await loadMusterTeklifler();
   const x = arr[idx];
   if (!x) return;
-  _currentBuyerTeklifId = x.id;
-  openTeklifDetayPage(x.id, 'buyer');
+  _currentMusterTeklifId = x.id;
+  openTeklifDetayPage(x.id, 'muster');
 }
 window.openTeklifDetayPageByIdx = openTeklifDetayPageByIdx;
 
@@ -5035,7 +5138,7 @@ async function loadNotifications() {
           _notifications.push({ id: notifId, type: 'message', title: 'Yeni Mesaj',
             sub: m.content.slice(0,60)+(m.content.length>60?'…':''), time: m.created_at,
             read: false,
-            action: function() { if (u.role === 'seller') { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 100); } else goBuyerDashboard(); }
+            action: function() { if (u.role === 'seller') { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 100); } else goMusterDashboard(); }
           });
         }
       });
@@ -5074,11 +5177,11 @@ function updateNotifBadge() {
     badge.textContent = count > 99 ? '99+' : count;
     badge.style.display = (u && u.role === 'seller' && count > 0) ? 'inline' : 'none';
   }
-  // Alıcı badge
-  var badgeBuyer = document.getElementById('nav-notif-badge-buyer');
+  // Müşteri badge
+  var badgeBuyer = document.getElementById('nav-notif-badge-muster');
   if (badgeBuyer) {
     badgeBuyer.textContent = count > 99 ? '99+' : count;
-    badgeBuyer.style.display = (u && u.role === 'buyer' && count > 0) ? 'inline' : 'none';
+    badgeBuyer.style.display = (u && u.role === 'muster' && count > 0) ? 'inline' : 'none';
   }
 }
 
@@ -5382,7 +5485,7 @@ async function loadSaved() {
 
 async function saveSavedList() {} // artık kullanılmıyor
 
-async function loadBuyerTeklifler() {
+async function loadMusterTeklifler() {
   const u = loadUser();
   if (!u) return [];
   const { data } = await _sb.from('offers').select('*').eq('user_id', u.id).order('created_at', { ascending: false });
@@ -5416,7 +5519,7 @@ async function saveIlan(ilan) {
     showToast('Hata', error.message, null, true);
     return;
   }
-  updateBuyerBadges();
+  updateMusterBadges();
   showToast('Favorilere eklendi', ilan.name + ' favori ilanlarına eklendi.', null, false);
 }
 
@@ -5424,21 +5527,21 @@ async function removeSaved(id) {
   const u = loadUser();
   if (!u) return;
   await _sb.from('favorites').delete().eq('user_id', u.id).eq('ilan_id', id);
-  updateBuyerBadges();
-  renderBuyerSaved();
+  updateMusterBadges();
+  renderMusterSaved();
 }
 
-async function updateBuyerBadges() {
+async function updateMusterBadges() {
   const u = loadUser();
   if (!u) return;
   const [{ data: favData, count: sc }, { data: teklifData, count: tc }] = await Promise.all([
     _sb.from('favorites').select('*', { count: 'exact', head: true }).eq('user_id', u.id),
     _sb.from('offers').select('id', { count: 'exact' }).eq('user_id', u.id)
   ]);
-  const sb = document.getElementById('buyer-saved-badge');
-  const tb = document.getElementById('buyer-teklif-badge');
-  const ms = document.getElementById('buyer-metric-saved');
-  const mt = document.getElementById('buyer-metric-teklif');
+  const sb = document.getElementById('muster-saved-badge');
+  const tb = document.getElementById('muster-teklif-badge');
+  const ms = document.getElementById('muster-metric-saved');
+  const mt = document.getElementById('muster-metric-teklif');
   if (sb) sb.textContent = sc || 0;
   if (ms) ms.textContent = sc || 0;
   if (mt) mt.textContent = tc || 0;
@@ -5447,22 +5550,22 @@ async function updateBuyerBadges() {
   if (tb) tb.textContent = unreadCount || 0;
 }
 
-function showBuyerDash(section) {
-  document.querySelectorAll('#buyer-dash-content > div').forEach(d => d.style.display = 'none');
-  const target = document.getElementById('buyer-dash-' + section);
+function showMusterDash(section) {
+  document.querySelectorAll('#muster-dash-content > div').forEach(d => d.style.display = 'none');
+  const target = document.getElementById('muster-dash-' + section);
   if (target) target.style.display = 'block';
-  document.querySelectorAll('#p-buyer-dashboard .sidebar-item').forEach(i => i.classList.remove('active'));
+  document.querySelectorAll('#p-muster-dashboard .sidebar-item').forEach(i => i.classList.remove('active'));
   if (event && event.currentTarget) event.currentTarget.classList.add('active');
-  updateBuyerBadges();
-  if (section === 'saved') renderBuyerSaved();
-  if (section === 'teklifler') renderBuyerTeklifler();
-  if (section === 'profil') loadBuyerProfile();
-  if (section === 'main') renderBuyerPreview();
+  updateMusterBadges();
+  if (section === 'saved') renderMusterSaved();
+  if (section === 'teklifler') renderMusterTeklifler();
+  if (section === 'profil') loadMusterProfile();
+  if (section === 'main') renderMusterPreview();
 }
 
-async function renderBuyerSaved() {
-  const list = document.getElementById('buyer-saved-list');
-  const title = document.getElementById('buyer-saved-title');
+async function renderMusterSaved() {
+  const list = document.getElementById('muster-saved-list');
+  const title = document.getElementById('muster-saved-title');
   if (!list) return;
   list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Yükleniyor...</div>';
   const arr = await loadSaved();
@@ -5484,12 +5587,12 @@ async function renderBuyerSaved() {
     </div>`).join('');
 }
 
-async function renderBuyerTeklifler() {
-  const list = document.getElementById('buyer-teklif-list');
-  const title = document.getElementById('buyer-teklif-title');
+async function renderMusterTeklifler() {
+  const list = document.getElementById('muster-teklif-list');
+  const title = document.getElementById('muster-teklif-title');
   if (!list) return;
   list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">Yükleniyor...</div>';
-  const arr = await loadBuyerTeklifler();
+  const arr = await loadMusterTeklifler();
   if (title) title.textContent = 'Teklif İsteklerim — ' + arr.length + ' istek';
   if (!arr.length) {
     list.innerHTML = '<div style="padding:32px 18px;text-align:center;color:var(--muted);font-size:13px">Henüz teklif isteği göndermediniz.</div>';
@@ -5509,28 +5612,28 @@ async function renderBuyerTeklifler() {
   }).join('');
 }
 
-var _currentBuyerTeklifId = null;
+var _currentMusterTeklifId = null;
 
-async function deleteBuyerTeklif() {
-  if (!_currentBuyerTeklifId) return;
+async function deleteMusterTeklif() {
+  if (!_currentMusterTeklifId) return;
   if (!confirm('Bu teklif isteğini silmek istediğinize emin misiniz?')) return;
-  const { error } = await _sb.from('offers').delete().eq('id', _currentBuyerTeklifId);
+  const { error } = await _sb.from('offers').delete().eq('id', _currentMusterTeklifId);
   if (error) { showToast('Hata', error.message, null, true); return; }
   document.getElementById('teklif-detail-modal').classList.remove('open');
   document.body.style.overflow = '';
   if (_chatSubscription) { _chatSubscription.unsubscribe(); _chatSubscription = null; }
-  _currentBuyerTeklifId = null;
-  updateBuyerBadges();
-  renderBuyerTeklifler();
+  _currentMusterTeklifId = null;
+  updateMusterBadges();
+  renderMusterTeklifler();
   showToast('Silindi', 'Teklif isteği silindi.', null, false);
 }
-window.deleteBuyerTeklif = deleteBuyerTeklif;
+window.deleteMusterTeklif = deleteMusterTeklif;
 
 async function openTeklifDetail(idx) {
-  const arr = await loadBuyerTeklifler();
+  const arr = await loadMusterTeklifler();
   const x = arr[idx];
   if (!x) return;
-  _currentBuyerTeklifId = x.id;
+  _currentMusterTeklifId = x.id;
   const dt = new Date(x.tarih);
   document.getElementById('teklif-detail-modal').classList.add('open');
   document.body.style.overflow = 'hidden';
@@ -5623,7 +5726,7 @@ async function sendChatMessage(idx) {
   const content = input.value.trim();
   if (!content) return;
 
-  const arr = await loadBuyerTeklifler();
+  const arr = await loadMusterTeklifler();
   const x = arr[idx];
   if (!x) return;
   const u = loadUser();
@@ -5639,7 +5742,7 @@ async function sendChatMessage(idx) {
   let convId = offerData?.conversation_id;
 
   // Conversation yoksa - satıcının henüz yanıt vermediği demek
-  // Alıcı mesaj gönderemez, satıcının önce yanıt vermesi gerekir
+  // Müşteri mesaj gönderemez, satıcının önce yanıt vermesi gerekir
   if (!convId) {
     showToast('Bilgi', 'Satıcı henüz size yanıt vermedi. Satıcı size teklif gönderdiğinde buradan konuşabilirsiniz.', null, false);
     return;
@@ -5662,8 +5765,8 @@ window.loadChatMessages = loadChatMessages;
 
 
 
-async function renderBuyerPreview() {
-  const el = document.getElementById('buyer-saved-preview');
+async function renderMusterPreview() {
+  const el = document.getElementById('muster-saved-preview');
   if (!el) return;
   const arr = await loadSaved();
   if (!arr.length) {
@@ -5680,7 +5783,7 @@ async function renderBuyerPreview() {
     </div>`).join('');
 }
 
-async function loadBuyerProfile() {
+async function loadMusterProfile() {
   const u = loadUser();
   if (!u) return;
   // Supabase'den profil çek
@@ -5691,7 +5794,7 @@ async function loadBuyerProfile() {
   f('bp-mail', u.mail); f('bp-firma', p.firma); f('bp-adres', p.adres);
 }
 
-async function saveBuyerProfile() {
+async function saveMusterProfile() {
   const u = loadUser();
   if (!u) return;
   const ad    = (document.getElementById('bp-ad')?.value||'').trim();
@@ -5709,17 +5812,17 @@ async function saveBuyerProfile() {
   showToast('Profil güncellendi', 'Bilgilerin başarıyla kaydedildi.', null, false);
 }
 
-function goBuyerDashboard() {
-  go('buyer-dashboard');
-  showBuyerDash('main');
-  setTimeout(() => { updateBuyerBadges(); renderBuyerPreview(); }, 50);
+function goMusterDashboard() {
+  go('muster-dashboard');
+  showMusterDash('main');
+  setTimeout(() => { updateMusterBadges(); renderMusterPreview(); }, 50);
 }
 
-window.showBuyerDash = showBuyerDash;
+window.showMusterDash = showMusterDash;
 window.removeSaved = removeSaved;
 window.saveIlan = saveIlan;
-window.saveBuyerProfile = saveBuyerProfile;
-window.goBuyerDashboard = goBuyerDashboard;
+window.saveMusterProfile = saveMusterProfile;
+window.goMusterDashboard = goMusterDashboard;
 
 
 window.go = go;
