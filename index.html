@@ -5037,8 +5037,10 @@ async function deleteTeklifDetay() {
     }
     if (_detayChatSub) { _detayChatSub.unsubscribe(); _detayChatSub = null; }
     showToast('Kaldırıldı', 'Teklif gelen kutunuzdan kaldırıldı.', null, false);
-    go('dashboard');
-    showDash('inbox');
+    setTimeout(() => {
+      go('dashboard');
+      setTimeout(() => showDash('inbox'), 200);
+    }, 100);
   } else {
     // Müşteri: gerçekten sil
     if (!confirm('Bu teklif isteğini silmek istediğinize emin misiniz?')) return;
