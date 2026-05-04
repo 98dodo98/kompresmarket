@@ -4965,6 +4965,13 @@ async function markItemRead(itemId, itemType) {
   const u = loadUser();
   if (!u || _readItemIds.has(itemId)) return;
   _readItemIds.add(itemId);
+  // Bildirimi hemen okundu işaretle
+  _notifications.forEach(function(n) {
+    if (n.id === 'offer-' + itemId || n.id === 'msg-' + itemId || n.id === itemId) {
+      n.read = true;
+    }
+  });
+  updateNotifBadge();
   await _sb.from('read_items').upsert({ user_id: u.id, item_id: itemId, item_type: itemType }, { onConflict: 'user_id,item_id' });
 }
 
@@ -4985,13 +4992,19 @@ async function loadNotifications() {
   _notifications = [];
 
   if (u.role === 'seller') {
-    const { data: offers } = await _sb.from('offers').select('id, baslik, created_at').order('created_at', { ascending: false }).limit(20);
-    if (offers) offers.forEach(o => {
-      _notifications.push({ id: 'offer-'+o.id, type: 'offer', title: 'Yeni Teklif İsteği', sub: o.baslik, time: o.created_at,
-        read: _readItemIds.has('offer-'+o.id),
-        action: function() { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 100); }
+    const { data: offers } = await _sb.from('offers').select('id, baslik, created_at').order('created_at', { ascending: false }).limit(50);
+    if (offers) {
+      // Sadece okunmamış olanları ekle
+      offers.forEach(o => {
+        const notifId = 'offer-' + o.id;
+        if (!_readItemIds.has(o.id)) { // offer ID'si read_items'ta yoksa okunmamış
+          _notifications.push({ id: notifId, type: 'offer', title: 'Yeni Teklif İsteği', sub: o.baslik, time: o.created_at,
+            read: _readItemIds.has(notifId),
+            action: function() { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 100); }
+          });
+        }
       });
-    });
+    }
   }
 
   const { data: convs } = await _sb.from('conversations').select('id').or('buyer_id.eq.'+u.id+',seller_id.eq.'+u.id);
@@ -5001,16 +5014,18 @@ async function loadNotifications() {
       .neq('sender_id', u.id)
       .order('created_at', { ascending: false }).limit(50);
     if (msgs) {
-      // Conversation bazında grupla — her conversation için sadece son mesaj
       var seenConvs = {};
       msgs.forEach(function(m) {
-        if (seenConvs[m.conversation_id]) return; // aynı conversation'dan ikinci mesajı atla
+        if (seenConvs[m.conversation_id]) return;
         seenConvs[m.conversation_id] = true;
-        _notifications.push({ id: 'msg-'+m.conversation_id, type: 'message', title: 'Yeni Mesaj',
-          sub: m.content.slice(0,60)+(m.content.length>60?'…':''), time: m.created_at,
-          read: _readItemIds.has('msg-'+m.conversation_id),
-          action: function() { if (u.role === 'seller') { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 100); } else goBuyerDashboard(); }
-        });
+        const notifId = 'msg-' + m.conversation_id;
+        if (!_readItemIds.has(notifId)) { // okunmamışsa ekle
+          _notifications.push({ id: notifId, type: 'message', title: 'Yeni Mesaj',
+            sub: m.content.slice(0,60)+(m.content.length>60?'…':''), time: m.created_at,
+            read: false,
+            action: function() { if (u.role === 'seller') { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 100); } else goBuyerDashboard(); }
+          });
+        }
       });
     }
   }
