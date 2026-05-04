@@ -3397,6 +3397,9 @@ body {
         <div id="teklif-detay-no-input" style="display:none;padding:14px 16px;border-top:1px solid var(--border);text-align:center;font-size:12px;color:var(--muted)">
           Satıcı size teklif gönderdiğinde buradan yanıtlayabilirsiniz.
         </div>
+        <div id="teklif-detay-sil-wrap" style="padding:12px 16px;border-top:1px solid var(--border);display:flex;justify-content:flex-start">
+          <button onclick="deleteTeklifDetay()" style="padding:7px 14px;border:1px solid #f5c6c6;border-radius:var(--radius);background:transparent;color:#c44;font-size:12px;cursor:pointer;font-family:var(--font)">Sil</button>
+        </div>
       </div>
     </div>
   </div>
@@ -4918,6 +4921,34 @@ async function sendTeklifDetayMsg() {
   if (error) showToast('Hata', error.message, null, true);
   else loadTeklifDetayMessages();
 }
+
+async function deleteTeklifDetay() {
+  if (!_detayOfferId) return;
+  const u = loadUser();
+  if (!u) return;
+
+  if (_detayRole === 'seller') {
+    // Satıcı: sadece inbox'tan kaldır
+    if (!confirm('Bu teklifi gelen kutunuzdan kaldırmak istediğinize emin misiniz?')) return;
+    await markItemRead(_detayOfferId, 'offer');
+    await _sb.from('read_items').upsert({
+      user_id: u.id, item_id: 'dismissed-' + _detayOfferId, item_type: 'dismissed'
+    }, { onConflict: 'user_id,item_id' });
+    _readItemIds.add('dismissed-' + _detayOfferId);
+    if (_detayChatSub) { _detayChatSub.unsubscribe(); _detayChatSub = null; }
+    showToast('Kaldırıldı', 'Teklif gelen kutunuzdan kaldırıldı.', null, false);
+    history.back();
+  } else {
+    // Alıcı: gerçekten sil
+    if (!confirm('Bu teklif isteğini silmek istediğinize emin misiniz?')) return;
+    const { error } = await _sb.from('offers').delete().eq('id', _detayOfferId);
+    if (error) { showToast('Hata', error.message, null, true); return; }
+    if (_detayChatSub) { _detayChatSub.unsubscribe(); _detayChatSub = null; }
+    showToast('Silindi', 'Teklif isteği silindi.', null, false);
+    history.back();
+  }
+}
+window.deleteTeklifDetay = deleteTeklifDetay;
 
 async function openTeklifDetayPageByIdx(idx) {
   const arr = await loadBuyerTeklifler();
