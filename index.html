@@ -3651,6 +3651,17 @@ async function loadTeklifler() {
     if (profiles) profiles.forEach(p => profileMap[p.id] = p);
   }
 
+  // Dismissed filtresi - yeni mesaj gelenleri geri ekle
+  const dismissedIds = data.filter(x => _readItemIds.has('dismissed-' + x.id) && x.conversation_id).map(x => x.conversation_id);
+  let activeConvIds = new Set();
+  if (dismissedIds.length) {
+    // Bu conversation'larda dismissed tarihinden sonra yeni mesaj var mı?
+    const { data: newMsgs } = await _sb.from('messages')
+      .select('conversation_id')
+      .in('conversation_id', dismissedIds);
+    if (newMsgs) newMsgs.forEach(m => activeConvIds.add(m.conversation_id));
+  }
+
   return data.map(x => ({
     id: x.id,
     kategori: x.kategori,
@@ -3664,7 +3675,11 @@ async function loadTeklifler() {
     yanitlandi: !!x.conversation_id,
     conversationId: x.conversation_id,
     alici: profileMap[x.user_id] || null
-  })).filter(x => !_readItemIds.has('dismissed-' + x.id));
+  })).filter(x => {
+    if (!_readItemIds.has('dismissed-' + x.id)) return true;
+    // Dismissed ama yeni mesaj var mı?
+    return x.conversation_id && activeConvIds.has(x.conversation_id);
+  });
 }
 
 function saveTeklifler(arr) {
