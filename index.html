@@ -5029,6 +5029,23 @@ async function deleteTeklifDetay() {
     }
     if (_detayChatSub) { _detayChatSub.unsubscribe(); _detayChatSub = null; }
     showToast('Kaldırıldı', 'Teklif gelen kutunuzdan kaldırıldı.', null, false);
+    // Yeni mesaj gelirse dismissed'ı kaldır ve inbox'ta göster
+    if (_detayConvId) {
+      const _dismissedId = _detayOfferId;
+      const dismissedConvSub = _sb.channel('dismissed-watch-' + _dismissedId)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages',
+          filter: 'conversation_id=eq.' + _detayConvId },
+          async function() {
+            const u2 = loadUser();
+            if (!u2) return;
+            _readItemIds.delete('dismissed-' + _dismissedId);
+            await _sb.from('read_items').delete()
+              .eq('user_id', u2.id).eq('item_id', 'dismissed-' + _dismissedId);
+            await renderInbox();
+            dismissedConvSub.unsubscribe();
+          })
+        .subscribe();
+    }
     go('dashboard');
     showDash('teklifler');
     renderInbox();
