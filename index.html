@@ -4738,6 +4738,9 @@ async function openTeklifDetayPage(offerId, role) {
 
   // Okundu işaretle
   await markItemRead(offerId, 'offer');
+  if (offer.conversation_id) {
+    await markItemRead('msg-' + offer.conversation_id, 'message');
+  }
   updateBuyerBadges();
 
   const dt = new Date(offer.created_at);
