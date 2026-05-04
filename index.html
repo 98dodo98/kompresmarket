@@ -4928,7 +4928,11 @@ async function deleteTeklifDetay() {
     _readItemIds.add('dismissed-' + _detayOfferId);
     if (_detayChatSub) { _detayChatSub.unsubscribe(); _detayChatSub = null; }
     showToast('Kaldırıldı', 'Teklif gelen kutunuzdan kaldırıldı.', null, false);
-    history.back();
+    go('dashboard');
+    setTimeout(async () => {
+      showDash('inbox');
+      await renderInbox();
+    }, 100);
   } else {
     // Alıcı: gerçekten sil
     if (!confirm('Bu teklif isteğini silmek istediğinize emin misiniz?')) return;
@@ -4936,7 +4940,11 @@ async function deleteTeklifDetay() {
     if (error) { showToast('Hata', error.message, null, true); return; }
     if (_detayChatSub) { _detayChatSub.unsubscribe(); _detayChatSub = null; }
     showToast('Silindi', 'Teklif isteği silindi.', null, false);
-    history.back();
+    goBuyerDashboard();
+    setTimeout(async () => {
+      showBuyerDash('teklifler');
+      await renderBuyerTeklifler();
+    }, 100);
   }
 }
 window.deleteTeklifDetay = deleteTeklifDetay;
