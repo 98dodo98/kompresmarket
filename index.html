@@ -3341,10 +3341,6 @@ body {
 <div class="page" id="p-teklif-detay">
   <div style="max-width:1100px;margin:0 auto;padding:24px 28px">
     <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
-      <button id="teklif-detay-back" style="background:none;border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px;font-size:13px;font-family:var(--font);cursor:pointer;color:var(--text);display:flex;align-items:center;gap:6px">
-        <svg viewBox="0 0 14 14" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 2L4 7l5 5"/></svg>
-        Geri
-      </button>
       <span id="teklif-detay-kategori" class="tk-modal-pill cat-komp" style="font-size:11px"></span>
       <span id="teklif-detay-durum" style="font-size:11px;padding:3px 10px;border-radius:20px;font-family:var(--mono);font-weight:600"></span>
     </div>
@@ -4812,14 +4808,7 @@ async function openTeklifDetayPage(offerId, role) {
     document.getElementById('teklif-detay-kopyala').onclick = function() { copyToClipboard(offer.iletisim); };
   } else iletisimWrap.style.display = 'none';
 
-  // Geri butonu
-  document.getElementById('teklif-detay-back').onclick = function() {
-    if (_detayChatSub) { _detayChatSub.unsubscribe(); _detayChatSub = null; }
-    if (role === 'seller') { go('dashboard'); setTimeout(function() { showDash('inbox'); }, 50); }
-    else goBuyerDashboard();
-  };
-
-  // Chat
+  // Realtime subscription başlat
   _detayConvId = offer.conversation_id;
   const inputWrap = document.getElementById('teklif-detay-input-wrap');
   const noInputWrap = document.getElementById('teklif-detay-no-input');
