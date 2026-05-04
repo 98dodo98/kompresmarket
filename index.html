@@ -3990,7 +3990,7 @@ async function toggleReadCurrent() {
 
 async function deleteCurrentTeklif() {
   if (!currentTeklifId) return;
-  if (!confirm('Bu teklif isteğini gelen kutunuzdan kaldırmak istediğinize emin misiniz?')) return;
+
   // Sadece okundu olarak işaretle, gerçek silme yapma
   await markItemRead(currentTeklifId, 'offer');
   // Satıcı inbox'ından gizlemek için dismissed listesine ekle
@@ -5021,11 +5021,8 @@ async function deleteTeklifDetay() {
   if (!u) return;
 
   if (_detayRole === 'seller') {
-    if (!confirm('Bu teklifi gelen kutunuzdan kaldırmak istediğinize emin misiniz?')) return;
-    // Lokal olarak dismissed işaretle
     _readItemIds.add('dismissed-' + _detayOfferId);
     _readItemIds.add(_detayOfferId);
-    // Supabase'e arka planda yaz (hata olsa bile devam et)
     const u = loadUser();
     if (u) {
       _sb.from('read_items').upsert([
@@ -5043,7 +5040,7 @@ async function deleteTeklifDetay() {
     }, 100);
   } else {
     // Müşteri: gerçekten sil
-    if (!confirm('Bu teklif isteğini silmek istediğinize emin misiniz?')) return;
+  
     const { error } = await _sb.from('offers').delete().eq('id', _detayOfferId);
     if (error) { showToast('Hata', error.message, null, true); return; }
     if (_detayChatSub) { _detayChatSub.unsubscribe(); _detayChatSub = null; }
@@ -5618,7 +5615,7 @@ var _currentMusterTeklifId = null;
 
 async function deleteMusterTeklif() {
   if (!_currentMusterTeklifId) return;
-  if (!confirm('Bu teklif isteğini silmek istediğinize emin misiniz?')) return;
+
   const { error } = await _sb.from('offers').delete().eq('id', _currentMusterTeklifId);
   if (error) { showToast('Hata', error.message, null, true); return; }
   document.getElementById('teklif-detail-modal').classList.remove('open');
