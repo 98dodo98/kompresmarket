@@ -4706,24 +4706,25 @@ async function submitRegister(type) {
   [prefix+'-ad', prefix+'-soyad', prefix+'-mail', prefix+'-telefon'].forEach(i => setErr(i, false));
 
   let hasErr = false;
-  if (!ad) { setErr(prefix+'-ad', true); hasErr = true; }
-  if (!soyad) { setErr(prefix+'-soyad', true); hasErr = true; }
-  if (!isValidMail(mail)) { setErr(prefix+'-mail', true); hasErr = true; }
-  if (!telefon) { setErr(prefix+'-telefon', true); hasErr = true; }
+  const errors = [];
+  if (!ad) { setErr(prefix+'-ad', true); hasErr = true; errors.push('Ad'); }
+  if (!soyad) { setErr(prefix+'-soyad', true); hasErr = true; errors.push('Soyad'); }
+  if (!isValidMail(mail)) { setErr(prefix+'-mail', true); hasErr = true; errors.push('E-posta'); }
+  if (!telefon) { setErr(prefix+'-telefon', true); hasErr = true; errors.push('Telefon'); }
 
   if (type === 'seller') {
-    if (!firma) { setErr('s-firma', true); hasErr = true; }
+    if (!firma) { setErr('s-firma', true); hasErr = true; errors.push('Firma'); }
     const pw2 = (document.getElementById('s-pw2')?.value || '').trim();
-    if (pw.length < 6) { setErr('s-pw', true); hasErr = true; }
-    else if (pw !== pw2) { setErr('s-pw', true); setErr('s-pw2', true); hasErr = true; }
+    if (pw.length < 6) { setErr('s-pw', true); hasErr = true; errors.push('Şifre (min 6)'); }
+    else if (pw !== pw2) { setErr('s-pw', true); setErr('s-pw2', true); hasErr = true; errors.push('Şifreler eşleşmiyor'); }
   } else {
     const pw2 = (document.getElementById('b-pw2')?.value || '').trim();
-    if (pw.length < 6) { setErr('b-pw', true); hasErr = true; }
-    else if (pw !== pw2) { setErr('b-pw', true); setErr('b-pw2', true); hasErr = true; }
+    if (pw.length < 6) { setErr('b-pw', true); hasErr = true; errors.push('Şifre (min 6)'); }
+    else if (pw !== pw2) { setErr('b-pw', true); setErr('b-pw2', true); hasErr = true; errors.push('Şifreler eşleşmiyor'); }
   }
 
   if (hasErr) {
-    showToast('Eksik bilgi', 'Lütfen tüm zorunlu alanları doldurun.', null, true);
+    showToast('Eksik bilgi', 'Eksik alanlar: ' + errors.join(', '), null, true);
     return;
   }
 
