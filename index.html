@@ -2962,6 +2962,7 @@ body {
           <div class="field"><label>Soyad</label><input type="text" id="b-soyad" placeholder="Yılmaz"></div>
         </div>
         <div class="field"><label>E-posta</label><input type="email" id="b-mail" placeholder="ahmet@firma.com"></div>
+        <div class="field"><label>Telefon <span style="color:#c44">*</span></label><input type="tel" id="b-telefon" placeholder="0532 123 45 67"></div>
         <div class="field-row">
           <div class="field"><label>Şifre</label><input type="password" id="b-pw" placeholder="En az 6 karakter"></div>
           <div class="field"><label>Şifre (Tekrar)</label><input type="password" id="b-pw2" placeholder="Şifrenizi tekrar girin"></div>
@@ -2980,6 +2981,7 @@ body {
           <div class="field"><label>Soyad</label><input type="text" id="s-soyad" placeholder="Demir"></div>
         </div>
         <div class="field"><label>E-posta</label><input type="email" id="s-mail" placeholder="info@firma.com"></div>
+        <div class="field"><label>Telefon <span style="color:#c44">*</span></label><input type="tel" id="s-telefon" placeholder="0532 123 45 67"></div>
         <div class="field"><label>Firma İsmi</label><input type="text" id="s-firma" placeholder="Demir Kompresör Ltd. Şti."></div>
         <div class="field"><label>Fatura Adresi</label><input type="text" id="s-adres" placeholder="Organize San. Böl. No:5, Bursa"></div>
         <div class="field-row">
@@ -4693,21 +4695,21 @@ async function submitLogin() {
 
 async function submitRegister(type) {
   const prefix = type === 'buyer' ? 'b' : 's';
-  const ad    = (document.getElementById(prefix+'-ad')?.value || '').trim();
-  const soyad = (document.getElementById(prefix+'-soyad')?.value || '').trim();
-  const mail  = (document.getElementById(prefix+'-mail')?.value || '').trim();
-  const firma = (document.getElementById(prefix+'-firma')?.value || '').trim();
-  const adres = (document.getElementById(prefix+'-adres')?.value || '').trim();
-  const pw = type === 'seller'
-    ? (document.getElementById('s-pw')?.value || '').trim()
-    : (document.getElementById('b-pw')?.value || '').trim();
+  const ad     = (document.getElementById(prefix+'-ad')?.value || '').trim();
+  const soyad  = (document.getElementById(prefix+'-soyad')?.value || '').trim();
+  const mail   = (document.getElementById(prefix+'-mail')?.value || '').trim();
+  const firma  = (document.getElementById(prefix+'-firma')?.value || '').trim();
+  const adres  = (document.getElementById(prefix+'-adres')?.value || '').trim();
+  const telefon = (document.getElementById(prefix+'-telefon')?.value || '').trim();
+  const pw = (document.getElementById(prefix+'-pw')?.value || '').trim();
 
-  [prefix+'-ad', prefix+'-soyad', prefix+'-mail'].forEach(i => setErr(i, false));
+  [prefix+'-ad', prefix+'-soyad', prefix+'-mail', prefix+'-telefon'].forEach(i => setErr(i, false));
 
   let hasErr = false;
   if (!ad) { setErr(prefix+'-ad', true); hasErr = true; }
   if (!soyad) { setErr(prefix+'-soyad', true); hasErr = true; }
   if (!isValidMail(mail)) { setErr(prefix+'-mail', true); hasErr = true; }
+  if (!telefon) { setErr(prefix+'-telefon', true); hasErr = true; }
 
   if (type === 'seller') {
     if (!firma) { setErr('s-firma', true); hasErr = true; }
@@ -4736,7 +4738,7 @@ async function submitRegister(type) {
   const { data, error } = await _sb.auth.signUp({
     email: mail,
     password: pw,
-    options: { data: { ad, soyad, firma, adres, plan, role: type } }
+    options: { data: { ad, soyad, firma, adres, telefon, plan, role: type } }
   });
 
   if (btn) { btn.disabled = false; btn.textContent = type === 'buyer' ? 'Üye Ol — Ücretsiz' : 'Satıcı Hesabı Oluştur'; }
@@ -4746,14 +4748,20 @@ async function submitRegister(type) {
     return;
   }
 
-  // Session hemen gelmediyse bekle
+  // Profiles tablosuna telefon yaz
+  if (data.user) {
+    await _sb.from('profiles').upsert({
+      id: data.user.id, ad, soyad, firma, adres, telefon, role: type
+    }, { onConflict: 'id' });
+  }
+
   const session = data.session;
   if (session) {
     _memStore[USER_KEY] = JSON.stringify(sessionToUser(session));
     updateNav();
   }
 
-  showToast('Hoş geldiniz!', ad + ', hesabınız başarıyla oluşturuldu.', type === 'seller' ? 'Satıcı' : 'Alıcı', false);
+  showToast('Hoş geldiniz!', ad + ', hesabınız başarıyla oluşturuldu.', type === 'seller' ? 'Satıcı' : 'Müşteri', false);
   if (type === 'seller') go('dashboard');
   else goMusterDashboard();
 }
@@ -5646,7 +5654,7 @@ window.closeMobileNav  = closeMobileNav;
 async function openListingDetail(id) {
   const { data: l } = await _sb.from('listings').select('*').eq('id', id).single();
   if (!l) return;
-  const { data: p } = await _sb.from('profiles').select('ad, soyad, firma, adres').eq('id', l.seller_id).single();
+  const { data: p } = await _sb.from('profiles').select('ad, soyad, firma, adres, telefon').eq('id', l.seller_id).single();
   const photos = JSON.parse(l.photos || '[]');
   const fiyatHtml = l.fiyat_gosterim === 'İletişime Geçiniz'
     ? '<span style="font-size:22px;font-weight:700;color:var(--accent)">İletişime Geçiniz</span>'
