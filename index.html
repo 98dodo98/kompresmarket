@@ -3593,6 +3593,7 @@ function sessionToUser(session) {
     adres: meta.adres || '',
     plan: meta.plan || null,
     role: meta.role || 'buyer',
+    telefon: meta.telefon || '',
     verified: true
   };
 }
@@ -3674,6 +3675,12 @@ async function publishIlan(status) {
 
   const { error } = await _sb.from('listings').insert({
     seller_id: u.id,
+    seller_ad: u.ad || '',
+    seller_soyad: u.soyad || '',
+    seller_firma: u.firma || '',
+    seller_adres: u.adres || '',
+    seller_telefon: u.telefon || u.phone || '',
+    seller_mail: u.mail || u.email || '',
     kategori,
     alt_kategori: document.getElementById('ilan-subcat')?.value || '',
     baslik,
@@ -5656,7 +5663,9 @@ window.closeMobileNav  = closeMobileNav;
 async function openListingDetail(id) {
   const { data: l } = await _sb.from('listings').select('*').eq('id', id).single();
   if (!l) return;
-  const { data: p } = await _sb.from('profiles').select('ad, soyad, firma, adres, telefon, eposta, mail').eq('id', l.seller_id).single();
+  const { data: p } = await _sb.from('profiles').select('*').eq('id', l.seller_id).single();
+  // profiles gelirse kullan, yoksa listings'deki seller_* alanlarına düş
+  const sellerMailFromAuth = '';
   const photos = JSON.parse(l.photos || '[]');
   const fiyatHtml = l.fiyat_gosterim === 'İletişime Geçiniz'
     ? '<span style="font-size:22px;font-weight:700;color:var(--accent)">İletişime Geçiniz</span>'
@@ -5669,8 +5678,8 @@ async function openListingDetail(id) {
     l.durum && ['Durum', l.durum],
     l.alt_kategori && ['Tip', l.alt_kategori],
   ].filter(Boolean);
-  const sellerName = p?.firma || ((p?.ad||'') + ' ' + (p?.soyad||'')).trim() || 'Satıcı';
-  const sellerMail = p?.eposta || p?.mail || '';
+  const sellerName = p?.firma || ((p?.ad||'') + ' ' + (p?.soyad||'')).trim() || l.seller_firma || ((l.seller_ad||'') + ' ' + (l.seller_soyad||'')).trim() || 'Satıcı';
+  const sellerMail = p?.eposta || p?.mail || p?.email || sellerMailFromAuth || l.seller_mail || '';
   const el = document.getElementById('p-listing-detail');
   if (!el) return;
   const galleryThumbsHtml = photos.length > 1
@@ -5696,10 +5705,10 @@ async function openListingDetail(id) {
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:18px">
           <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-family:var(--mono);margin-bottom:10px">Satıcı Bilgileri</div>
           <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px">${escapeHtml(sellerName)}</div>
-          ${p?.adres ? `<div style="font-size:13px;color:var(--muted);margin-bottom:10px">${escapeHtml(p.adres)}</div>` : ''}
-          ${p?.telefon ? `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg2);border-radius:var(--radius);margin-bottom:8px"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h3l1.5 3-1.5 1.5a9 9 0 003.5 3.5L10 9.5l3 1.5v3a1 1 0 01-1 1C5.4 15 1 10.6 1 4a1 1 0 011-1z"/></svg><span style="font-size:13px;font-weight:500">${escapeHtml(p.telefon)}</span></div>` : ''}
+          ${(p?.adres||l.seller_adres) ? `<div style="font-size:13px;color:var(--muted);margin-bottom:10px">${escapeHtml(p?.adres||l.seller_adres)}</div>` : ''}
+          ${(p?.telefon||l.seller_telefon) ? `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg2);border-radius:var(--radius);margin-bottom:8px"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h3l1.5 3-1.5 1.5a9 9 0 003.5 3.5L10 9.5l3 1.5v3a1 1 0 01-1 1C5.4 15 1 10.6 1 4a1 1 0 011-1z"/></svg><span style="font-size:13px;font-weight:500">${escapeHtml(p?.telefon||l.seller_telefon)}</span></div>` : ''}
           ${sellerMail ? `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg2);border-radius:var(--radius)"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1"/><path d="M1 3l7 6 7-6"/></svg><span style="font-size:13px;font-weight:500">${escapeHtml(sellerMail)}</span></div>` : ''}
-          ${!p?.telefon && !sellerMail ? `<div style="font-size:12px;color:var(--muted)">İletişim bilgisi paylaşılmamış.</div>` : ''}
+          ${!(p?.telefon||l.seller_telefon) && !sellerMail ? `<div style="font-size:12px;color:var(--muted)">İletişim bilgisi paylaşılmamış.</div>` : ''}
         </div>
       </div>
     </div>
