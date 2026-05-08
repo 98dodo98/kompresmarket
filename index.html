@@ -3087,6 +3087,92 @@ body {
         </div>
       </div>
 
+      <!-- İlan Düzenle -->
+      <div id="dash-ilan-duzenle" style="display:none">
+        <div class="dash-head">
+          <p class="dash-title">İlan Düzenle</p>
+          <p class="dash-sub" id="edit-ilan-sub">İlanı güncelle</p>
+        </div>
+        <div class="ilan-form-wrap" style="padding:0">
+          <div class="ilan-form-inner">
+            <input type="hidden" id="edit-ilan-id">
+
+            <div class="form-card">
+              <div class="form-card-head"><span class="form-card-num">1</span><p class="form-card-title">Kategori</p></div>
+              <div class="form-card-body">
+                <div class="field-row">
+                  <div class="field"><label>Ana Kategori</label>
+                    <select id="edit-ilan-cat" onchange="updateEditSubCat()">
+                      <option value="">Seçiniz...</option>
+                      <option value="komp">Kompresörler</option>
+                      <option value="kuru">Kurutucular</option>
+                      <option value="filtre">Filtreler</option>
+                      <option value="aksesuar">Aksesuarlar</option>
+                      <option value="jenerator">Gaz Jeneratörleri</option>
+                      <option value="yp">Yedek Parça</option>
+                    </select>
+                  </div>
+                  <div class="field"><label>Alt Kategori</label>
+                    <select id="edit-ilan-subcat"><option>Önce ana kategori seçin</option></select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-card">
+              <div class="form-card-head"><span class="form-card-num">2</span><p class="form-card-title">Ürün Bilgileri</p></div>
+              <div class="form-card-body">
+                <div class="field"><label>İlan Başlığı *</label><input type="text" id="edit-ilan-baslik" placeholder="Örn: Atlas Copco GA 15 Vidalı Kompresör — 2024 Model"></div>
+                <div class="field-row">
+                  <div class="field"><label>Marka</label><input type="text" id="edit-ilan-marka" placeholder="Atlas Copco"></div>
+                  <div class="field"><label>Model</label><input type="text" id="edit-ilan-model" placeholder="GA 15"></div>
+                </div>
+                <div class="field-row">
+                  <div class="field"><label>Durum</label><select id="edit-ilan-durum"><option>Yeni</option><option>2. El</option></select></div>
+                  <div class="field"><label>Yıl</label><input type="text" id="edit-ilan-yil" placeholder="2024"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-card">
+              <div class="form-card-head"><span class="form-card-num">3</span><p class="form-card-title">Teknik Özellikler</p></div>
+              <div class="form-card-body">
+                <div class="field-3">
+                  <div class="field"><label>Kapasite (m³/dk)</label><input type="text" id="edit-ilan-kapasite" placeholder="2.4"></div>
+                  <div class="field"><label>Motor Gücü (kW)</label><input type="text" id="edit-ilan-guc" placeholder="15"></div>
+                  <div class="field"><label>Maks. Basınç (bar)</label><input type="text" id="edit-ilan-basinc" placeholder="8"></div>
+                </div>
+                <div class="field"><label>Teknik Bilgiler</label><textarea id="edit-ilan-teknik" rows="3" placeholder="Soğutma tipi, elektrik bağlantısı, yağ kapasitesi, özel özellikler..."></textarea></div>
+              </div>
+            </div>
+
+            <div class="form-card">
+              <div class="form-card-head"><span class="form-card-num">4</span><p class="form-card-title">Fiyat ve Durum</p></div>
+              <div class="form-card-body">
+                <div class="field-row">
+                  <div class="field"><label>Fiyat (₺)</label><input type="text" id="edit-ilan-fiyat" placeholder="185000"></div>
+                  <div class="field"><label>Fiyat Gösterimi</label><select id="edit-ilan-fiyat-tip"><option value="Fiyatı Göster">Fiyatı Göster</option><option value="İletişime Geçiniz">İletişime Geçiniz</option></select></div>
+                </div>
+                <div class="field"><label>Yayın Durumu</label>
+                  <select id="edit-ilan-status">
+                    <option value="aktif">Aktif</option>
+                    <option value="taslak">Taslak</option>
+                    <option value="pasif">Pasif</option>
+                  </select>
+                </div>
+                <div class="field"><label>İlan Açıklaması</label><textarea id="edit-ilan-aciklama" rows="4" placeholder="Ürün hakkında ek bilgiler, teslim koşulları, garanti, montaj seçenekleri..."></textarea></div>
+                <div id="edit-ilan-error" style="display:none;color:#c44;font-size:12px;margin-bottom:10px"></div>
+                <div class="form-submit-row">
+                  <button class="btn-draft" onclick="showDash('ilanlarim')">Vazgeç</button>
+                  <button class="btn-publish" onclick="saveIlanEdit()">Değişiklikleri Kaydet</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
       <!-- Yeni İlan Ver -->
       <div id="dash-ilan-ver" style="display:none">
         <div class="dash-head"><p class="dash-title">Yeni İlan Ver</p><p class="dash-sub">Ürününüzü ekleyin</p></div>
@@ -3489,48 +3575,7 @@ body {
 </div>
 
 <!-- ===== İLAN DÜZENLEME MODALI ===== -->
-<div class="tk-modal" id="ilan-edit-modal" onclick="if(event.target===this)closeIlanEdit()">
-  <div class="tk-modal-card" style="max-width:520px">
-    <div class="tk-modal-head">
-      <div class="tk-modal-head-l">
-        <span class="tk-modal-pill cat-komp">İlan Düzenle</span>
-        <p class="tk-modal-title" id="ilan-edit-title"></p>
-        <p class="tk-modal-meta" id="ilan-edit-kategori"></p>
-      </div>
-      <button class="tk-modal-x" onclick="closeIlanEdit()">×</button>
-    </div>
-    <div style="padding:20px 22px">
-      <div style="margin-bottom:14px">
-        <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:6px">İlan Başlığı</label>
-        <input type="text" id="ilan-edit-baslik" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none">
-      </div>
-      <div style="margin-bottom:14px">
-        <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:6px">Fiyat (₺)</label>
-        <input type="number" id="ilan-edit-fiyat" placeholder="Boş bırakırsanız İletişim görünür" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none">
-      </div>
-      <div style="margin-bottom:14px">
-        <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:6px">Durum</label>
-        <select id="ilan-edit-durum" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none">
-          <option value="aktif">Aktif</option>
-          <option value="beklemede">Beklemede</option>
-          <option value="taslak">Taslak</option>
-          <option value="pasif">Pasif</option>
-        </select>
-      </div>
-      <div style="margin-bottom:6px">
-        <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:6px">Açıklama</label>
-        <textarea id="ilan-edit-aciklama" rows="4" placeholder="İlan açıklaması..." style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none;resize:vertical;line-height:1.5"></textarea>
-      </div>
-    </div>
-    <div class="tk-modal-foot" style="display:flex;justify-content:space-between">
-      <button class="tk-btn" style="color:#c44;border-color:#f5c6c6" onclick="closeIlanEdit()">İlanı Sil</button>
-      <div style="display:flex;gap:8px">
-        <button class="tk-btn" onclick="closeIlanEdit()">Vazgeç</button>
-        <button class="tk-btn tk-btn-primary" onclick="saveIlanEdit()">Kaydet</button>
-      </div>
-    </div>
-  </div>
-</div>
+<!-- ilan-edit-modal kaldırıldı, dash-ilan-duzenle kullanılıyor -->
 
 <!-- ===== İLETİŞİM MESAJ MODALI ===== -->
 <div class="tk-modal" id="contact-modal" onclick="if(event.target===this)closeContactModal()">
@@ -5794,28 +5839,86 @@ window.loadSellerFavoriler = loadSellerFavoriler;
 
 
 // ===== İLAN DÜZENLEME =====
-function openIlanEdit(btn) {
-  document.getElementById('ilan-edit-title').textContent = btn.dataset.title;
-  document.getElementById('ilan-edit-kategori').textContent = btn.dataset.kategori;
-  document.getElementById('ilan-edit-baslik').value = btn.dataset.title;
-  document.getElementById('ilan-edit-fiyat').value = btn.dataset.fiyat || '';
-  document.getElementById('ilan-edit-durum').value = btn.dataset.durum || 'aktif';
-  document.getElementById('ilan-edit-aciklama').value = '';
-  document.getElementById('ilan-edit-modal').classList.add('open');
-  document.body.style.overflow = 'hidden';
+async function openIlanEdit(btn) {
+  const id = btn.dataset.id;
+  if (!id) return;
+  showDash('ilan-duzenle');
+  document.getElementById('edit-ilan-id').value = id;
+  document.getElementById('edit-ilan-sub').textContent = 'Yükleniyor...';
+  const { data: l } = await _sb.from('listings').select('*').eq('id', id).single();
+  if (!l) return;
+  document.getElementById('edit-ilan-sub').textContent = l.baslik;
+  const f = (id, val) => { const el = document.getElementById(id); if (el) el.value = val||''; };
+  f('edit-ilan-baslik', l.baslik);
+  f('edit-ilan-marka', l.marka);
+  f('edit-ilan-model', l.model);
+  f('edit-ilan-yil', l.yil);
+  f('edit-ilan-kapasite', l.kapasite);
+  f('edit-ilan-guc', l.guc);
+  f('edit-ilan-basinc', l.basinc);
+  f('edit-ilan-teknik', l.teknik_aciklama);
+  f('edit-ilan-fiyat', l.fiyat);
+  f('edit-ilan-aciklama', l.aciklama);
+  const durumEl = document.getElementById('edit-ilan-durum');
+  if (durumEl) durumEl.value = l.durum || 'Yeni';
+  const fiyatTipEl = document.getElementById('edit-ilan-fiyat-tip');
+  if (fiyatTipEl) fiyatTipEl.value = l.fiyat_gosterim || 'Fiyatı Göster';
+  const statusEl = document.getElementById('edit-ilan-status');
+  if (statusEl) statusEl.value = l.status || 'aktif';
+  // Kategori
+  const catEl = document.getElementById('edit-ilan-cat');
+  if (catEl) { catEl.value = l.kategori || ''; updateEditSubCat(); }
+  setTimeout(() => {
+    const subEl = document.getElementById('edit-ilan-subcat');
+    if (subEl) subEl.value = l.alt_kategori || '';
+  }, 50);
 }
-function closeIlanEdit() {
-  document.getElementById('ilan-edit-modal').classList.remove('open');
-  document.body.style.overflow = '';
-}
-function saveIlanEdit() {
-  var baslik = document.getElementById('ilan-edit-baslik').value.trim();
-  if (!baslik) return;
-  closeIlanEdit();
+
+function closeIlanEdit() { showDash('ilanlarim'); }
+
+async function saveIlanEdit() {
+  const id = document.getElementById('edit-ilan-id')?.value;
+  const baslik = document.getElementById('edit-ilan-baslik')?.value.trim();
+  const errEl = document.getElementById('edit-ilan-error');
+  if (!baslik) { if (errEl) { errEl.textContent = 'İlan başlığı zorunludur.'; errEl.style.display = 'block'; } return; }
+  if (errEl) errEl.style.display = 'none';
+  const fiyatRaw = (document.getElementById('edit-ilan-fiyat')?.value||'').replace(/\D/g,'');
+  const { error } = await _sb.from('listings').update({
+    baslik,
+    marka: document.getElementById('edit-ilan-marka')?.value||'',
+    model: document.getElementById('edit-ilan-model')?.value||'',
+    durum: document.getElementById('edit-ilan-durum')?.value||'Yeni',
+    yil: document.getElementById('edit-ilan-yil')?.value||'',
+    kapasite: document.getElementById('edit-ilan-kapasite')?.value||'',
+    guc: document.getElementById('edit-ilan-guc')?.value||'',
+    basinc: document.getElementById('edit-ilan-basinc')?.value||'',
+    teknik_aciklama: document.getElementById('edit-ilan-teknik')?.value||'',
+    fiyat: fiyatRaw ? parseInt(fiyatRaw) : null,
+    fiyat_gosterim: document.getElementById('edit-ilan-fiyat-tip')?.value||'Fiyatı Göster',
+    aciklama: document.getElementById('edit-ilan-aciklama')?.value||'',
+    status: document.getElementById('edit-ilan-status')?.value||'aktif',
+    kategori: document.getElementById('edit-ilan-cat')?.value||'',
+    alt_kategori: document.getElementById('edit-ilan-subcat')?.value||'',
+  }).eq('id', id);
+  if (error) { if (errEl) { errEl.textContent = 'Hata: ' + error.message; errEl.style.display = 'block'; } return; }
   showToast('İlan güncellendi', baslik + ' başarıyla kaydedildi.', null, false);
+  showDash('ilanlarim');
+  loadSellerListings();
 }
+
+function updateEditSubCat() {
+  const cat = document.getElementById('edit-ilan-cat')?.value;
+  const sub = document.getElementById('edit-ilan-subcat');
+  if (!sub) return;
+  const opts = subcats[cat] || [];
+  sub.innerHTML = opts.length
+    ? opts.map(o => `<option value="${o}">${o}</option>`).join('')
+    : '<option>Alt kategori yok</option>';
+}
+
 window.openIlanEdit  = openIlanEdit;
 window.closeIlanEdit = closeIlanEdit;
+window.updateEditSubCat = updateEditSubCat;
 window.saveIlanEdit  = saveIlanEdit;
 
 
