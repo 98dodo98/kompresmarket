@@ -5690,7 +5690,11 @@ async function openListingDetail(id) {
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:14px">
           <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-family:var(--mono)">${escapeHtml((l.marka||'')+' '+(l.model||''))}</div>
           <h1 style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:16px;line-height:1.4">${escapeHtml(l.baslik)}</h1>
-          <div style="margin-bottom:20px">${fiyatHtml}</div>
+          <div style="margin-bottom:16px">${fiyatHtml}</div>
+          <button id="ld-fav-btn" onclick="toggleFavDetail('${l.id}','${escapeHtml(l.baslik)}','${escapeHtml(l.marka||'')}','${l.fiyat_gosterim==='İletişime Geçiniz'?'İletişime Geçiniz':'₺ '+(l.fiyat||0).toLocaleString('tr-TR')}')" style="width:100%;padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--muted);font-size:13px;font-family:var(--font);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s">
+            <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 13.5S1.5 9 1.5 5a3.5 3.5 0 017-0 3.5 3.5 0 017 0c0 4-6.5 8.5-6.5 8.5z"/></svg>
+            <span id="ld-fav-label">Favorilere Ekle</span>
+          </button>
         </div>
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:18px">
           <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-family:var(--mono);margin-bottom:10px">Satıcı Bilgileri</div>
@@ -5704,8 +5708,42 @@ async function openListingDetail(id) {
     </div>
   `;
   go('listing-detail');
+  checkFavDetail(id);
 }
 window.openListingDetail = openListingDetail;
+
+async function toggleFavDetail(id, name, brand, price) {
+  const u = loadUser();
+  if (!u) { go('login'); return; }
+  const btn = document.getElementById('ld-fav-btn');
+  const lbl = document.getElementById('ld-fav-label');
+  const isFav = btn && btn.dataset.fav === '1';
+  if (isFav) {
+    await removeSaved(id);
+    if (btn) { btn.dataset.fav = '0'; btn.style.color = 'var(--muted)'; btn.style.borderColor = 'var(--border)'; btn.style.background = 'var(--surface)'; }
+    if (lbl) lbl.textContent = 'Favorilere Ekle';
+  } else {
+    await saveIlan({ id, name, brand, price, page: 'listing-detail' });
+    if (btn) { btn.dataset.fav = '1'; btn.style.color = 'var(--accent)'; btn.style.borderColor = 'var(--accent)'; btn.style.background = 'rgba(201,74,30,.06)'; }
+    if (lbl) lbl.textContent = 'Favorilerden Çıkar';
+  }
+}
+
+async function checkFavDetail(id) {
+  const u = loadUser();
+  if (!u) return;
+  const { data } = await _sb.from('favorites').select('id').eq('user_id', u.id).eq('ilan_id', id).maybeSingle();
+  const btn = document.getElementById('ld-fav-btn');
+  const lbl = document.getElementById('ld-fav-label');
+  if (data) {
+    if (btn) { btn.dataset.fav = '1'; btn.style.color = 'var(--accent)'; btn.style.borderColor = 'var(--accent)'; btn.style.background = 'rgba(201,74,30,.06)'; }
+    if (lbl) lbl.textContent = 'Favorilerden Çıkar';
+  } else {
+    if (btn) { btn.dataset.fav = '0'; }
+  }
+}
+window.toggleFavDetail = toggleFavDetail;
+
 
 // ===== İLAN DÜZENLEME =====
 function openIlanEdit(btn) {
