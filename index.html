@@ -3188,15 +3188,19 @@ body {
       <div id="dash-profil" style="display:none">
         <div class="dash-head"><p class="dash-title">Profilim</p></div>
         <div class="dash-section">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-            <div class="field"><label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Ad</label><input type="text" id="sp-ad" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none"></div>
-            <div class="field"><label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Soyad</label><input type="text" id="sp-soyad" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none"></div>
+          <div class="form-card" style="max-width:560px">
+            <div class="form-card-body">
+              <div class="field-row" style="margin-bottom:14px">
+                <div class="field"><label>Ad</label><input type="text" id="sp-ad"></div>
+                <div class="field"><label>Soyad</label><input type="text" id="sp-soyad"></div>
+              </div>
+              <div class="field" style="margin-bottom:14px"><label>E-posta</label><input type="text" id="sp-mail" readonly style="background:var(--bg2);color:var(--muted);cursor:default"></div>
+              <div class="field" style="margin-bottom:14px"><label>Firma</label><input type="text" id="sp-firma"></div>
+              <div class="field" style="margin-bottom:14px"><label>Telefon</label><input type="text" id="sp-telefon"></div>
+              <div class="field" style="margin-bottom:20px"><label>Adres</label><input type="text" id="sp-adres"></div>
+              <button class="btn-publish" onclick="saveSellerProfile()">Değişiklikleri Kaydet</button>
+            </div>
           </div>
-          <div class="field" style="margin-bottom:16px"><label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">E-posta</label><input type="text" id="sp-mail" readonly style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none;background:var(--bg2);color:var(--muted)"></div>
-          <div class="field" style="margin-bottom:16px"><label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Firma</label><input type="text" id="sp-firma" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none"></div>
-          <div class="field" style="margin-bottom:16px"><label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Telefon</label><input type="text" id="sp-telefon" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none"></div>
-          <div class="field" style="margin-bottom:16px"><label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Adres</label><input type="text" id="sp-adres" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none"></div>
-          <button class="btn-publish" onclick="saveSellerProfile()">Değişiklikleri Kaydet</button>
         </div>
       </div>
 
