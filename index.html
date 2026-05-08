@@ -2202,7 +2202,7 @@ body {
     <button class="sub-btn" onclick="filterKomp('paletli',this)">Paletli</button>
     <button class="sub-btn" onclick="filterKomp('turbo',this)">Turbo</button>
     <button class="sub-btn" onclick="filterKomp('yagsiz',this)">Yağsız</button>
-    <button class="sub-btn teklif" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('komp', document.querySelector('[onclick*="komp"]')), 50)">+ Teklif Al</button>
+    
   </div>
   <div class="listing-wrap">
     <div class="filter-panel">
@@ -2269,7 +2269,7 @@ body {
     <button class="sub-btn" onclick="go('paletli')">Paletli</button>
     <button class="sub-btn" onclick="go('turbo')">Turbo</button>
     <button class="sub-btn" onclick="go('yagsiz')">Yağsız</button>
-    <button class="sub-btn teklif" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('komp', document.querySelector('[onclick*="komp"]')), 50)">+ Teklif Al</button>
+    
   </div>
   <div class="listing-wrap">
     <div class="filter-panel">
@@ -2320,7 +2320,7 @@ body {
 <!-- ===== PİSTONLU / PALETLİ / TURBO / YAGSIZ (aynı şablonla) ===== -->
 <div class="page" id="p-pistonlu">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Pistonlu Kompresörler</span></div>
-  <div class="sub-strip"><button class="sub-btn active">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn" onclick="go('paletli')">Paletli</button><button class="sub-btn" onclick="go('turbo')">Turbo</button><button class="sub-btn" onclick="go('yagsiz')">Yağsız</button><button class="sub-btn teklif" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('komp', document.querySelector('[onclick*="komp"]')), 50)">+ Teklif Al</button></div>
+  <div class="sub-strip"><button class="sub-btn active">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn" onclick="go('paletli')">Paletli</button><button class="sub-btn" onclick="go('turbo')">Turbo</button><button class="sub-btn" onclick="go('yagsiz')">Yağsız</button></div>
   <div class="listing-wrap">
     <div class="filter-panel">
       <p class="f-title">Filtrele</p>
@@ -2341,19 +2341,19 @@ body {
 
 <div class="page" id="p-paletli">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Paletli Kompresörler</span></div>
-  <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn active">Paletli</button><button class="sub-btn" onclick="go('turbo')">Turbo</button><button class="sub-btn" onclick="go('yagsiz')">Yağsız</button><button class="sub-btn teklif" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('komp', document.querySelector('[onclick*="komp"]')), 50)">+ Teklif Al</button></div>
+  <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn active">Paletli</button><button class="sub-btn" onclick="go('turbo')">Turbo</button><button class="sub-btn" onclick="go('yagsiz')">Yağsız</button></div>
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <div class="page" id="p-turbo">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Turbo Kompresörler</span></div>
-  <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn" onclick="go('paletli')">Paletli</button><button class="sub-btn active">Turbo</button><button class="sub-btn" onclick="go('yagsiz')">Yağsız</button><button class="sub-btn teklif" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('komp', document.querySelector('[onclick*="komp"]')), 50)">+ Teklif Al</button></div>
+  <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn" onclick="go('paletli')">Paletli</button><button class="sub-btn active">Turbo</button><button class="sub-btn" onclick="go('yagsiz')">Yağsız</button></div>
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <div class="page" id="p-yagsiz">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Yağsız Kompresörler</span></div>
-  <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn" onclick="go('paletli')">Paletli</button><button class="sub-btn" onclick="go('turbo')">Turbo</button><button class="sub-btn active">Yağsız</button><button class="sub-btn teklif" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('komp', document.querySelector('[onclick*="komp"]')), 50)">+ Teklif Al</button></div>
+  <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn" onclick="go('paletli')">Paletli</button><button class="sub-btn" onclick="go('turbo')">Turbo</button><button class="sub-btn active">Yağsız</button></div>
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
@@ -2364,7 +2364,7 @@ body {
     <button class="sub-btn active" onclick="filterKuru('tumu',this)">Tümü</button>
     <button class="sub-btn" onclick="filterKuru('gazli',this)">Gazlı Kurutucular</button>
     <button class="sub-btn" onclick="filterKuru('kimyasal',this)">Kimyasal Kurutucular</button>
-    <button class="sub-btn teklif" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('kuru', document.querySelector('[onclick*="kuru"]')), 50)">+ Kurutucu Teklif Al</button>
+    
   </div>
   <div class="listing-wrap">
     <div class="filter-panel">
@@ -2412,7 +2412,7 @@ body {
 
 <div class="page" id="p-gazli-kurutucu">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kurutucular')">Kurutucular</span><span class="bc-sep">/</span><span class="bc-cur">Gazlı Kurutucular</span></div>
-  <div class="sub-strip"><button class="sub-btn active">Gazlı</button><button class="sub-btn" onclick="go('kimyasal-kurutucu')">Kimyasal</button><button class="sub-btn teklif" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('kuru', document.querySelector('[onclick*="kuru"]')), 50)">+ Teklif Al</button></div>
+  <div class="sub-strip"><button class="sub-btn active">Gazlı</button><button class="sub-btn" onclick="go('kimyasal-kurutucu')">Kimyasal</button></div>
   <div class="listing-wrap">
     <div class="filter-panel">
       <p class="f-title">Filtrele</p>
@@ -2433,7 +2433,7 @@ body {
 
 <div class="page" id="p-kimyasal-kurutucu">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kurutucular')">Kurutucular</span><span class="bc-sep">/</span><span class="bc-cur">Kimyasal Kurutucular</span></div>
-  <div class="sub-strip"><button class="sub-btn" onclick="go('gazli-kurutucu')">Gazlı</button><button class="sub-btn active">Kimyasal</button><button class="sub-btn teklif" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('kuru', document.querySelector('[onclick*="kuru"]')), 50)">+ Teklif Al</button></div>
+  <div class="sub-strip"><button class="sub-btn" onclick="go('gazli-kurutucu')">Gazlı</button><button class="sub-btn active">Kimyasal</button></div>
   <div class="listing-wrap">
     <div class="filter-panel">
       <p class="f-title">Filtrele</p>
