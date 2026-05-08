@@ -3376,6 +3376,9 @@ body {
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
+<!-- ===== İLAN DETAY SAYFASI ===== -->
+<div class="page" id="p-listing-detail"></div>
+
 <!-- ===== TEKLİF DETAY SAYFASI ===== -->
 <div class="page" id="p-teklif-detay">
   <div style="max-width:1100px;margin:0 auto;padding:24px 28px">
@@ -3735,7 +3738,7 @@ async function loadListings(kategori, gridId, countId) {
     const thumb = photo
       ? `<img src="${escapeHtml(photo)}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius)">`
       : `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg>`;
-    return `<div class="listing-card db-card" data-tip="${escapeHtml((l.alt_kategori||'').toLowerCase())}" onclick="">
+    return `<div class="listing-card db-card" data-tip="${escapeHtml((l.alt_kategori||'').toLowerCase())}" onclick="openListingDetail('${l.id}')">
       <div class="card-thumb">${thumb}<span class="card-badge ${badge}">${escapeHtml(l.durum||'Yeni')}</span></div>
       <div class="card-body">
         <div class="card-brand">${escapeHtml(l.marka||'')}</div>
@@ -5639,6 +5642,57 @@ window.toggleMobileNav = toggleMobileNav;
 window.closeMobileNav  = closeMobileNav;
 
 
+// ===== İLAN DETAY =====
+async function openListingDetail(id) {
+  const { data: l } = await _sb.from('listings').select('*').eq('id', id).single();
+  if (!l) return;
+  const { data: p } = await _sb.from('profiles').select('ad, soyad, firma, adres').eq('id', l.seller_id).single();
+  const photos = JSON.parse(l.photos || '[]');
+  const fiyatHtml = l.fiyat_gosterim === 'İletişime Geçiniz'
+    ? '<span style="font-size:22px;font-weight:700;color:var(--accent)">İletişime Geçiniz</span>'
+    : `<span style="font-size:22px;font-weight:700;color:var(--text)">₺ ${(l.fiyat||0).toLocaleString('tr-TR')}</span>`;
+  const specs = [
+    l.kapasite && ['Kapasite', l.kapasite + ' m³/dk'],
+    l.guc && ['Motor Gücü', l.guc + ' kW'],
+    l.basinc && ['Maks. Basınç', l.basinc + ' bar'],
+    l.yil && ['Yıl', l.yil],
+    l.durum && ['Durum', l.durum],
+    l.alt_kategori && ['Tip', l.alt_kategori],
+  ].filter(Boolean);
+  const sellerName = p?.firma || ((p?.ad||'') + ' ' + (p?.soyad||'')).trim() || 'Satıcı';
+  const el = document.getElementById('p-listing-detail');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="breadcrumb"><span class="bc-link" onclick="history.back()">← Geri</span><span class="bc-sep">/</span><span class="bc-cur">${escapeHtml(l.baslik)}</span></div>
+    <div style="max-width:1100px;margin:0 auto;padding:24px 28px;display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start">
+      <div>
+        <div style="background:var(--bg2);border-radius:var(--radius);overflow:hidden;margin-bottom:16px;min-height:260px;display:flex;align-items:center;justify-content:center">
+          ${photos.length ? `<img src="${escapeHtml(photos[0])}" style="width:100%;max-height:380px;object-fit:contain">` : `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1" style="width:80px;height:80px;color:var(--border)"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg>`}
+        </div>
+        ${photos.length > 1 ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">${photos.slice(1).map(u=>`<img src="${escapeHtml(u)}" style="width:80px;height:60px;object-fit:cover;border-radius:6px">`).join('')}</div>` : ''}
+        ${specs.length ? `<div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:16px"><div style="padding:12px 18px;border-bottom:1px solid var(--border)"><span style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-family:var(--mono)">Teknik Özellikler</span></div><div style="display:grid;grid-template-columns:1fr 1fr">${specs.map(([k,v])=>`<div style="padding:11px 18px;border-bottom:1px solid var(--border)"><div style="font-size:10px;color:var(--muted);font-family:var(--mono);text-transform:uppercase;margin-bottom:3px">${escapeHtml(k)}</div><div style="font-size:14px;font-weight:500">${escapeHtml(v)}</div></div>`).join('')}</div></div>` : ''}
+        ${l.aciklama ? `<div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:18px"><div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-family:var(--mono);margin-bottom:10px">Açıklama</div><div style="font-size:14px;line-height:1.7;color:var(--text);white-space:pre-line">${escapeHtml(l.aciklama)}</div></div>` : ''}
+      </div>
+      <div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:22px;margin-bottom:14px">
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-family:var(--mono)">${escapeHtml((l.marka||'')+' '+(l.model||''))}</div>
+          <h1 style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:16px;line-height:1.4">${escapeHtml(l.baslik)}</h1>
+          <div style="margin-bottom:20px">${fiyatHtml}</div>
+          <button onclick="goTeklifAl('${escapeHtml(l.kategori||'komp')}')" style="width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font)">Teklif İste</button>
+        </div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:18px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-family:var(--mono);margin-bottom:10px">Satıcı</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">${escapeHtml(sellerName)}</div>
+          ${p?.adres ? `<div style="font-size:12px;color:var(--muted)">${escapeHtml(p.adres)}</div>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+  go('listing-detail');
+}
+window.openListingDetail = openListingDetail;
+
+// ===== İLAN DÜZENLEME =====
 function openIlanEdit(btn) {
   document.getElementById('ilan-edit-title').textContent = btn.dataset.title;
   document.getElementById('ilan-edit-kategori').textContent = btn.dataset.kategori;
@@ -5667,14 +5721,15 @@ window.saveIlanEdit  = saveIlanEdit;
 var uploadedPhotos = [];
 
 function handlePhotoUpload(files) {
+  if (!window._ilanPhotos) _ilanPhotos = [];
   var arr = Array.from(files);
   arr.forEach(function(file) {
-    if (uploadedPhotos.length >= 8) { showToast('Limit', 'En fazla 8 fotoğraf ekleyebilirsiniz.', null, true); return; }
+    if (_ilanPhotos.length >= 8) { showToast('Limit', 'En fazla 8 fotoğraf ekleyebilirsiniz.', null, true); return; }
     if (!file.type.match(/image\/(jpeg|png|webp)/)) { showToast('Hatalı format', 'Sadece PNG, JPG veya WebP yükleyin.', null, true); return; }
     if (file.size > 10 * 1024 * 1024) { showToast('Dosya çok büyük', file.name + ' 10 MB limitini aşıyor.', null, true); return; }
     var reader = new FileReader();
     reader.onload = function(e) {
-      uploadedPhotos.push({ name: file.name, url: e.target.result });
+      _ilanPhotos.push(e.target.result);
       renderPhotoGrid();
     };
     reader.readAsDataURL(file);
@@ -5682,7 +5737,7 @@ function handlePhotoUpload(files) {
 }
 
 function removePhoto(idx) {
-  uploadedPhotos.splice(idx, 1);
+  _ilanPhotos.splice(idx, 1);
   renderPhotoGrid();
 }
 
@@ -5690,14 +5745,14 @@ function renderPhotoGrid() {
   var grid = document.getElementById('photo-preview-grid');
   var drop = document.getElementById('photo-drop');
   if (!grid) return;
-  if (!uploadedPhotos.length) {
+  if (!_ilanPhotos || !_ilanPhotos.length) {
     grid.style.display = 'none';
     return;
   }
   grid.style.display = 'grid';
-  grid.innerHTML = uploadedPhotos.map(function(p, i) {
+  grid.innerHTML = _ilanPhotos.map(function(p, i) {
     return '<div class="photo-thumb">' +
-      '<img src="' + p.url + '" alt="' + p.name + '">' +
+      '<img src="' + p + '" alt="foto">' +
       (i === 0 ? '<span class="photo-thumb-main">Kapak</span>' : '') +
       '<button class="photo-thumb-remove" onclick="removePhoto(' + i + ')">×</button>' +
     '</div>';
@@ -5705,7 +5760,7 @@ function renderPhotoGrid() {
   // Dolu değilse drop alanına "Daha fazla ekle" yaz
   if (drop) {
     var span = drop.querySelector('span');
-    if (span) span.textContent = uploadedPhotos.length + '/8 fotoğraf — daha fazla eklemek için tıklayın';
+    if (span) span.textContent = (_ilanPhotos.length) + '/8 fotoğraf — daha fazla eklemek için tıklayın';
   }
 }
 
