@@ -3052,11 +3052,11 @@ body {
     <div class="dash-main" id="dash-content">
       <!-- Genel Bakış -->
       <div id="dash-main">
-        <div class="dash-head"><p class="dash-title">Genel Bakış</p><p class="dash-sub">Pnömatik Makine A.Ş. — Satıcı Hesabı</p></div>
+        <div class="dash-head"><p class="dash-title">Genel Bakış</p><p class="dash-sub" id="dash-seller-sub">Satıcı Hesabı</p></div>
         <div class="metrics-row">
-          <div class="metric-card"><p class="metric-lbl">Aktif İlan</p><p class="metric-val">24</p><p class="metric-delta">+3 bu ay</p></div>
-          <div class="metric-card"><p class="metric-lbl">İlan Görüntüleme</p><p class="metric-val">1.847</p><p class="metric-delta">+12% geçen ay</p></div>
-          <div class="metric-card" style="cursor:pointer" onclick="showDashFromCard('teklifler')"><p class="metric-lbl">Teklif İsteği</p><p class="metric-val" id="metric-teklif">4</p><p class="metric-delta">Son 7 günde</p></div>
+          <div class="metric-card"><p class="metric-lbl">Aktif İlan</p><p class="metric-val" id="metric-aktif-ilan">—</p><p class="metric-delta" id="metric-aktif-ilan-delta"></p></div>
+          <div class="metric-card"><p class="metric-lbl">İlan Görüntüleme</p><p class="metric-val" id="metric-goruntulenme">—</p><p class="metric-delta"></p></div>
+          <div class="metric-card" style="cursor:pointer" onclick="showDashFromCard('teklifler')"><p class="metric-lbl">Teklif İsteği</p><p class="metric-val" id="metric-teklif">—</p><p class="metric-delta">Son 7 günde</p></div>
           <div class="metric-card"><p class="metric-lbl">Abonelik</p><p class="metric-val" style="font-size:16px">Aylık</p><p class="metric-delta" style="color:var(--muted)">₺ 990/ay</p></div>
         </div>
         <div class="dash-section">
@@ -3064,11 +3064,6 @@ body {
           <table class="ilan-table">
             <thead><tr><th>İlan Başlığı</th><th>Kategori</th><th>Fiyat</th><th>Görüntüleme</th><th>Durum</th></tr></thead><tbody><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Yükleniyor...</td></tr></tbody>
             <tbody>
-              <tr><td>Atlas Copco GA 15 Vidalı</td><td>Vidalı Kompresör</td><td style="font-family:var(--mono)">₺ 185.000</td><td style="font-family:var(--mono)">342</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-              <tr><td>Kaeser SM 11 — 2. El</td><td>Vidalı Kompresör</td><td style="font-family:var(--mono)">₺ 72.000</td><td style="font-family:var(--mono)">218</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-              <tr><td>Beko DFID 170 Kurutucu</td><td>Gazlı Kurutucu</td><td style="font-family:var(--mono)">İletişim</td><td style="font-family:var(--mono)">155</td><td><span class="status-pill status-active">Aktif</span></td></tr>
-              <tr><td>Atlas Copco DD 62+ Filtre</td><td>Filtre</td><td style="font-family:var(--mono)">₺ 6.800</td><td style="font-family:var(--mono)">88</td><td><span class="status-pill status-pending">Beklemede</span></td></tr>
-              <tr><td>V-Kayış Seti GA Serisi</td><td>Yedek Parça</td><td style="font-family:var(--mono)">₺ 1.200</td><td style="font-family:var(--mono)">44</td><td><span class="status-pill status-draft">Taslak</span></td></tr>
             </tbody>
           </table>
         </div>
@@ -3076,17 +3071,12 @@ body {
 
       <!-- İlanlarım -->
       <div id="dash-ilanlarim" style="display:none">
-        <div class="dash-head"><p class="dash-title">İlanlarım</p><p class="dash-sub">24 aktif ilan</p></div>
+        <div class="dash-head"><p class="dash-title">İlanlarım</p><p class="dash-sub" id="dash-ilanlarim-sub"></p></div>
         <div class="dash-section">
           <div class="dash-section-head"><p class="dash-section-title">Tüm İlanlar</p><button class="btn-small" onclick="showDash('ilan-ver')">+ Yeni İlan</button></div>
           <table class="ilan-table">
             <thead><tr><th>İlan Başlığı</th><th>Kategori</th><th>Fiyat</th><th>Görüntüleme</th><th>Durum</th><th></th></tr></thead><tbody><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">Yükleniyor...</td></tr></tbody>
             <tbody>
-              <tr><td>Atlas Copco GA 15 Vidalı</td><td>Vidalı Kompresör</td><td style="font-family:var(--mono)">₺ 185.000</td><td style="font-family:var(--mono)">342</td><td><span class="status-pill status-active">Aktif</span></td><td><button class="ilan-edit-btn" data-title="Atlas Copco GA 15 Vidalı" data-kategori="Vidalı Kompresör" data-fiyat="185000" data-durum="aktif">Düzenle</button></td></tr>
-              <tr><td>Kaeser SM 11 — 2. El</td><td>Vidalı Kompresör</td><td style="font-family:var(--mono)">₺ 72.000</td><td style="font-family:var(--mono)">218</td><td><span class="status-pill status-active">Aktif</span></td><td><button class="ilan-edit-btn" data-title="Kaeser SM 11 — 2. El" data-kategori="Vidalı Kompresör" data-fiyat="72000" data-durum="aktif">Düzenle</button></td></tr>
-              <tr><td>Beko DFID 170 Kurutucu</td><td>Gazlı Kurutucu</td><td style="font-family:var(--mono)">İletişim</td><td style="font-family:var(--mono)">155</td><td><span class="status-pill status-active">Aktif</span></td><td><button class="ilan-edit-btn" data-title="Beko DFID 170 Kurutucu" data-kategori="Gazlı Kurutucu" data-fiyat="" data-durum="aktif">Düzenle</button></td></tr>
-              <tr><td>Atlas Copco DD 62+ Filtre</td><td>Filtre</td><td style="font-family:var(--mono)">₺ 6.800</td><td style="font-family:var(--mono)">88</td><td><span class="status-pill status-pending">Beklemede</span></td><td><button class="ilan-edit-btn" data-title="Atlas Copco DD 62+ Filtre" data-kategori="Filtre" data-fiyat="6800" data-durum="beklemede">Düzenle</button></td></tr>
-              <tr><td>V-Kayış Seti GA Serisi</td><td>Yedek Parça</td><td style="font-family:var(--mono)">₺ 1.200</td><td style="font-family:var(--mono)">44</td><td><span class="status-pill status-draft">Taslak</span></td><td><button class="ilan-edit-btn" data-title="V-Kayış Seti GA Serisi" data-kategori="Yedek Parça" data-fiyat="1200" data-durum="taslak">Düzenle</button></td></tr>
             </tbody>
           </table>
         </div>
@@ -3779,8 +3769,17 @@ async function loadSellerListings() {
 
   // Metrik güncelle
   const aktif = data?.filter(l => l.status === 'aktif').length || 0;
-  const metricEl = document.getElementById('metric-ilan');
+  const toplam = data?.length || 0;
+  const metricEl = document.getElementById('metric-aktif-ilan');
   if (metricEl) metricEl.textContent = aktif;
+  const deltaEl = document.getElementById('metric-aktif-ilan-delta');
+  if (deltaEl) deltaEl.textContent = toplam + ' toplam ilan';
+  const subEl = document.getElementById('dash-ilanlarim-sub');
+  if (subEl) subEl.textContent = aktif + ' aktif ilan';
+  // Firma adını doldur
+  const u2 = loadUser();
+  const sellerSubEl = document.getElementById('dash-seller-sub');
+  if (sellerSubEl && u2) sellerSubEl.textContent = (u2.firma || (u2.ad + ' ' + u2.soyad).trim() || 'Satıcı') + ' — Satıcı Hesabı';
 }
 
 async function deleteListingById(id) {
