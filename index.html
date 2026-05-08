@@ -3186,20 +3186,34 @@ body {
         </div>
       </div>
       <div id="dash-profil" style="display:none">
-        <div class="dash-head"><p class="dash-title">Profilim</p></div>
-        <div class="dash-section">
-          <div class="form-card" style="max-width:560px">
-            <div class="form-card-body">
-              <div class="field-row" style="margin-bottom:14px">
-                <div class="field"><label>Ad</label><input type="text" id="sp-ad"></div>
-                <div class="field"><label>Soyad</label><input type="text" id="sp-soyad"></div>
-              </div>
-              <div class="field" style="margin-bottom:14px"><label>E-posta</label><input type="text" id="sp-mail" readonly style="background:var(--bg2);color:var(--muted);cursor:default"></div>
-              <div class="field" style="margin-bottom:14px"><label>Firma</label><input type="text" id="sp-firma"></div>
-              <div class="field" style="margin-bottom:14px"><label>Telefon</label><input type="text" id="sp-telefon"></div>
-              <div class="field" style="margin-bottom:20px"><label>Adres</label><input type="text" id="sp-adres"></div>
-              <button class="btn-publish" onclick="saveSellerProfile()">Değişiklikleri Kaydet</button>
+        <div class="dash-head">
+          <p class="dash-title">Profilim</p>
+          <p class="dash-sub">Hesap bilgilerin</p>
+        </div>
+        <div class="dash-section" style="max-width:480px">
+          <div class="dash-section-head"><p class="dash-section-title">Kişisel Bilgiler</p></div>
+          <div style="padding:20px">
+            <div class="field-row" style="margin-bottom:14px">
+              <div class="field"><label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Ad</label><input type="text" id="sp-ad" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none"></div>
+              <div class="field"><label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Soyad</label><input type="text" id="sp-soyad" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none"></div>
             </div>
+            <div style="margin-bottom:14px">
+              <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">E-posta</label>
+              <input type="text" id="sp-mail" readonly style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none;background:var(--bg2);color:var(--muted);cursor:default">
+            </div>
+            <div style="margin-bottom:14px">
+              <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Firma</label>
+              <input type="text" id="sp-firma" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none">
+            </div>
+            <div style="margin-bottom:14px">
+              <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Telefon</label>
+              <input type="text" id="sp-telefon" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none">
+            </div>
+            <div style="margin-bottom:20px">
+              <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Adres</label>
+              <input type="text" id="sp-adres" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none">
+            </div>
+            <button class="btn-publish" onclick="saveSellerProfile()">Değişiklikleri Kaydet</button>
           </div>
         </div>
       </div>
@@ -3320,7 +3334,11 @@ body {
             </div>
             <div style="margin-bottom:14px">
               <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">E-posta</label>
-              <input type="email" id="bp-mail" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none">
+              <input type="email" id="bp-mail" readonly style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none;background:var(--bg2);color:var(--muted);cursor:default">
+            </div>
+            <div style="margin-bottom:14px">
+              <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Telefon</label>
+              <input type="text" id="bp-telefon" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none">
             </div>
             <div style="margin-bottom:14px">
               <label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Firma <span style="font-style:italic;text-transform:none;letter-spacing:0;font-weight:400">isteğe bağlı</span></label>
@@ -6134,18 +6152,19 @@ async function loadMusterProfile() {
   const p = data || u;
   const f = (id, val) => { const el = document.getElementById(id); if (el) el.value = val||''; };
   f('bp-ad', p.ad); f('bp-soyad', p.soyad);
-  f('bp-mail', u.mail); f('bp-firma', p.firma); f('bp-adres', p.adres);
+  f('bp-mail', u.mail); f('bp-telefon', p.telefon); f('bp-firma', p.firma); f('bp-adres', p.adres);
 }
 
 async function saveMusterProfile() {
   const u = loadUser();
   if (!u) return;
-  const ad    = (document.getElementById('bp-ad')?.value||'').trim();
-  const soyad = (document.getElementById('bp-soyad')?.value||'').trim();
-  const firma = (document.getElementById('bp-firma')?.value||'').trim();
-  const adres = (document.getElementById('bp-adres')?.value||'').trim();
+  const ad      = (document.getElementById('bp-ad')?.value||'').trim();
+  const soyad   = (document.getElementById('bp-soyad')?.value||'').trim();
+  const telefon = (document.getElementById('bp-telefon')?.value||'').trim();
+  const firma   = (document.getElementById('bp-firma')?.value||'').trim();
+  const adres   = (document.getElementById('bp-adres')?.value||'').trim();
 
-  const { error } = await _sb.from('profiles').upsert({ id: u.id, ad, soyad, firma, adres });
+  const { error } = await _sb.from('profiles').upsert({ id: u.id, ad, soyad, telefon, firma, adres });
   if (error) { showToast('Hata', error.message, null, true); return; }
 
   // Memory'deki user'ı güncelle
