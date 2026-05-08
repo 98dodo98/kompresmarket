@@ -3037,6 +3037,11 @@ body {
         Teklif İstekleri
         <span class="sb-badge" id="sb-badge">4</span>
       </button>
+      <button class="sidebar-item" onclick="showDash('favoriler')">
+        <svg viewBox="0 0 14 14"><path d="M7 12S1 8 1 4.5a3 3 0 016 0 3 3 0 016 0C13 8 7 12 7 12z"/></svg>
+        Favori İlanlar
+        <span class="sb-badge" id="sb-fav-badge" style="display:none">0</span>
+      </button>
       <div class="sidebar-sep"></div>
       <p class="sidebar-label">Hesap</p>
       <button class="sidebar-item" onclick="showDash('profil')">
@@ -3183,6 +3188,14 @@ body {
             <button class="inbox-filter" data-f="servis" onclick="filterInbox('servis',this)">Servis</button>
           </div>
           <div class="inbox-list" id="inbox-list"></div>
+        </div>
+      </div>
+      <div id="dash-favoriler" style="display:none">
+        <div class="dash-head"><p class="dash-title">Favori İlanlar</p></div>
+        <div class="dash-section">
+          <div id="seller-fav-list" style="min-height:60px">
+            <div style="color:var(--muted);font-size:13px;text-align:center;padding:32px">Yükleniyor...</div>
+          </div>
         </div>
       </div>
       <div id="dash-profil" style="display:none">
@@ -3819,6 +3832,9 @@ async function loadSellerListings() {
   const u2 = loadUser();
   const sellerSubEl = document.getElementById('dash-seller-sub');
   if (sellerSubEl && u2) sellerSubEl.textContent = (u2.firma || (u2.ad + ' ' + u2.soyad).trim() || 'Satıcı') + ' — Satıcı Hesabı';
+  // Favori badge
+  const u3 = loadUser();
+  if (u3) { _sb.from('favorites').select('id',{count:'exact',head:true}).eq('user_id',u3.id).then(({count})=>{ const b=document.getElementById('sb-fav-badge'); if(b&&count){b.textContent=count;b.style.display='';} }); }
 }
 
 async function deleteListingById(id) {
@@ -3882,6 +3898,7 @@ function showDash(section) {
   }
   if (section === 'teklifler') renderInbox();
   if (section === 'profil') loadSellerProfile();
+  if (section === 'favoriler') loadSellerFavoriler();
 }
 
 function showDashFromCard(section) {
@@ -5743,6 +5760,34 @@ async function checkFavDetail(id) {
   }
 }
 window.toggleFavDetail = toggleFavDetail;
+
+async function loadSellerFavoriler() {
+  const u = loadUser();
+  if (!u) return;
+  const el = document.getElementById('seller-fav-list');
+  if (!el) return;
+  const { data } = await _sb.from('favorites').select('*').eq('user_id', u.id).order('created_at', { ascending: false });
+  if (!data?.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:13px;text-align:center;padding:32px">Henüz favori ilan yok. İlan detay sayfalarında favoriye ekleyebilirsiniz.</div>';
+    return;
+  }
+  // badge güncelle
+  const badge = document.getElementById('sb-fav-badge');
+  if (badge) { badge.textContent = data.length; badge.style.display = ''; }
+  el.innerHTML = data.map(f => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--bg2)">
+      <div>
+        <div style="font-size:13px;font-weight:500;color:var(--text);margin-bottom:2px">${escapeHtml(f.ilan_name||'')}</div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${escapeHtml(f.ilan_brand||'')}${f.ilan_price?' • '+escapeHtml(f.ilan_price):''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:12px;color:var(--accent);cursor:pointer" onclick="openListingDetail('${escapeHtml(f.ilan_id)}')">Görüntüle →</span>
+        <span style="font-size:12px;color:var(--muted);cursor:pointer" onclick="removeSaved('${escapeHtml(f.ilan_id)}').then(()=>loadSellerFavoriler())">✕</span>
+      </div>
+    </div>`).join('');
+}
+window.loadSellerFavoriler = loadSellerFavoriler;
+
 
 
 // ===== İLAN DÜZENLEME =====
