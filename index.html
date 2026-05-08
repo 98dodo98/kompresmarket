@@ -3911,6 +3911,13 @@ function go(page, addHistory = true) {
       });
       loadAllListings();
     }
+    // Aktif cat-btn'i güncelle
+    if (listingPages.includes(page)) {
+      document.querySelectorAll('.cat-strip .cat-btn').forEach(b => {
+        const target = b.getAttribute('onclick')?.match(/go\('([^']+)'\)/)?.[1];
+        b.classList.toggle('active', target === page);
+      });
+    }
     if (page === 'dashboard') {
       loadSellerListings();
     }
