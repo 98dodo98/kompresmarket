@@ -4717,8 +4717,9 @@ async function submitRegister(type) {
     if (pw.length < 6) { setErr('s-pw', true); hasErr = true; }
     else if (pw !== pw2) { setErr('s-pw', true); setErr('s-pw2', true); hasErr = true; }
   } else {
-    const bpw = (document.getElementById('b-pw')?.value || '').trim();
-    if (bpw.length < 6) { setErr('b-pw', true); hasErr = true; }
+    const pw2 = (document.getElementById('b-pw2')?.value || '').trim();
+    if (pw.length < 6) { setErr('b-pw', true); hasErr = true; }
+    else if (pw !== pw2) { setErr('b-pw', true); setErr('b-pw2', true); hasErr = true; }
   }
 
   if (hasErr) {
