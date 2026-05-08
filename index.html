@@ -3709,8 +3709,63 @@ async function publishIlan(status) {
   showDash('ilanlarim');
   loadSellerListings();
 }
-window.publishIlan = publishIlan;
-window.updateSubCat = updateSubCat;
+// ===== İLAN LİSTESİ SUPABASE'DEN YÜKLE =====
+async function loadListings(kategori, gridId, countId) {
+  const grid = document.getElementById(gridId);
+  const countEl = document.getElementById(countId);
+  if (!grid) return;
+
+  const { data } = await _sb.from('listings')
+    .select('*')
+    .eq('kategori', kategori)
+    .eq('status', 'aktif')
+    .order('created_at', { ascending: false });
+
+  if (!data?.length) return;
+
+  // Supabase ilanlarını en üste ekle
+  const cards = data.map(l => {
+    const fiyat = l.fiyat_gosterim === 'İletişime Geçiniz'
+      ? `<span class="card-price-contact">İletişime geçiniz</span>`
+      : `<span class="card-price">₺ ${(l.fiyat||0).toLocaleString('tr-TR')}</span>`;
+    const specs = [l.kapasite ? l.kapasite+' m³/dk' : '', l.guc ? l.guc+' kW' : '', l.basinc ? l.basinc+' bar' : '']
+      .filter(Boolean).map(s => `<span class="spec-tag">${escapeHtml(s)}</span>`).join('');
+    const badge = l.durum === '2. El' ? 'badge-used' : 'badge-new';
+    const photo = (JSON.parse(l.photos || '[]')[0]) || '';
+    const thumb = photo
+      ? `<img src="${escapeHtml(photo)}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius)">`
+      : `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg>`;
+    return `<div class="listing-card db-card" data-tip="${escapeHtml((l.alt_kategori||'').toLowerCase())}" onclick="">
+      <div class="card-thumb">${thumb}<span class="card-badge ${badge}">${escapeHtml(l.durum||'Yeni')}</span></div>
+      <div class="card-body">
+        <div class="card-brand">${escapeHtml(l.marka||'')}</div>
+        <div class="card-name">${escapeHtml(l.baslik)}</div>
+        <div class="card-specs">${specs}</div>
+        <div class="card-foot">${fiyat}<span class="card-cta">Detay →</span></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  grid.insertAdjacentHTML('afterbegin', cards);
+
+  // Sayacı güncelle
+  const total = grid.querySelectorAll('.listing-card').length;
+  if (countEl) countEl.textContent = '— ' + total + ' ilan';
+}
+
+// Sayfa açılınca ilgili kategorileri yükle
+function loadAllListings() {
+  loadListings('komp', 'komp-cards-grid', 'komp-list-count');
+  loadListings('kuru', 'kuru-cards-grid', 'kuru-list-count');
+  loadListings('filtre', 'filtre-cards-grid', 'filtre-list-count');
+  loadListings('aksesuar', 'aksesuar-cards-grid', 'aksesuar-list-count');
+  loadListings('jenerator', 'jenerator-cards-grid', 'jenerator-list-count');
+  loadListings('yp', 'yp-cards-grid', 'yp-list-count');
+}
+window.loadAllListings = loadAllListings;
+window.loadListings = loadListings;
+
+
 
 async function loadSellerListings() {
   const u = loadUser();
@@ -3760,7 +3815,14 @@ function go(page, addHistory = true) {
     if (addHistory) {
       try { history.pushState({ page }, '', '#' + page); } catch(e) {}
     }
+    // İlan sayfaları açılınca Supabase'den yükle (sadece bir kez)
+    const listingPages = ['kompresorler','kurutucular','filtreler-ana','aksesuarlar','jeneratorler','yedek-parca'];
+    if (listingPages.includes(page) && !el.dataset.loaded) {
+      el.dataset.loaded = '1';
+      loadAllListings();
+    }
   }
+  updateNav();
 }
 window.go = go;
 
