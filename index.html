@@ -3039,11 +3039,11 @@ body {
       </button>
       <div class="sidebar-sep"></div>
       <p class="sidebar-label">Hesap</p>
-      <button class="sidebar-item">
+      <button class="sidebar-item" onclick="showDash('profil')">
         <svg viewBox="0 0 14 14"><circle cx="7" cy="5" r="3"/><path d="M1 13c0-3 2.7-5 6-5s6 2 6 5"/></svg>
         Profil
       </button>
-      <button class="sidebar-item">
+      <button class="sidebar-item" onclick="logout()">
         <svg viewBox="0 0 14 14"><path d="M5 2H2a1 1 0 00-1 1v8a1 1 0 001 1h3M10 10l3-3-3-3M13 7H5"/></svg>
         Çıkış
       </button>
@@ -3183,6 +3183,20 @@ body {
             <button class="inbox-filter" data-f="servis" onclick="filterInbox('servis',this)">Servis</button>
           </div>
           <div class="inbox-list" id="inbox-list"></div>
+        </div>
+      </div>
+      <div id="dash-profil" style="display:none">
+        <div class="dash-head"><p class="dash-title">Profilim</p></div>
+        <div class="dash-section">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+            <div class="field"><label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Ad</label><input type="text" id="sp-ad" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none"></div>
+            <div class="field"><label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Soyad</label><input type="text" id="sp-soyad" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none"></div>
+          </div>
+          <div class="field" style="margin-bottom:16px"><label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">E-posta</label><input type="text" id="sp-mail" readonly style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none;background:var(--bg2);color:var(--muted)"></div>
+          <div class="field" style="margin-bottom:16px"><label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Firma</label><input type="text" id="sp-firma" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none"></div>
+          <div class="field" style="margin-bottom:16px"><label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Telefon</label><input type="text" id="sp-telefon" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none"></div>
+          <div class="field" style="margin-bottom:16px"><label style="font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;font-family:var(--mono);display:block;margin-bottom:5px">Adres</label><input type="text" id="sp-adres" style="width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-family:var(--font);outline:none"></div>
+          <button class="btn-publish" onclick="saveSellerProfile()">Değişiklikleri Kaydet</button>
         </div>
       </div>
 
@@ -3845,6 +3859,7 @@ function showDash(section) {
     event.currentTarget.classList.add('active');
   }
   if (section === 'teklifler') renderInbox();
+  if (section === 'profil') loadSellerProfile();
 }
 
 function showDashFromCard(section) {
@@ -6146,6 +6161,37 @@ window.showMusterDash = showMusterDash;
 window.removeSaved = removeSaved;
 window.saveIlan = saveIlan;
 window.saveMusterProfile = saveMusterProfile;
+async function loadSellerProfile() {
+  const u = loadUser();
+  if (!u) return;
+  const { data: p } = await _sb.from('profiles').select('*').eq('id', u.id).single();
+  const f = (id, val) => { const el = document.getElementById(id); if (el) el.value = val||''; };
+  f('sp-ad', p?.ad || u.ad);
+  f('sp-soyad', p?.soyad || u.soyad);
+  f('sp-mail', u.mail);
+  f('sp-firma', p?.firma || u.firma);
+  f('sp-telefon', p?.telefon || u.telefon);
+  f('sp-adres', p?.adres || u.adres);
+}
+
+async function saveSellerProfile() {
+  const u = loadUser();
+  if (!u) return;
+  const ad      = (document.getElementById('sp-ad')?.value||'').trim();
+  const soyad   = (document.getElementById('sp-soyad')?.value||'').trim();
+  const firma   = (document.getElementById('sp-firma')?.value||'').trim();
+  const telefon = (document.getElementById('sp-telefon')?.value||'').trim();
+  const adres   = (document.getElementById('sp-adres')?.value||'').trim();
+  const { error } = await _sb.from('profiles').upsert({ id: u.id, ad, soyad, firma, telefon, adres }, { onConflict: 'id' });
+  if (error) { showToast('Hata', error.message, null, true); return; }
+  u.ad = ad; u.soyad = soyad; u.firma = firma; u.telefon = telefon; u.adres = adres;
+  _memStore[USER_KEY] = JSON.stringify(u);
+  updateNav();
+  showToast('Profil güncellendi', 'Bilgilerin başarıyla kaydedildi.', null, false);
+}
+window.loadSellerProfile = loadSellerProfile;
+window.saveSellerProfile = saveSellerProfile;
+
 window.goMusterDashboard = goMusterDashboard;
 
 
