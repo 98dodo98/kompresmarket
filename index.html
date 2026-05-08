@@ -2181,6 +2181,82 @@ body {
 
 
 <!-- ===== VİDALI KOMPRESÖRLER LİSTESİ ===== -->
+<div class="page" id="p-kompresorler">
+  <div class="breadcrumb">
+    <span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span>
+    <span class="bc-cur">Kompresörler</span>
+  </div>
+  <div class="cat-strip">
+    <button class="cat-btn active" onclick="switchKompCat('komp', this)"><span class="cat-icon"></span>Kompresörler</button>
+    <button class="cat-btn" onclick="go('kurutucular')"><span class="cat-icon"></span>Kurutucular</button>
+    <button class="cat-btn" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('borulama', document.querySelector('[onclick*="borulama"]')), 50)"><span class="cat-icon"></span>Borulama</button>
+    <button class="cat-btn" onclick="go('filtreler-ana')"><span class="cat-icon"></span>Filtreler</button>
+    <button class="cat-btn" onclick="go('jeneratorler')"><span class="cat-icon"></span>Gaz Jeneratörleri</button>
+    <button class="cat-btn" onclick="go('aksesuarlar')"><span class="cat-icon"></span>Aksesuarlar</button>
+    <button class="cat-btn" onclick="go('yedek-parca')"><span class="cat-icon"></span>Yedek Parça</button>
+  </div>
+  <div class="sub-strip" id="komp-sub-strip">
+    <button class="sub-btn active" onclick="filterKomp('tumu',this)">Tümü</button>
+    <button class="sub-btn" onclick="filterKomp('pistonlu',this)">Pistonlu</button>
+    <button class="sub-btn" onclick="filterKomp('vidali',this)">Vidalı</button>
+    <button class="sub-btn" onclick="filterKomp('paletli',this)">Paletli</button>
+    <button class="sub-btn" onclick="filterKomp('turbo',this)">Turbo</button>
+    <button class="sub-btn" onclick="filterKomp('yagsiz',this)">Yağsız</button>
+    <button class="sub-btn teklif" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('komp', document.querySelector('[onclick*="komp"]')), 50)">+ Teklif Al</button>
+  </div>
+  <div class="listing-wrap">
+    <div class="filter-panel">
+      <p class="f-title">Filtrele</p>
+      <div class="f-section">
+        <p class="f-group-label">Kapasite (m³/dk)</p>
+        <input type="range" class="f-range" min="0" max="30" value="30" oninput="this.nextElementSibling.children[1].textContent='0–'+this.value+' m³/dk'">
+        <div class="f-range-row"><span>0</span><span>0–30 m³/dk</span><span>30</span></div>
+      </div>
+      <div class="f-section">
+        <p class="f-group-label">Motor Gücü (kW)</p>
+        <input type="range" class="f-range" min="1" max="315" value="315" oninput="this.nextElementSibling.children[1].textContent='1–'+this.value+' kW'">
+        <div class="f-range-row"><span>1</span><span>1–315 kW</span><span>315</span></div>
+      </div>
+      <div class="f-section">
+        <p class="f-group-label">Marka</p>
+        <div class="f-row"><input type="checkbox" checked><label>Atlas Copco</label><span class="f-count">38</span></div>
+        <div class="f-row"><input type="checkbox" checked><label>Kaeser</label><span class="f-count">24</span></div>
+        <div class="f-row"><input type="checkbox" checked><label>Ingersoll Rand</label><span class="f-count">19</span></div>
+        <div class="f-row"><input type="checkbox" checked><label>Beko</label><span class="f-count">11</span></div>
+        <div class="f-row"><input type="checkbox" checked><label>CompAir</label><span class="f-count">8</span></div>
+        <div class="f-row"><input type="checkbox" checked><label>Mattei</label><span class="f-count">12</span></div>
+        <div class="f-row"><input type="checkbox" checked><label>Abac</label><span class="f-count">18</span></div>
+        <div class="f-row"><input type="checkbox" checked><label>Diğer</label><span class="f-count">51</span></div>
+      </div>
+      <div class="f-section">
+        <p class="f-group-label">Durum</p>
+        <div class="f-row"><input type="checkbox" checked><label>Yeni</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>2. El</label></div>
+      </div>
+      <button class="f-apply">Uygula</button>
+    </div>
+    <div class="listing-main">
+      <div class="listing-header">
+        <div class="listing-title-row">
+          <span class="listing-title" id="komp-list-title">Tüm Kompresörler</span>
+          <span class="listing-count" id="komp-list-count">— 0 ilan</span>
+        </div>
+        <select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select>
+      </div>
+      <div class="cards-grid" id="komp-cards-grid">
+        <!-- Pistonlu -->
+        <!-- Vidalı -->
+        <!-- Paletli -->
+        <!-- Turbo -->
+        <!-- Yağsız -->
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
+</div>
+
+
+<!-- ===== VİDALI KOMPRESÖRLER LİSTESİ ===== -->
 <div class="page" id="p-vidali">
   <div class="breadcrumb">
     <span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span>
@@ -2235,12 +2311,6 @@ body {
         <select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select>
       </div>
       <div class="cards-grid">
-        
-        
-        
-        
-        
-        
       </div>
     </div>
   </div>
@@ -2263,9 +2333,6 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Pistonlu Kompresörler</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option><option>Yüksek Fiyat</option></select></div>
       <div class="cards-grid">
-        
-        
-        
       </div>
     </div>
   </div>
@@ -2275,21 +2342,18 @@ body {
 <div class="page" id="p-paletli">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Paletli Kompresörler</span></div>
   <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn active">Paletli</button><button class="sub-btn" onclick="go('turbo')">Turbo</button><button class="sub-btn" onclick="go('yagsiz')">Yağsız</button><button class="sub-btn teklif" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('komp', document.querySelector('[onclick*="komp"]')), 50)">+ Teklif Al</button></div>
-  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="0" max="25" value="10"><div class="f-range-row"><span>0</span><span>0–10 m³/dk</span><span>25</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="1" max="160" value="45"><div class="f-range-row"><span>1</span><span>1–45 kW</span><span>160</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Mattei</label><span class="f-count">12</span></div><div class="f-row"><input type="checkbox"><label>Diğer</label><span class="f-count">8</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Paletli Kompresörler</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div><div class="cards-grid"></div></div></div>
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <div class="page" id="p-turbo">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Turbo Kompresörler</span></div>
   <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn" onclick="go('paletli')">Paletli</button><button class="sub-btn active">Turbo</button><button class="sub-btn" onclick="go('yagsiz')">Yağsız</button><button class="sub-btn teklif" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('komp', document.querySelector('[onclick*="komp"]')), 50)">+ Teklif Al</button></div>
-  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="5" max="500" value="100"><div class="f-range-row"><span>5</span><span>5–100 m³/dk</span><span>500</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="30" max="1000" value="250"><div class="f-range-row"><span>30</span><span>30–250 kW</span><span>1000</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Atlas Copco</label><span class="f-count">6</span></div><div class="f-row"><input type="checkbox"><label>Siemens</label><span class="f-count">4</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Turbo Kompresörler</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div><div class="cards-grid"></div></div></div>
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <div class="page" id="p-yagsiz">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Yağsız Kompresörler</span></div>
   <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn" onclick="go('paletli')">Paletli</button><button class="sub-btn" onclick="go('turbo')">Turbo</button><button class="sub-btn active">Yağsız</button><button class="sub-btn teklif" onclick="go('teklif-al'); setTimeout(() => switchTeklifTab('komp', document.querySelector('[onclick*="komp"]')), 50)">+ Teklif Al</button></div>
-  <div class="listing-wrap"><div class="filter-panel"><p class="f-title">Filtrele</p><div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" class="f-range" min="0" max="20" value="5"><div class="f-range-row"><span>0</span><span>0–5 m³/dk</span><span>20</span></div></div><div class="f-section"><p class="f-group-label">Motor Gücü (kW)</p><input type="range" class="f-range" min="1" max="200" value="30"><div class="f-range-row"><span>1</span><span>1–30 kW</span><span>200</span></div></div><div class="f-section"><p class="f-group-label">Marka</p><div class="f-row"><input type="checkbox" checked><label>Atlas Copco</label><span class="f-count">9</span></div><div class="f-row"><input type="checkbox"><label>Ingersoll Rand</label><span class="f-count">5</span></div></div><button class="f-apply">Uygula</button></div><div class="listing-main"><div class="listing-header"><div class="listing-title-row"><span class="listing-title">Yağsız Kompresörler</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div><div class="cards-grid"></div></div></div>
   <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
@@ -2361,8 +2425,6 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Gazlı Kurutucular</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
       <div class="cards-grid">
-        
-        
       </div>
     </div>
   </div>
@@ -2382,7 +2444,6 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Kimyasal Kurutucular</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
       <div class="cards-grid">
-        
       </div>
     </div>
   </div>
@@ -2404,8 +2465,6 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Basınçlı Gazlar İçin Filtreler</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
       <div class="cards-grid">
-        
-        
       </div>
     </div>
   </div>
@@ -2426,8 +2485,6 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Diğer Aksesuarlar</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
       <div class="cards-grid">
-        
-        
       </div>
     </div>
   </div>
@@ -2448,7 +2505,6 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Endüstriyel Gaz Jeneratörleri</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
       <div class="cards-grid">
-        
       </div>
     </div>
   </div>
@@ -2489,9 +2545,6 @@ body {
     <div class="listing-main">
       <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Yedek Parça</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
       <div class="cards-grid">
-        
-        
-        
       </div>
     </div>
   </div>
@@ -2499,6 +2552,148 @@ body {
 </div>
 
 <!-- ===== TEKLİF AL - BİRLEŞİK SAYFA ===== -->
+<div class="page" id="p-teklif-al">
+  <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-cur">Teklif Al</span></div>
+  <div class="teklif-page">
+    <div class="teklif-inner">
+      <div class="teklif-card" style="max-width:640px">
+        <!-- Kategori sekmeleri -->
+        <div style="display:flex;flex-wrap:wrap;gap:6px;padding:18px 20px;border-bottom:1px solid var(--border)">
+          <button class="teklif-tab active" onclick="switchTeklifTab('komp',this)">Kompresör</button>
+          <button class="teklif-tab" onclick="switchTeklifTab('kuru',this)">Kurutucu</button>
+          <button class="teklif-tab" onclick="switchTeklifTab('borulama',this)">Borulama</button>
+          <button class="teklif-tab" onclick="switchTeklifTab('servis',this)">Servis</button>
+          <button class="teklif-tab" onclick="switchTeklifTab('filtre',this)">Filtre</button>
+          <button class="teklif-tab" onclick="switchTeklifTab('aksesuar',this)">Aksesuar</button>
+          <button class="teklif-tab" onclick="switchTeklifTab('yedek',this)">Yedek Parça</button>
+          <button class="teklif-tab" onclick="switchTeklifTab('jenerator',this)">Gaz Jeneratörü</button>
+        </div>
+
+        <!-- Kompresör Formu -->
+        <div class="teklif-tab-content" id="tab-komp">
+          <div class="teklif-head"><p class="teklif-title">Kompresör Teklifi Al</p><p class="teklif-sub">İhtiyacınızı yazın, tüm kompresör satıcıları bildirim alsın</p></div>
+          <div class="teklif-body" id="form-komp">
+            <div class="field-row" style="margin-bottom:14px"><div class="field"><label>Kompresör Tipi</label><select data-k="Tip"><option>Vidalı</option><option>Pistonlu</option><option>Paletli</option><option>Turbo</option><option>Yağsız</option><option>Fark etmez</option></select></div><div class="field"><label>Kapasite (m³/dk)</label><input type="text" data-k="Kapasite" placeholder="Örn: 2.5"></div></div>
+            <div class="field-row" style="margin-bottom:14px"><div class="field"><label>Motor Gücü (kW)</label><input type="text" data-k="Güç" placeholder="Örn: 15"></div><div class="field"><label>Basınç (bar)</label><input type="text" data-k="Basınç" placeholder="Örn: 8"></div></div>
+            <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
+            <div class="field"><label>Detaylı Açıklama</label><textarea class="teklif-area" data-k="Açıklama" placeholder="Montaj gereksinimleri, mevcut enerji altyapısı, tercihler..."></textarea></div>
+            <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Tüm satıcılara bildirim gönderilir. Komisyon alınmaz.</span></div>
+            <button class="btn-teklif" data-kategori="komp" data-label="Kompresör" data-form="form-komp" data-baslik="Kompresör">Teklif İsteği Oluştur</button>
+          </div>
+        </div>
+
+        <!-- Kurutucu Formu -->
+        <div class="teklif-tab-content" id="tab-kuru" style="display:none">
+          <div class="teklif-head"><p class="teklif-title">Kurutucu Teklifi Al</p><p class="teklif-sub">İhtiyacınızı yazın, tüm satıcılar bildirim alsın</p></div>
+          <div class="teklif-body" id="form-kuru">
+            <div class="field-row" style="margin-bottom:14px"><div class="field"><label>Kurutucu Tipi</label><select data-k="Tip"><option>Gazlı (Soğutmalı)</option><option>Kimyasal (Adsorpsiyonlu)</option><option>Fark etmez</option></select></div><div class="field"><label>Kapasite (m³/dk)</label><input type="text" data-k="Kapasite" placeholder="Örn: 3.0"></div></div>
+            <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
+            <div class="field"><label>Detaylı Açıklama</label><textarea class="teklif-area" data-k="Açıklama" placeholder="Çalışma sıcaklığı, basıncı, kullanım amacı, mevcut kompresör modeli vb..."></textarea></div>
+            <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Tüm satıcılara bildirim gönderilir.</span></div>
+            <button class="btn-teklif" data-kategori="kuru" data-label="Kurutucu" data-form="form-kuru" data-baslik="Kurutucu">Teklif İsteği Oluştur</button>
+          </div>
+        </div>
+
+        <!-- Borulama Formu -->
+        <div class="teklif-tab-content" id="tab-borulama" style="display:none">
+          <div class="teklif-head"><p class="teklif-title">Basınçlı Gaz Borulama Teklifi Al</p><p class="teklif-sub">İhtiyacınızı detaylı yazın, satıcılar size teklif göndersin</p></div>
+          <div class="teklif-body" id="form-borulama">
+            <div class="field"><label>Proje Konumu</label><input type="text" data-k="Konum" placeholder="Örn: İstanbul, Gebze OSB..."></div>
+            <div class="field"><label>Boru Çapı / Uzunluk</label><input type="text" data-k="Boru" placeholder="Örn: DN50, yaklaşık 200 metre"></div>
+            <div class="field"><label>Çalışma Basıncı</label><input type="text" data-k="Basınç" placeholder="Örn: 8 bar"></div>
+            <div class="field"><label>Gaz Cinsi</label><input type="text" data-k="Gaz" placeholder="Örn: Basınçlı hava, azot..."></div>
+            <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
+            <div class="field"><label>Detaylı Açıklama</label><textarea class="teklif-area" data-k="Açıklama" placeholder="Projenizle ilgili detayları, tercihlerinizi ve varsa özel koşulları buraya yazın..."></textarea></div>
+            <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Bu teklif isteği, platformdaki tüm ücretli satıcılara bildirim olarak iletilecektir.</span></div>
+            <button class="btn-teklif" data-kategori="borulama" data-label="Borulama" data-form="form-borulama" data-baslik="Basınçlı Gaz Borulama">Teklif İsteği Oluştur</button>
+          </div>
+        </div>
+
+        <!-- Servis Formu -->
+        <div class="teklif-tab-content" id="tab-servis" style="display:none">
+          <div class="teklif-head"><p class="teklif-title">Servis Teklifi Al</p><p class="teklif-sub">Bakım, onarım veya kurulum için servis teklifi isteyin</p></div>
+          <div class="teklif-body" id="form-servis">
+            <div class="field"><label>Servis Tipi</label><select data-k="Tip"><option>Periyodik Bakım</option><option>Arıza Onarımı</option><option>Montaj / Kurulum</option><option>Taşıma</option><option>Diğer</option></select></div>
+            <div class="field"><label>Ekipman Bilgisi</label><input type="text" data-k="Ekipman" placeholder="Örn: Atlas Copco GA 15, 2018 model"></div>
+            <div class="field"><label>Konum</label><input type="text" data-k="Konum" placeholder="Örn: Bursa, Nilüfer OSB"></div>
+            <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
+            <div class="field"><label>İhtiyaç Açıklaması</label><textarea class="teklif-area" data-k="Açıklama" rows="5" placeholder="İstediğiniz gibi yazın: belirtiler, yapılması istenen işlemler, aciliyet durumu, bütçe..."></textarea></div>
+            <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Bu servis teklif isteği platformdaki tüm ücretli satıcılara iletilecektir.</span></div>
+            <button class="btn-teklif" data-kategori="servis" data-label="Servis" data-form="form-servis" data-baslik="Servis">Teklif İsteği Oluştur</button>
+          </div>
+        </div>
+
+        <!-- Filtre Formu -->
+        <div class="teklif-tab-content" id="tab-filtre" style="display:none">
+          <div class="teklif-head"><p class="teklif-title">Filtre Teklifi Al</p><p class="teklif-sub">İhtiyacınıza uygun filtre için teklif alın</p></div>
+          <div class="teklif-body" id="form-filtre">
+            <div class="field"><label>Filtre Tipi</label><select data-k="Tip"><option>Hava Filtresi</option><option>Yağ Filtresi</option><option>Yağ Ayırıcı</option><option>Kömür Filtresi</option><option>Diğer</option></select></div>
+            <div class="field"><label>Mevcut Cihaz / Model</label><input type="text" data-k="Cihaz" placeholder="Örn: Atlas Copco GA 15"></div>
+            <div class="field"><label>Miktar</label><input type="text" data-k="Miktar" placeholder="Örn: 5 adet"></div>
+            <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
+            <div class="field"><label>Detaylı Açıklama</label><textarea class="teklif-area" data-k="Açıklama" placeholder="Ek bilgiler, özel gereksinimler..."></textarea></div>
+            <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Tüm satıcılara bildirim gönderilir.</span></div>
+            <button class="btn-teklif" data-kategori="filtre" data-label="Filtre" data-form="form-filtre" data-baslik="Filtre">Teklif İsteği Oluştur</button>
+          </div>
+        </div>
+
+        <!-- Aksesuar Formu -->
+        <div class="teklif-tab-content" id="tab-aksesuar" style="display:none">
+          <div class="teklif-head"><p class="teklif-title">Aksesuar Teklifi Al</p><p class="teklif-sub">Kompresör aksesuarları için teklif alın</p></div>
+          <div class="teklif-body" id="form-aksesuar">
+            <div class="field"><label>Aksesuar Tipi</label><select data-k="Tip"><option>Basınç Regülatörü</option><option>Nem Tutucu</option><option>Aftercooler</option><option>Manifold</option><option>Diğer</option></select></div>
+            <div class="field"><label>Mevcut Sistem</label><input type="text" data-k="Sistem" placeholder="Örn: Kompresör markası, kapasite..."></div>
+            <div class="field"><label>Miktar</label><input type="text" data-k="Miktar" placeholder="Örn: 2 adet"></div>
+            <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
+            <div class="field"><label>Detaylı Açıklama</label><textarea class="teklif-area" data-k="Açıklama" placeholder="Ek bilgiler, özel gereksinimler..."></textarea></div>
+            <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Tüm satıcılara bildirim gönderilir.</span></div>
+            <button class="btn-teklif" data-kategori="aksesuar" data-label="Aksesuar" data-form="form-aksesuar" data-baslik="Aksesuar">Teklif İsteği Oluştur</button>
+          </div>
+        </div>
+
+        <!-- Yedek Parça Formu -->
+        <div class="teklif-tab-content" id="tab-yedek" style="display:none">
+          <div class="teklif-head"><p class="teklif-title">Yedek Parça Teklifi Al</p><p class="teklif-sub">İhtiyacınız olan yedek parça için teklif alın</p></div>
+          <div class="teklif-body" id="form-yedek">
+            <div class="field"><label>Cihaz Markası / Modeli</label><input type="text" data-k="Cihaz" placeholder="Örn: Kaeser SM 11, 2015 model"></div>
+            <div class="field"><label>Parça Adı / Kodu</label><input type="text" data-k="Parça" placeholder="Örn: V-Kayış, Part No: 12345"></div>
+            <div class="field"><label>Miktar</label><input type="text" data-k="Miktar" placeholder="Örn: 2 adet"></div>
+            <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
+            <div class="field"><label>Detaylı Açıklama</label><textarea class="teklif-area" data-k="Açıklama" placeholder="Ek bilgiler, aciliyet durumu..."></textarea></div>
+            <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Tüm satıcılara bildirim gönderilir.</span></div>
+            <button class="btn-teklif" data-kategori="yedek" data-label="Yedek Parça" data-form="form-yedek" data-baslik="Yedek Parça">Teklif İsteği Oluştur</button>
+          </div>
+        </div>
+
+        <!-- Gaz Jeneratörü Formu -->
+        <div class="teklif-tab-content" id="tab-jenerator" style="display:none">
+          <div class="teklif-head"><p class="teklif-title">Gaz Jeneratörü Teklifi Al</p><p class="teklif-sub">Azot, oksijen veya diğer gaz jeneratörleri için teklif alın</p></div>
+          <div class="teklif-body" id="form-jenerator">
+            <div class="field"><label>Gaz Tipi</label><select data-k="Gaz"><option>Azot (N₂)</option><option>Oksijen (O₂)</option><option>Hidrojen (H₂)</option><option>Diğer</option></select></div>
+            <div class="field"><label>Debi (m³/sa)</label><input type="text" data-k="Debi" placeholder="Örn: 50 m³/sa"></div>
+            <div class="field"><label>Saflık (%)</label><input type="text" data-k="Saflık" placeholder="Örn: %99.9"></div>
+            <div class="field"><label>İletişim (E-posta / Telefon)</label><input type="text" data-k="İletişim" placeholder="Satıcının size dönmesi için..."></div>
+            <div class="field"><label>Detaylı Açıklama</label><textarea class="teklif-area" data-k="Açıklama" placeholder="Kullanım amacı, kurulum yeri, enerji kaynağı..."></textarea></div>
+            <div class="teklif-info"><div class="info-icon"><svg viewBox="0 0 9 9"><path d="M4.5 1v4M4.5 7v.5"/></svg></div><span>Tüm satıcılara bildirim gönderilir.</span></div>
+            <button class="btn-teklif" data-kategori="jenerator" data-label="Gaz Jeneratörü" data-form="form-jenerator" data-baslik="Gaz Jeneratörü">Teklif İsteği Oluştur</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
+</div>
+
+<!-- ===== ESKİ TEKLİF SAYFALARI (yönlendirme için korundu) ===== -->
+<div class="page" id="p-borulama"></div>
+<div class="page" id="p-komp-teklif"></div>
+<div class="page" id="p-kurutucu-teklif"></div>
+<div class="page" id="p-servis-teklif"></div>
+
+
+
+<!-- ===== DETAIL: VİDALI KOMPRESÖR ===== -->
 <div class="page" id="p-teklif-al">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-cur">Teklif Al</span></div>
   <div class="teklif-page">
