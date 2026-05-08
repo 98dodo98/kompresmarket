@@ -5678,12 +5678,14 @@ async function openListingDetail(id) {
           <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-family:var(--mono)">${escapeHtml((l.marka||'')+' '+(l.model||''))}</div>
           <h1 style="font-size:17px;font-weight:700;color:var(--text);margin-bottom:16px;line-height:1.4">${escapeHtml(l.baslik)}</h1>
           <div style="margin-bottom:20px">${fiyatHtml}</div>
-          <button onclick="goTeklifAl('${escapeHtml(l.kategori||'komp')}')" style="width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font)">Teklif İste</button>
         </div>
         <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:18px">
-          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-family:var(--mono);margin-bottom:10px">Satıcı</div>
-          <div style="font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px">${escapeHtml(sellerName)}</div>
-          ${p?.adres ? `<div style="font-size:12px;color:var(--muted)">${escapeHtml(p.adres)}</div>` : ''}
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-family:var(--mono);margin-bottom:10px">Satıcı Bilgileri</div>
+          <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:6px">${escapeHtml(sellerName)}</div>
+          ${p?.adres ? `<div style="font-size:13px;color:var(--muted);margin-bottom:10px">${escapeHtml(p.adres)}</div>` : ''}
+          ${p?.telefon ? `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg2);border-radius:var(--radius);margin-bottom:8px"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h3l1.5 3-1.5 1.5a9 9 0 003.5 3.5L10 9.5l3 1.5v3a1 1 0 01-1 1C5.4 15 1 10.6 1 4a1 1 0 011-1z"/></svg><span style="font-size:13px;font-weight:500">${escapeHtml(p.telefon)}</span></div>` : ''}
+          ${p?.eposta ? `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg2);border-radius:var(--radius)"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="14" height="10" rx="1"/><path d="M1 3l7 6 7-6"/></svg><span style="font-size:13px;font-weight:500">${escapeHtml(p.eposta)}</span></div>` : ''}
+          ${!p?.telefon && !p?.eposta ? `<div style="font-size:12px;color:var(--muted)">İletişim bilgisi paylaşılmamış.</div>` : ''}
         </div>
       </div>
     </div>
