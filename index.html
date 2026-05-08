@@ -4701,9 +4701,9 @@ async function submitRegister(type) {
   const firma  = (document.getElementById(prefix+'-firma')?.value || '').trim();
   const adres  = (document.getElementById(prefix+'-adres')?.value || '').trim();
   const telefon = (document.getElementById(prefix+'-telefon')?.value || '').trim();
-  const pw = (document.getElementById(prefix+'-pw')?.value || '').trim();
+  const pw = (document.getElementById(prefix+'-pw')?.value || '');
 
-  [prefix+'-ad', prefix+'-soyad', prefix+'-mail', prefix+'-telefon'].forEach(i => setErr(i, false));
+  [prefix+'-ad', prefix+'-soyad', prefix+'-mail', prefix+'-telefon', prefix+'-pw', prefix+'-pw2', 's-firma'].forEach(i => setErr(i, false));
 
   let hasErr = false;
   const errors = [];
@@ -4714,11 +4714,11 @@ async function submitRegister(type) {
 
   if (type === 'seller') {
     if (!firma) { setErr('s-firma', true); hasErr = true; errors.push('Firma'); }
-    const pw2 = (document.getElementById('s-pw2')?.value || '').trim();
+    const pw2 = (document.getElementById('s-pw2')?.value || '');
     if (pw.length < 6) { setErr('s-pw', true); hasErr = true; errors.push('Şifre (min 6)'); }
     else if (pw !== pw2) { setErr('s-pw', true); setErr('s-pw2', true); hasErr = true; errors.push('Şifreler eşleşmiyor'); }
   } else {
-    const pw2 = (document.getElementById('b-pw2')?.value || '').trim();
+    const pw2 = (document.getElementById('b-pw2')?.value || '');
     if (pw.length < 6) { setErr('b-pw', true); hasErr = true; errors.push('Şifre (min 6)'); }
     else if (pw !== pw2) { setErr('b-pw', true); setErr('b-pw2', true); hasErr = true; errors.push('Şifreler eşleşmiyor'); }
   }
