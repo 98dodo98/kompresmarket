@@ -3689,6 +3689,8 @@ async function loadListings(kategori, gridId, countId) {
   const grid = document.getElementById(gridId);
   const countEl = document.getElementById(countId);
   if (!grid) return;
+  if (grid.dataset.loading) return;
+  grid.dataset.loading = '1';
 
   const { data } = await _sb.from('listings')
     .select('*')
@@ -3696,7 +3698,7 @@ async function loadListings(kategori, gridId, countId) {
     .eq('status', 'aktif')
     .order('created_at', { ascending: false });
 
-  if (!data?.length) return;
+  if (!data?.length) { grid.dataset.loading = ''; return; }
 
   // Supabase ilanlarını en üste ekle
   const cards = data.map(l => {
@@ -3721,7 +3723,8 @@ async function loadListings(kategori, gridId, countId) {
     </div>`;
   }).join('');
 
-  grid.insertAdjacentHTML('afterbegin', cards);
+  grid.dataset.loading = '';
+  grid.innerHTML = cards;
 
   // Sayacı güncelle
   const total = grid.querySelectorAll('.listing-card').length;
@@ -3802,8 +3805,14 @@ function go(page, addHistory = true) {
     // İlan sayfaları açılınca Supabase'den yükle (sadece bir kez)
     const listingPages = ['kompresorler','kurutucular','filtreler-ana','aksesuarlar','jeneratorler','yedek-parca'];
     if (listingPages.includes(page) && !el.dataset.loaded) {
-      el.dataset.loaded = '1';
+      listingPages.forEach(p => {
+        const pe = document.getElementById('p-' + p);
+        if (pe) pe.dataset.loaded = '1';
+      });
       loadAllListings();
+    }
+    if (page === 'dashboard') {
+      loadSellerListings();
     }
   }
   updateNav();
@@ -4796,7 +4805,6 @@ function updateNav() {
         subscribeToNotifications();
       });
     }
-    if (u.role === 'seller') loadSellerListings();
     // Giriş yapılmış: login/register butonlarını gizle
     const bl = document.getElementById('btn-login');
     const br = document.getElementById('btn-register');
