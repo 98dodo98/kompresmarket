@@ -3812,7 +3812,10 @@ async function loadSellerListings() {
         <td style="font-family:var(--mono)">${l.fiyat_gosterim === 'İletişime Geçiniz' ? 'İletişim' : (l.fiyat ? '₺ ' + l.fiyat.toLocaleString('tr-TR') : '-')}</td>
         <td style="font-family:var(--mono)">-</td>
         <td><span class="status-pill ${l.status === 'aktif' ? 'status-active' : l.status === 'taslak' ? 'status-draft' : 'status-pending'}">${l.status === 'aktif' ? 'Aktif' : l.status === 'taslak' ? 'Taslak' : 'Beklemede'}</span></td>
-        <td><button class="ilan-edit-btn" onclick="deleteListingById('${l.id}')" style="color:#c44;border-color:#f5c6c6">Sil</button></td>
+        <td style="display:flex;gap:8px;align-items:center;padding:10px 0">
+          <button class="ilan-edit-btn" data-id="${l.id}" data-title="${escapeHtml(l.baslik)}" data-kategori="${escapeHtml(l.alt_kategori||l.kategori||'')}" data-fiyat="${l.fiyat||''}" data-durum="${l.status||'aktif'}" onclick="openIlanEdit(this)">Düzenle</button>
+          <button class="ilan-edit-btn" onclick="deleteListingById('${l.id}')" style="color:#c44">Sil</button>
+        </td>
       </tr>`).join('');
   };
   
@@ -6025,7 +6028,7 @@ async function renderMusterSaved() {
         <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${escapeHtml(x.brand||'')}${x.price?' • '+escapeHtml(x.price):''}</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
-        <button onclick="go('${escapeHtml(x.page||'kompresorler')}')" style="font-size:12px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;font-family:var(--font)">Görüntüle</button>
+        <button onclick="openListingDetail('${escapeHtml(x.id)}')" style="font-size:12px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;font-family:var(--font)">Görüntüle</button>
         <button onclick="removeSaved('${escapeHtml(x.id)}')" style="font-size:12px;padding:6px 12px;border:1px solid #f5c6c6;border-radius:var(--radius);background:transparent;color:#c44;cursor:pointer;font-family:var(--font)">Kaldır</button>
       </div>
     </div>`).join('');
