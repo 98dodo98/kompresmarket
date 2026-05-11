@@ -2121,6 +2121,14 @@ body {
     <button class="btn-accent" id="btn-register">Üye Ol</button>
   </div>
 </nav>
+<div class="cat-strip" id="global-cat-strip" style="display:none">
+  <button class="cat-btn" onclick="go('kompresorler')"><span class="cat-icon"></span>Kompresörler</button>
+  <button class="cat-btn" onclick="go('kurutucular')"><span class="cat-icon"></span>Kurutucular</button>
+  <button class="cat-btn" onclick="go('filtreler-ana')"><span class="cat-icon"></span>Filtreler</button>
+  <button class="cat-btn" onclick="go('jeneratorler')"><span class="cat-icon"></span>Gaz Jeneratörleri</button>
+  <button class="cat-btn" onclick="go('aksesuarlar')"><span class="cat-icon"></span>Aksesuarlar</button>
+  <button class="cat-btn" onclick="go('yedek-parca')"><span class="cat-icon"></span>Yedek Parça</button>
+</div>
 <div class="mobile-nav-drawer" id="mobile-nav-drawer">
   <button class="mobile-nav-item" onclick="closeMobileNav();go('kompresorler')">İlanlar</button>
   <button class="mobile-nav-item" onclick="closeMobileNav();go('how')">Nasıl Çalışır</button>
@@ -2154,15 +2162,6 @@ body {
     </div>
   </div>
 
-  <div class="cat-strip">
-    <button class="cat-btn active" onclick="go('kompresorler')"><span class="cat-icon"></span>Kompresörler</button>
-    <button class="cat-btn" onclick="go('kurutucular')"><span class="cat-icon"></span>Kurutucular</button>
-    <button class="cat-btn" onclick="go('filtreler-ana')"><span class="cat-icon"></span>Filtreler</button>
-    <button class="cat-btn" onclick="go('jeneratorler')"><span class="cat-icon"></span>Gaz Jeneratörleri</button>
-    <button class="cat-btn" onclick="go('aksesuarlar')"><span class="cat-icon"></span>Aksesuarlar</button>
-    <button class="cat-btn" onclick="go('yedek-parca')"><span class="cat-icon"></span>Yedek Parça</button>
-  </div>
-
   <div class="feat-section">
     <div class="section-head">
       <div class="section-label">Öne çıkan ilanlar</div>
@@ -2176,7 +2175,6 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 
@@ -2185,15 +2183,6 @@ body {
   <div class="breadcrumb">
     <span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span>
     <span class="bc-cur">Kompresörler</span>
-  </div>
-  <div class="cat-strip">
-    <button class="cat-btn active" onclick="switchKompCat('komp', this)"><span class="cat-icon"></span>Kompresörler</button>
-    <button class="cat-btn" onclick="go('kurutucular')"><span class="cat-icon"></span>Kurutucular</button>
-
-    <button class="cat-btn" onclick="go('filtreler-ana')"><span class="cat-icon"></span>Filtreler</button>
-    <button class="cat-btn" onclick="go('jeneratorler')"><span class="cat-icon"></span>Gaz Jeneratörleri</button>
-    <button class="cat-btn" onclick="go('aksesuarlar')"><span class="cat-icon"></span>Aksesuarlar</button>
-    <button class="cat-btn" onclick="go('yedek-parca')"><span class="cat-icon"></span>Yedek Parça</button>
   </div>
   <div class="sub-strip" id="komp-sub-strip">
     <button class="sub-btn active" onclick="filterKomp('tumu',this)">Tümü</button>
@@ -2252,7 +2241,6 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 
@@ -2314,7 +2302,6 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <!-- ===== PİSTONLU / PALETLİ / TURBO / YAGSIZ (aynı şablonla) ===== -->
@@ -2336,25 +2323,21 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <div class="page" id="p-paletli">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Paletli Kompresörler</span></div>
   <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn active">Paletli</button><button class="sub-btn" onclick="go('turbo')">Turbo</button><button class="sub-btn" onclick="go('yagsiz')">Yağsız</button></div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <div class="page" id="p-turbo">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Turbo Kompresörler</span></div>
   <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn" onclick="go('paletli')">Paletli</button><button class="sub-btn active">Turbo</button><button class="sub-btn" onclick="go('yagsiz')">Yağsız</button></div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <div class="page" id="p-yagsiz">
   <div class="breadcrumb"><span class="bc-link" onclick="go('home')">Ana Sayfa</span><span class="bc-sep">/</span><span class="bc-link" onclick="go('kompresorler')">Kompresörler</span><span class="bc-sep">/</span><span class="bc-cur">Yağsız Kompresörler</span></div>
   <div class="sub-strip"><button class="sub-btn" onclick="go('pistonlu')">Pistonlu</button><button class="sub-btn" onclick="go('vidali')">Vidalı</button><button class="sub-btn" onclick="go('paletli')">Paletli</button><button class="sub-btn" onclick="go('turbo')">Turbo</button><button class="sub-btn active">Yağsız</button></div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <!-- ===== KURUTUCULAR ===== -->
@@ -2406,7 +2389,6 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 
@@ -2428,7 +2410,6 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <div class="page" id="p-kimyasal-kurutucu">
@@ -2447,7 +2428,6 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <!-- ===== FİLTRELER ANA ===== -->
@@ -2468,7 +2448,6 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <!-- ===== AKSESUARLAR ===== -->
@@ -2488,7 +2467,6 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <!-- ===== ENDÜSTRİYEL GAZ JENERATÖRLERİ ===== -->
@@ -2508,7 +2486,6 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <!-- ===== YEDEK PARÇA ===== -->
@@ -2548,7 +2525,6 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <!-- ===== TEKLİF AL - BİRLEŞİK SAYFA ===== -->
@@ -2682,7 +2658,6 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <!-- ===== ESKİ TEKLİF SAYFALARI (yönlendirme için korundu) ===== -->
@@ -2824,7 +2799,6 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <!-- ===== ESKİ TEKLİF SAYFALARI (yönlendirme için korundu) ===== -->
@@ -2837,14 +2811,6 @@ body {
 
 <!-- ===== DETAIL: VİDALI KOMPRESÖR ===== -->
 <div class="page" id="p-ilanlar">
-  <div class="cat-strip">
-    <button class="cat-btn active" onclick="go('kompresorler')">Kompresörler</button>
-    <button class="cat-btn" onclick="go('gazli-kurutucu')">Kurutucular</button>
-    <button class="cat-btn" onclick="go('filtreler-ana')">Filtreler</button>
-    <button class="cat-btn" onclick="go('jeneratorler')">Gaz Jeneratörleri</button>
-    <button class="cat-btn" onclick="go('aksesuarlar')">Aksesuarlar</button>
-    <button class="cat-btn" onclick="go('yedek-parca')">Yedek Parça</button>
-  </div>
   <div class="listing-wrap">
     <div class="filter-panel">
       <p class="f-title">Filtrele</p>
@@ -2862,7 +2828,6 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <!-- ===== YENİ ŞİFRE BELİRLEME SAYFASI ===== -->
@@ -3479,7 +3444,6 @@ body {
       </div>
     </div>
   </div>
-  <div class="footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </div>
 
 <!-- ===== İLAN DETAY SAYFASI ===== -->
@@ -3911,11 +3875,16 @@ function go(page, addHistory = true) {
       });
       loadAllListings();
     }
-    // Aktif cat-btn'i güncelle
-    if (listingPages.includes(page)) {
-      document.querySelectorAll('.cat-strip .cat-btn').forEach(b => {
-        const target = b.getAttribute('onclick')?.match(/go\('([^']+)'\)/)?.[1];
-        b.classList.toggle('active', target === page);
+    // Global cat-strip göster/gizle ve aktif butonu güncelle
+    const globalStrip = document.getElementById('global-cat-strip');
+    if (globalStrip) {
+      const showStrip = listingPages.includes(page) || ['vidali','pistonlu','paletli','turbo','yagsiz','gazli-kurutucu','kimyasal-kurutucu','filtreler-ana','aksesuarlar','jeneratorler','yedek-parca'].includes(page);
+      globalStrip.style.display = showStrip ? '' : 'none';
+      const pageToBtn = {'vidali':'kompresorler','pistonlu':'kompresorler','paletli':'kompresorler','turbo':'kompresorler','yagsiz':'kompresorler','gazli-kurutucu':'kurutucular','kimyasal-kurutucu':'kurutucular'};
+      const activeTarget = pageToBtn[page] || page;
+      globalStrip.querySelectorAll('.cat-btn').forEach(b => {
+        const target = (b.getAttribute('onclick')||'').replace(/.*go\('([^']+)'\).*/, '$1');
+        b.classList.toggle('active', target === activeTarget);
       });
     }
     if (page === 'dashboard') {
@@ -6437,7 +6406,7 @@ window.toggleUserMenu = toggleUserMenu;
 window.logout = logout;
 window.updateSubCat = updateSubCat;
 
-// Nav butonlarına direkt listener bağla (script </body>'den önce, butonlar hazır)
+// Nav butonlarına direkt listener bağla (body kapanmadan önce, butonlar hazır)
 (function() {
   var bl = document.getElementById('btn-login');
   var br = document.getElementById('btn-register');
@@ -6468,5 +6437,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+
+
+<div class="footer" id="global-footer"><span class="footer-logo">Kompres<span>Market</span></span><span class="footer-copy">© 2025</span></div>
 </body>
 </html>
