@@ -4587,15 +4587,24 @@ async function openTeklifModal(id) {
 
   body.innerHTML = html;
 
-  // Mesaj geçmişini ve chat input'u yükle
-  const { data: msgs } = await _sb
+  // Bu satıcıya ait conv ID'yi bul (offers.conversation_id değil, kendi conv'u)
+  const u = loadUser();
+  const { data: myConv } = await _sb
+    .from('conversations')
+    .select('id')
+    .eq('seller_id', u.id)
+    .eq('listing_id', id)
+    .maybeSingle();
+  const myConvId = myConv?.id || null;
+
+  // Mesaj geçmişini yükle
+  const { data: msgs } = myConvId ? await _sb
     .from('messages')
     .select('*')
-    .eq('conversation_id', t.conversationId || '')
-    .order('created_at', { ascending: true });
+    .eq('conversation_id', myConvId)
+    .order('created_at', { ascending: true }) : { data: [] };
 
   // Satıcı chat bölümü
-  const u = loadUser();
   let chatHtml = '<div class="tk-section"><div class="tk-section-lbl">Mesajlar</div>';
   chatHtml += `<div id="seller-chat-messages" style="display:flex;flex-direction:column;gap:8px;margin:8px 0;max-height:220px;overflow-y:auto;padding:4px">`;
 
@@ -4609,7 +4618,7 @@ async function openTeklifModal(id) {
       </div>`;
     });
   } else {
-    chatHtml += '<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px">Henüz mesaj yok.</div>';
+    chatHtml += '<div style="color:var(--muted);font-size:12px;text-align:center;padding:12px">Henüz mesaj yok. Müşteriye ilk mesajı gönderin.</div>';
   }
 
   chatHtml += '</div>';
@@ -4624,15 +4633,15 @@ async function openTeklifModal(id) {
 
   body.innerHTML += chatHtml;
 
-  // Realtime subscription
+  // Realtime subscription — sadece bu satıcının conv'u
   if (_chatSubscription) { _chatSubscription.unsubscribe(); _chatSubscription = null; }
-  if (t.conversationId) {
+  if (myConvId) {
     _chatSubscription = _sb
-      .channel('seller-chat-' + t.conversationId)
+      .channel('seller-chat-' + myConvId)
       .on('postgres_changes', {
         event: 'INSERT', schema: 'public', table: 'messages',
-        filter: 'conversation_id=eq.' + t.conversationId
-      }, () => reloadSellerChat(t.conversationId))
+        filter: 'conversation_id=eq.' + myConvId
+      }, () => reloadSellerChat(myConvId))
       .subscribe();
   }
 
