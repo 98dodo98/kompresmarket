@@ -3159,7 +3159,7 @@ body {
                     </select>
                   </div>
                   <div class="field"><label>Alt Kategori</label>
-                    <select id="ilan-subcat"><option>Önce ana kategori seçin</option></select>
+                    <select id="ilan-subcat" onchange="updateSubCatFields()"><option>Önce ana kategori seçin</option></select>
                   </div>
                 </div>
               </div>
@@ -3180,15 +3180,10 @@ body {
               </div>
             </div>
 
-            <div class="form-card">
-              <div class="form-card-head"><span class="form-card-num">3</span><p class="form-card-title">Teknik Özellikler</p></div>
-              <div class="form-card-body">
-                <div class="field-3">
-                  <div class="field"><label>Kapasite (m³/dk)</label><input type="text" id="ilan-kapasite" placeholder="2.4"></div>
-                  <div class="field"><label>Motor Gücü (kW)</label><input type="text" id="ilan-guc" placeholder="15"></div>
-                  <div class="field"><label>Maks. Basınç (bar)</label><input type="text" id="ilan-basinc" placeholder="8"></div>
-                </div>
-                <div class="field"><label>Teknik Bilgiler</label><textarea id="ilan-teknik" rows="3" placeholder="Soğutma tipi, elektrik bağlantısı, yağ kapasitesi, özel özellikler..."></textarea></div>
+            <div class="form-card" id="ilan-teknik-card" style="display:none">
+              <div class="form-card-head"><span class="form-card-num">3</span><p class="form-card-title" id="ilan-teknik-title">Teknik Özellikler</p></div>
+              <div class="form-card-body" id="ilan-teknik-fields">
+                <!-- kategori seçimine göre doldurulur -->
               </div>
             </div>
 
@@ -3668,13 +3663,101 @@ function updateSubCat() {
     filtre: ['Hava Filtresi', 'Yağ Filtresi', 'Yağ Ayırıcı', 'Kömür Filtresi'],
     aksesuar: ['Basınç Regülatörü', 'Nem Tutucu', 'Aftercooler', 'Manifold', 'Diğer'],
     jenerator: ['Azot', 'Oksijen', 'Hidrojen', 'Diğer'],
-    yp: ['Kompresör', 'Kurutucu', 'Filtre', 'Diğer']
+    yp: ['Hava Filtresi','Yağ Filtresi','Separator Filtre','V-Kayış','Solenoid Valf','Yatak / Rulman','Diğer']
   };
   const list = opts[cat] || [];
   sub.innerHTML = list.length
     ? list.map(o => `<option>${o}</option>`).join('')
     : '<option>Önce ana kategori seçin</option>';
+  renderTeknikFields(cat, 'ilan-teknik-fields', 'ilan-teknik-card', 'ilan-teknik-title');
 }
+
+function inp(id, label, placeholder) {
+  return `<div class="field" style="margin-bottom:14px"><label>${label}</label><input type="text" id="${id}" placeholder="${placeholder}"></div>`;
+}
+function sel(id, label, opts) {
+  return `<div class="field" style="margin-bottom:14px"><label>${label}</label><select id="${id}">${opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+}
+function row2(a, b) { return `<div class="field-row" style="margin-bottom:14px">${a}${b}</div>`; }
+function row3(a,b,c) { return `<div class="field-3" style="margin-bottom:14px">${a}${b}${c}</div>`; }
+function txtarea(id, label, ph, rows=3) {
+  return `<div class="field" style="margin-bottom:14px"><label>${label}</label><textarea id="${id}" rows="${rows}" placeholder="${ph}"></textarea></div>`;
+}
+function finp(id,lbl,ph) { return `<div class="field"><label>${lbl}</label><input type="text" id="${id}" placeholder="${ph}"></div>`; }
+function fsel(id,lbl,opts) { return `<div class="field"><label>${lbl}</label><select id="${id}">${opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`; }
+
+function renderTeknikFields(cat, containerId, cardId, titleId) {
+  const card = document.getElementById(cardId);
+  const container = document.getElementById(containerId);
+  const titleEl = document.getElementById(titleId);
+  if (!card || !container) return;
+  if (!cat) { card.style.display = 'none'; return; }
+  card.style.display = '';
+
+  const fields = {
+    komp: {
+      title: 'Teknik Özellikler',
+      html: () =>
+        row3(finp('ilan-kapasite','Kapasite (m³/dk)','2.4'), finp('ilan-guc','Motor Gücü (kW)','15'), finp('ilan-basinc','Maks. Basınç (bar)','8')) +
+        row2(fsel('ilan-sogutma','Soğutma Tipi',['Hava Soğutmalı','Su Soğutmalı']), fsel('ilan-yag','Yağlama',['Yağlı','Yağsız'])) +
+        row2(finp('ilan-tank','Tank Hacmi (L)','200'), finp('ilan-voltaj','Voltaj','380V 3F')) +
+        txtarea('ilan-teknik','Ek Teknik Bilgiler','Gürültü seviyesi, IP sınıfı, sertifikalar...')
+    },
+    kuru: {
+      title: 'Teknik Özellikler',
+      html: () => {
+        const sub = document.getElementById('ilan-subcat')?.value || '';
+        const isKimyasal = sub.toLowerCase().includes('kimyasal') || sub.toLowerCase().includes('adsorps');
+        const common = row2(finp('ilan-kapasite','Kapasite (m³/dk)','3.0'), finp('ilan-basinc','Çalışma Basıncı (bar)','10'));
+        const extra = isKimyasal
+          ? row2(fsel('ilan-malzeme','Dolgu Malzemesi',['Silikajel','Aktif Alümina','Moleküler Elek']), finp('ilan-cikis-nem','Çıkış Çiğ Noktası (°C)','-40')) +
+            row2(finp('ilan-tank','Tank Hacmi (L)',''), finp('ilan-voltaj','Voltaj','220V'))
+          : row2(fsel('ilan-gaz','Soğutucu Gaz',['R-410A','R-134a','R-407C','R-290']), finp('ilan-guc','Kompresör Gücü (kW)','0.5')) +
+            row2(finp('ilan-cikis-nem','Çıkış Çiğ Noktası (°C)','+3'), finp('ilan-voltaj','Voltaj','220V'));
+        return common + extra + txtarea('ilan-teknik','Ek Teknik Bilgiler','Bağlantı boyutu, çevresel koşullar...');
+      }
+    },
+    filtre: {
+      title: 'Filtre Özellikleri',
+      html: () =>
+        row2(finp('ilan-kapasite','Kapasite (m³/dk)','5.0'), finp('ilan-basinc','Maks. Basınç (bar)','16')) +
+        row2(fsel('ilan-filtre-sinif','Filtre Sınıfı',['ISO 8573-1 Sınıf 1','Sınıf 2','Sınıf 3','Sınıf 4','Sınıf 5']), finp('ilan-baglanti','Bağlantı Boyutu','G 1/2')) +
+        txtarea('ilan-teknik','Ek Teknik Bilgiler','Gövde malzemesi, element değişim periyodu...')
+    },
+    aksesuar: {
+      title: 'Aksesuar Özellikleri',
+      html: () =>
+        row2(finp('ilan-basinc','Çalışma Basıncı (bar)','10'), finp('ilan-baglanti','Bağlantı Boyutu','G 1/2')) +
+        txtarea('ilan-teknik','Ek Teknik Bilgiler','Materyal, standart, uyumlu marka/model...')
+    },
+    jenerator: {
+      title: 'Jeneratör Özellikleri',
+      html: () =>
+        row2(fsel('ilan-gaz-turu','Gaz Türü',['Azot (N₂)','Oksijen (O₂)','Hidrojen (H₂)']), finp('ilan-kapasite','Kapasite (m³/saat)','10')) +
+        row2(finp('ilan-safiyet','Safiyet (%)', '99.9'), finp('ilan-basinc','Çıkış Basıncı (bar)','5')) +
+        row2(finp('ilan-guc','Güç Tüketimi (kW)','3.5'), finp('ilan-voltaj','Voltaj','380V')) +
+        txtarea('ilan-teknik','Ek Teknik Bilgiler','Besleme havası gereksinimi, güvenlik sınıfı...')
+    },
+    yp: {
+      title: 'Parça Özellikleri',
+      html: () =>
+        row2(finp('ilan-parca-no','Parça Numarası',''), finp('ilan-uyumlu-model','Uyumlu Model','Atlas Copco GA 15')) +
+        row2(fsel('ilan-parca-tipi','Parça Tipi',['Hava Filtresi','Yağ Filtresi','Separator Filtre','V-Kayış','Solenoid Valf','Yatak / Rulman','Diğer']), finp('ilan-adet','Adet','1')) +
+        txtarea('ilan-teknik','Ek Teknik Bilgiler','Orijinal mi yedek mi, garanti durumu, stok adedi...')
+    }
+  };
+
+  const f = fields[cat];
+  if (!f) { card.style.display = 'none'; return; }
+  if (titleEl) titleEl.textContent = f.title;
+  container.innerHTML = f.html();
+}
+window.renderTeknikFields = renderTeknikFields;
+function updateSubCatFields() {
+  const cat = document.getElementById('ilan-cat')?.value;
+  renderTeknikFields(cat, 'ilan-teknik-fields', 'ilan-teknik-card', 'ilan-teknik-title');
+}
+window.updateSubCatFields = updateSubCatFields;
 
 async function publishIlan(status) {
   const u = loadUser();
@@ -3699,22 +3782,33 @@ async function publishIlan(status) {
 
   const fiyatRaw = (document.getElementById('ilan-fiyat')?.value || '').replace(/\D/g, '');
 
+  const gv = id => (document.getElementById(id)?.value || '');
+  // Dinamik teknik field'leri topla
+  const extraFields = {};
+  ['ilan-sogutma','ilan-yag','ilan-tank','ilan-voltaj','ilan-malzeme','ilan-cikis-nem',
+   'ilan-gaz','ilan-filtre-sinif','ilan-baglanti','ilan-gaz-turu','ilan-safiyet',
+   'ilan-parca-no','ilan-uyumlu-model','ilan-parca-tipi','ilan-adet'].forEach(id => {
+    const v = gv(id);
+    if (v) extraFields[id.replace('ilan-','')] = v;
+  });
+
   const { error } = await _sb.from('listings').insert({
     seller_id: u.id,
     kategori,
-    alt_kategori: document.getElementById('ilan-subcat')?.value || '',
+    alt_kategori: gv('ilan-subcat'),
     baslik,
-    marka: document.getElementById('ilan-marka')?.value || '',
-    model: document.getElementById('ilan-model')?.value || '',
-    durum: document.getElementById('ilan-durum')?.value || 'Yeni',
-    yil: document.getElementById('ilan-yil')?.value || '',
-    kapasite: document.getElementById('ilan-kapasite')?.value || '',
-    guc: document.getElementById('ilan-guc')?.value || '',
-    basinc: document.getElementById('ilan-basinc')?.value || '',
-    teknik_aciklama: document.getElementById('ilan-teknik')?.value || '',
+    marka: gv('ilan-marka'),
+    model: gv('ilan-model'),
+    durum: gv('ilan-durum') || 'Yeni',
+    yil: gv('ilan-yil'),
+    kapasite: gv('ilan-kapasite'),
+    guc: gv('ilan-guc'),
+    basinc: gv('ilan-basinc'),
+    teknik_aciklama: gv('ilan-teknik'),
+    extra_fields: JSON.stringify(extraFields),
     fiyat: fiyatRaw ? parseInt(fiyatRaw) : null,
-    fiyat_gosterim: document.getElementById('ilan-fiyat-tip')?.value || 'Fiyatı Göster',
-    aciklama: document.getElementById('ilan-aciklama')?.value || '',
+    fiyat_gosterim: gv('ilan-fiyat-tip') || 'Fiyatı Göster',
+    aciklama: gv('ilan-aciklama'),
     photos: JSON.stringify(_ilanPhotos || []),
     status
   });
