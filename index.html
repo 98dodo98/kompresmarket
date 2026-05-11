@@ -6306,9 +6306,16 @@ async function saveIlan(ilan) {
 async function removeSaved(id) {
   const u = loadUser();
   if (!u) return;
-  await _sb.from('favorites').delete().eq('user_id', u.id).eq('ilan_id', id);
-  updateMusterBadges();
-  renderMusterSaved();
+  const { error } = await _sb.from('favorites').delete().eq('user_id', u.id).eq('ilan_id', id);
+  if (error) { showToast('Hata', error.message, null, true); return; }
+  await updateMusterBadges();
+  // Hangi panel açıksa onu güncelle
+  const musterSaved = document.getElementById('muster-saved-list');
+  const sellerFav = document.getElementById('seller-fav-list');
+  if (musterSaved && musterSaved.closest('[style*="block"]')) renderMusterSaved();
+  else if (sellerFav) loadSellerFavoriler();
+  else renderMusterSaved();
+  showToast('Favoriden kaldırıldı', '', null, false);
 }
 
 async function updateMusterBadges() {
@@ -6362,7 +6369,7 @@ async function renderMusterSaved() {
       </div>
       <div style="display:flex;gap:8px;align-items:center">
         <button onclick="openListingDetail('${escapeHtml(x.id)}')" style="font-size:12px;padding:6px 12px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--text);cursor:pointer;font-family:var(--font)">Görüntüle</button>
-        <button onclick="removeSaved('${escapeHtml(x.id)}')" style="font-size:12px;padding:6px 12px;border:1px solid #f5c6c6;border-radius:var(--radius);background:transparent;color:#c44;cursor:pointer;font-family:var(--font)">Kaldır</button>
+        <button onclick="removeSaved('${escapeHtml(x.id)}').then(()=>renderMusterSaved())" style="font-size:12px;padding:6px 12px;border:1px solid #f5c6c6;border-radius:var(--radius);background:transparent;color:#c44;cursor:pointer;font-family:var(--font)">Kaldır</button>
       </div>
     </div>`).join('');
 }
