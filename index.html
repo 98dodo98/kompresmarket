@@ -2544,8 +2544,8 @@ body {
       <button class="f-apply">Uygula</button>
     </div>
     <div class="listing-main">
-      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Basınçlı Gazlar İçin Filtreler</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
-      <div class="cards-grid">
+      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Basınçlı Gazlar İçin Filtreler</span><span class="listing-count" id="filtre-list-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
+      <div class="cards-grid" id="filtre-cards-grid">
       </div>
     </div>
   </div>
@@ -2563,8 +2563,8 @@ body {
       <button class="f-apply">Uygula</button>
     </div>
     <div class="listing-main">
-      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Diğer Aksesuarlar</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
-      <div class="cards-grid">
+      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Diğer Aksesuarlar</span><span class="listing-count" id="aksesuar-list-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
+      <div class="cards-grid" id="aksesuar-cards-grid">
       </div>
     </div>
   </div>
@@ -2610,8 +2610,8 @@ body {
       <button class="f-apply">Uygula</button>
     </div>
     <div class="listing-main">
-      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Endüstriyel Gaz Jeneratörleri</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
-      <div class="cards-grid">
+      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Endüstriyel Gaz Jeneratörleri</span><span class="listing-count" id="jenerator-list-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option></select></div>
+      <div class="cards-grid" id="jenerator-cards-grid">
       </div>
     </div>
   </div>
@@ -2626,13 +2626,12 @@ body {
       <div class="f-section">
         <p class="f-group-label">Yedek Parça Tipi</p>
         <input type="text" class="f-input" placeholder="Parça tipi ara..." style="margin-bottom:8px">
-        <div class="f-row"><input type="checkbox" checked><label>Hava Filtresi</label><span class="f-count">44</span></div>
-        <div class="f-row"><input type="checkbox" checked><label>Yağ Filtresi</label><span class="f-count">38</span></div>
-        <div class="f-row"><input type="checkbox"><label>Separator Filtre</label><span class="f-count">28</span></div>
-        <div class="f-row"><input type="checkbox"><label>V-Kayış</label><span class="f-count">22</span></div>
-        <div class="f-row"><input type="checkbox"><label>Solenoid Valf</label><span class="f-count">16</span></div>
-        <div class="f-row"><input type="checkbox"><label>Yatak / Rulman</label><span class="f-count">12</span></div>
-        <div class="f-row"><input type="checkbox"><label>Diğer</label><span class="f-count">55</span></div>
+        <div class="f-row"><input type="checkbox" checked><label>V-Kayış</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Solenoid Valf</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Yatak / Rulman</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Piston / Silindir</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Vida Rotoru</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Diğer</label></div>
       </div>
       <div class="f-section">
         <p class="f-group-label">Marka</p>
@@ -2649,8 +2648,8 @@ body {
       <button class="f-apply">Uygula</button>
     </div>
     <div class="listing-main">
-      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Yedek Parça</span><span class="listing-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
-      <div class="cards-grid">
+      <div class="listing-header"><div class="listing-title-row"><span class="listing-title">Yedek Parça</span><span class="listing-count" id="yp-list-count">— 0 ilan</span></div><select class="listing-sort"><option>En Yeni</option><option>Düşük Fiyat</option></select></div>
+      <div class="cards-grid" id="yp-cards-grid">
       </div>
     </div>
   </div>
