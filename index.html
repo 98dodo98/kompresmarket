@@ -2415,6 +2415,35 @@ body {
         <div class="f-row"><input type="checkbox" checked><label>Moleküler Elek</label></div>
       </div>
       <div class="f-section">
+        <p class="f-group-label">Marka</p>
+        <div class="f-row"><input type="checkbox" checked><label>Ingersoll Rand</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Atlas Copco</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Parker</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Chicago Pneumatic</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>CompAir</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Omega Air</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>SCR</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Ekomak</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Dalgakıran</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Özen Kompresör</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Gardner Denver</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Puma</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Kaeser</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Boge</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Mattei</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Tamsan</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Alkın Kompresör</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Vortex</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Komsan</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Lupamat</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Danfoss</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Kaishan Group</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Doosan</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Yiğitsan</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Mikropor</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Diğer</label></div>
+      </div>
+      <div class="f-section">
         <p class="f-group-label">Durum</p>
         <div class="f-row"><input type="checkbox" checked><label>Yeni</label></div>
         <div class="f-row"><input type="checkbox" checked><label>2. El</label></div>
@@ -5832,11 +5861,19 @@ function applyFilters(btn) {
   // Tüm checkbox satırlarını oku
   const allRows = [...panel.querySelectorAll('.f-row')];
 
-  // Marka satırları (sayı badge'i olan satırlar)
-  const brandRows = allRows.filter(r => r.querySelector('.f-count'));
-  const checkedBrands = brandRows
+  // Marka satırları: "Marka" başlıklı f-section içindeki tüm f-row'lar
+  const markaSections = [...panel.querySelectorAll('.f-section')].filter(s =>
+    s.querySelector('.f-group-label')?.textContent?.trim().toLowerCase().includes('marka')
+  );
+  const brandRows = markaSections.flatMap(s => [...s.querySelectorAll('.f-row')]);
+  const allBrandRows = brandRows.filter(r => r.querySelector('input[type=checkbox]'));
+  const checkedBrands = allBrandRows
     .filter(r => r.querySelector('input[type=checkbox]')?.checked)
     .map(r => r.querySelector('label')?.textContent?.trim().toLowerCase()).filter(Boolean);
+  const uncheckedBrands = allBrandRows
+    .filter(r => !r.querySelector('input[type=checkbox]')?.checked)
+    .map(r => r.querySelector('label')?.textContent?.trim().toLowerCase()).filter(Boolean);
+  const hasMarkaFilter = allBrandRows.length > 0 && uncheckedBrands.length > 0;
 
   // Durum satırları
   const durumYeniRow = allRows.find(r => r.querySelector('label')?.textContent?.trim().toLowerCase() === 'yeni');
@@ -5857,21 +5894,22 @@ function applyFilters(btn) {
     const isNew   = badge?.classList.contains('badge-new');
     const isUsed  = badge?.classList.contains('badge-used');
 
-    // Marka / kategori filtresi
+    // Marka filtresi
     let brandOk = true;
-    if (checkedBrands.length > 0) {
-      brandOk = checkedBrands.some(l => {
-        if (l === 'diğer') return true;
-        // Marka eşleşmesi
-        if (brand.includes(l) || l.includes(brand)) return true;
-        // Kategori eşleşmesi (kompresör, kurutucu vb.)
-        const catMap = {
-          'kompresörler': 'kompresör', 'kurutucular': 'kurutucu',
-          'filtreler': 'filtre', 'yedek parça': 'filtre', 'aksesuarlar': 'aksesuar', 'jeneratörler': 'jeneratör'
-        };
-        const mapped = catMap[l] || l;
-        return name.includes(mapped) || brand.includes(mapped);
-      });
+    if (hasMarkaFilter) {
+      // Diğer işaretliyse eşleşmeyen markalara da izin ver
+      const digerChecked = checkedBrands.includes('diğer');
+      const knownChecked = checkedBrands.filter(l => l !== 'diğer');
+      // Kartın markası bilinen markalarda var mı?
+      const matchesKnown = knownChecked.some(l => brand && (brand.includes(l) || l.includes(brand) && brand.length > 2));
+      const matchesAny = checkedBrands.some(l => l !== 'diğer' && brand && (brand.includes(l) || l.includes(brand) && brand.length > 2));
+      if (digerChecked) {
+        // Diğer seçiliyse: bilinen seçili markalardan biri eşleşir VEYA hiçbir bilinen markayla eşleşmiyorsa göster
+        const matchesNoKnownBrand = !uncheckedBrands.some(l => brand && brand.includes(l));
+        brandOk = matchesKnown || matchesNoKnownBrand;
+      } else {
+        brandOk = matchesAny;
+      }
     }
 
     // Durum filtresi
