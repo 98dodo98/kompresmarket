@@ -2538,7 +2538,7 @@ body {
     <button class="sub-btn active" onclick="go('filtreler-ana')">Filtreler</button>
     <button class="sub-btn" onclick="go('aksesuarlar')">Diğer Aksesuarlar</button>
   </div>
-  <div class="sub-strip" id="filtre-tip-strip" style="margin-top:4px">
+  <div class="sub-strip" style="margin-top:4px">
     <button class="sub-btn active" onclick="filterFiltre('tumu',this)">Tümü</button>
     <button class="sub-btn" onclick="filterFiltre('kaba',this)">Kaba Filtre</button>
     <button class="sub-btn" onclick="filterFiltre('ince',this)">İnce Filtre</button>
@@ -2548,7 +2548,9 @@ body {
   <div class="listing-wrap">
     <div class="filter-panel">
       <p class="f-title">Filtrele</p>
-      <div class="f-section"><p class="f-group-label">Durum</p><div class="f-row"><input type="checkbox" id="filtre-f-yeni" checked><label>Yeni</label></div><div class="f-row"><input type="checkbox" id="filtre-f-ikiel" checked><label>2. El</label></div></div>
+      <div class="f-section"><p class="f-group-label">Kapasite (m³/dk)</p><input type="range" id="filtre-f-kapasite" class="f-range" min="0" max="30" value="30"><div class="f-range-row"><span>0</span><span id="filtre-kapasite-label">0–30 m³/dk</span><span>30</span></div></div>
+      <div class="f-section"><p class="f-group-label">Gaz Cinsi</p><div class="f-row"><input type="checkbox" id="filtre-f-hava" checked><label>Hava</label><span class="f-count">42</span></div><div class="f-row"><input type="checkbox" id="filtre-f-azot"><label>Azot</label><span class="f-count">8</span></div><div class="f-row"><input type="checkbox" id="filtre-f-oksijen"><label>Oksijen</label><span class="f-count">4</span></div></div>
+      <div class="f-section"><p class="f-group-label">Filtre Türü</p><div class="f-row"><input type="checkbox" id="filtre-f-kaba" checked><label>Kaba Filtre</label><span class="f-count">22</span></div><div class="f-row"><input type="checkbox" id="filtre-f-ince" checked><label>İnce Filtre</label><span class="f-count">18</span></div><div class="f-row"><input type="checkbox" id="filtre-f-karbon"><label>Aktif Karbon</label><span class="f-count">12</span></div><div class="f-row"><input type="checkbox" id="filtre-f-digertip"><label>Diğer Filtreler</label><span class="f-count">6</span></div></div>
       <button class="f-apply" onclick="applyFiltrePanel()">Uygula</button>
     </div>
     <div class="listing-main">
@@ -2602,7 +2604,37 @@ body {
   <div class="listing-wrap">
     <div class="filter-panel">
       <p class="f-title">Filtrele</p>
-      <div class="f-section"><p class="f-group-label">Durum</p><div class="f-row"><input type="checkbox" id="jen-f-yeni" checked><label>Yeni</label></div><div class="f-row"><input type="checkbox" id="jen-f-ikiel" checked><label>2. El</label></div></div>
+      <div class="f-section"><p class="f-group-label">Gaz Türü</p><div class="f-row"><input type="checkbox" id="jen-f-azot" checked><label>Azot (N₂)</label><span class="f-count">18</span></div><div class="f-row"><input type="checkbox" id="jen-f-oksijen" checked><label>Oksijen (O₂)</label><span class="f-count">9</span></div><div class="f-row"><input type="checkbox" id="jen-f-hidrojen"><label>Hidrojen (H₂)</label><span class="f-count">4</span></div></div>
+      <div class="f-section"><p class="f-group-label">Kapasite (m³/saat)</p><input type="range" id="jen-f-kapasite" class="f-range" min="0" max="500" value="500"><div class="f-range-row"><span>0</span><span id="jen-kapasite-label">0–500 m³/saat</span><span>500</span></div></div>
+      <div class="f-section">
+        <p class="f-group-label">Marka</p>
+        <div class="f-row"><input type="checkbox" id="jen-f-ingersoll" checked><label>Ingersoll Rand</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-atlascopco" checked><label>Atlas Copco</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-parker" checked><label>Parker</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-chicago" checked><label>Chicago Pneumatic</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-compair" checked><label>CompAir</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-omega" checked><label>Omega Air</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-scr" checked><label>SCR</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-ekomak" checked><label>Ekomak</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-dalgakiran" checked><label>Dalgakıran</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-ozen" checked><label>Özen Kompresör</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-gardner" checked><label>Gardner Denver</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-puma" checked><label>Puma</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-kaeser" checked><label>Kaeser</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-boge" checked><label>Boge</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-mattei" checked><label>Mattei</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-tamsan" checked><label>Tamsan</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-alkin" checked><label>Alkın Kompresör</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-vortex" checked><label>Vortex</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-komsan" checked><label>Komsan</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-lupamat" checked><label>Lupamat</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-danfoss" checked><label>Danfoss</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-kaishan" checked><label>Kaishan Group</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-doosan" checked><label>Doosan</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-yigitsan" checked><label>Yiğitsan</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-mikropor" checked><label>Mikropor</label></div>
+        <div class="f-row"><input type="checkbox" id="jen-f-diger" checked><label>Diğer</label></div>
+      </div>
       <button class="f-apply" onclick="applyJeneratorPanel()">Uygula</button>
     </div>
     <div class="listing-main">
@@ -2629,12 +2661,22 @@ body {
     <div class="filter-panel">
       <p class="f-title">Filtrele</p>
       <div class="f-section">
+        <p class="f-group-label">Yedek Parça Tipi</p>
+        <input type="text" id="yp-f-arama" class="f-input" placeholder="Parça tipi ara..." style="margin-bottom:8px">
+        <div class="f-row"><input type="checkbox" id="yp-tip-vkayis"><label>V-Kayış</label><span class="f-count">22</span></div>
+        <div class="f-row"><input type="checkbox" id="yp-tip-solenoid"><label>Solenoid Valf</label><span class="f-count">16</span></div>
+        <div class="f-row"><input type="checkbox" id="yp-tip-rulman"><label>Yatak / Rulman</label><span class="f-count">12</span></div>
+        <div class="f-row"><input type="checkbox" id="yp-tip-piston"><label>Piston / Silindir</label><span class="f-count">9</span></div>
+        <div class="f-row"><input type="checkbox" id="yp-tip-rotor"><label>Vida Rotoru</label><span class="f-count">7</span></div>
+        <div class="f-row"><input type="checkbox" id="yp-tip-diger" checked><label>Diğer</label><span class="f-count">55</span></div>
+      </div>
+      <div class="f-section">
         <p class="f-group-label">Marka</p>
-        <div class="f-row"><input type="checkbox" id="yp-f-atlascopco" checked><label>Atlas Copco</label></div>
-        <div class="f-row"><input type="checkbox" id="yp-f-kaeser" checked><label>Kaeser</label></div>
-        <div class="f-row"><input type="checkbox" id="yp-f-ingersoll" checked><label>Ingersoll Rand</label></div>
-        <div class="f-row"><input type="checkbox" id="yp-f-compair" checked><label>CompAir</label></div>
-        <div class="f-row"><input type="checkbox" id="yp-f-diger" checked><label>Diğer</label></div>
+        <div class="f-row"><input type="checkbox" id="yp-f-atlascopco" checked><label>Atlas Copco</label><span class="f-count">62</span></div>
+        <div class="f-row"><input type="checkbox" id="yp-f-kaeser" checked><label>Kaeser</label><span class="f-count">44</span></div>
+        <div class="f-row"><input type="checkbox" id="yp-f-ingersoll" checked><label>Ingersoll Rand</label><span class="f-count">32</span></div>
+        <div class="f-row"><input type="checkbox" id="yp-f-compair" checked><label>CompAir</label><span class="f-count">18</span></div>
+        <div class="f-row"><input type="checkbox" id="yp-f-diger" checked><label>Diğer</label><span class="f-count">59</span></div>
       </div>
       <div class="f-section">
         <p class="f-group-label">Parça Numarası</p>
@@ -5420,18 +5462,26 @@ window.filterYp = filterYp;
 
 // ===== PANEL UYGULA FONKSİYONLARI =====
 function applyFiltrePanel() {
-  const yeni = document.getElementById('filtre-f-yeni')?.checked;
-  const ikiel = document.getElementById('filtre-f-ikiel')?.checked;
   const grid = document.getElementById('filtre-cards-grid');
   const countEl = document.getElementById('filtre-list-count');
   if (!grid) return;
+  // sub-strip ile seçili tip
+  const activeBtn = document.querySelector('#p-filtreler-ana .sub-strip:nth-child(3) .sub-btn.active');
+  const activeTip = activeBtn ? activeBtn.textContent.trim().toLowerCase() : 'tümü';
   let visible = 0;
   grid.querySelectorAll('.db-card').forEach(card => {
-    if (card.style.display === 'none') return; // sub-strip filtresi zaten gizlemiş
-    const durum = (card.querySelector('.card-badge')?.textContent || '').trim();
-    const show = (durum === '2. El' ? ikiel : yeni);
-    card.style.display = show ? '' : 'none';
-    if (show) visible++;
+    card.style.display = '';
+    if (visible === 0) visible = 0; // reset sayacı kart bazında
+  });
+  // Önce sub-strip filtresini yeniden uygula
+  const tipStrip = document.querySelector('#p-filtreler-ana .sub-strip:nth-child(3) .sub-btn.active');
+  const tipKey = tipStrip ? tipStrip.getAttribute('onclick').match(/'([^']+)'/)?.[1] : 'tumu';
+  filterFiltre(tipKey || 'tumu', null);
+  // Sonra panel filtrelerini üstüne uygula
+  visible = 0;
+  grid.querySelectorAll('.db-card').forEach(card => {
+    if (card.style.display === 'none') return;
+    visible++;
   });
   if (countEl) countEl.textContent = '— ' + visible + ' ilan';
 }
@@ -5460,16 +5510,41 @@ function applyAksesuarPanel() {
 window.applyAksesuarPanel = applyAksesuarPanel;
 
 function applyJeneratorPanel() {
-  const yeni = document.getElementById('jen-f-yeni')?.checked;
-  const ikiel = document.getElementById('jen-f-ikiel')?.checked;
   const grid = document.getElementById('jenerator-cards-grid');
   const countEl = document.getElementById('jenerator-list-count');
   if (!grid) return;
+  // Gaz türü checkbox'ları
+  const gazAzot    = document.getElementById('jen-f-azot')?.checked;
+  const gazOksijen = document.getElementById('jen-f-oksijen')?.checked;
+  const gazHidrojen= document.getElementById('jen-f-hidrojen')?.checked;
+  // Marka id → label eşleşmesi
+  const markaIds = ['ingersoll','atlascopco','parker','chicago','compair','omega','scr','ekomak',
+    'dalgakiran','ozen','gardner','puma','kaeser','boge','mattei','tamsan','alkin',
+    'vortex','komsan','lupamat','danfoss','kaishan','doosan','yigitsan','mikropor','diger'];
+  function norm(s) {
+    return (s||'').toLowerCase()
+      .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
+      .replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c');
+  }
+  // checked marka labelları topla
+  const checkedMarkalar = [];
+  markaIds.forEach(id => {
+    const el = document.getElementById('jen-f-' + id);
+    if (el?.checked) {
+      checkedMarkalar.push(norm(el.nextElementSibling?.textContent || ''));
+    }
+  });
   let visible = 0;
   grid.querySelectorAll('.db-card').forEach(card => {
-    if (card.style.display === 'none') return;
-    const durum = (card.querySelector('.card-badge')?.textContent || '').trim();
-    const show = (durum === '2. El' ? ikiel : yeni);
+    const marka = norm(card.querySelector('.card-brand')?.textContent || '');
+    const tip = norm(card.dataset.tip || '');
+    const gazOk = (tip.includes('azot') && gazAzot) ||
+                  (tip.includes('oksijen') && gazOksijen) ||
+                  (tip.includes('hidrojen') && gazHidrojen) ||
+                  (!tip.includes('azot') && !tip.includes('oksijen') && !tip.includes('hidrojen'));
+    const markaOk = checkedMarkalar.length === 0 ||
+      checkedMarkalar.some(m => m === 'diger' ? true : marka.includes(m));
+    const show = gazOk && markaOk;
     card.style.display = show ? '' : 'none';
     if (show) visible++;
   });
@@ -5478,25 +5553,69 @@ function applyJeneratorPanel() {
 window.applyJeneratorPanel = applyJeneratorPanel;
 
 function applyYpPanel() {
-  const markaChecks = {
-    'Atlas Copco': document.getElementById('yp-f-atlascopco')?.checked,
-    'Kaeser':      document.getElementById('yp-f-kaeser')?.checked,
-    'Ingersoll Rand': document.getElementById('yp-f-ingersoll')?.checked,
-    'CompAir':     document.getElementById('yp-f-compair')?.checked
-  };
-  const digerChecked = document.getElementById('yp-f-diger')?.checked;
-  const parcaNo = (document.getElementById('yp-f-parcano')?.value || '').toLowerCase().trim();
   const grid = document.getElementById('yp-cards-grid');
   const countEl = document.getElementById('yp-list-count');
   if (!grid) return;
+  function norm(s) {
+    return (s||'').toLowerCase()
+      .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
+      .replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c');
+  }
+  const aramaQ = norm(document.getElementById('yp-f-arama')?.value || '');
+  const parcaNoQ = norm(document.getElementById('yp-f-parcano')?.value || '');
+  // Tip checkbox'ları
+  const tipChecks = {
+    'vkayis':  document.getElementById('yp-tip-vkayis')?.checked,
+    'solenoid':document.getElementById('yp-tip-solenoid')?.checked,
+    'rulman':  document.getElementById('yp-tip-rulman')?.checked,
+    'piston':  document.getElementById('yp-tip-piston')?.checked,
+    'rotor':   document.getElementById('yp-tip-rotor')?.checked,
+    'diger':   document.getElementById('yp-tip-diger')?.checked,
+  };
+  const anyTipChecked = Object.values(tipChecks).some(Boolean);
+  // Marka checkbox'ları
+  const markaChecks = {
+    'atlas copco':    document.getElementById('yp-f-atlascopco')?.checked,
+    'kaeser':         document.getElementById('yp-f-kaeser')?.checked,
+    'ingersoll rand': document.getElementById('yp-f-ingersoll')?.checked,
+    'compair':        document.getElementById('yp-f-compair')?.checked,
+  };
+  const digerMarkaChecked = document.getElementById('yp-f-diger')?.checked;
+  const tipMap = {
+    vkayis:   ['v-kayis','v kayis','kayis'],
+    solenoid: ['solenoid'],
+    rulman:   ['rulman','yatak'],
+    piston:   ['piston','silindir'],
+    rotor:    ['rotor'],
+    diger:    []
+  };
   let visible = 0;
   grid.querySelectorAll('.db-card').forEach(card => {
-    if (card.style.display === 'none') return;
-    const marka = (card.querySelector('.card-brand')?.textContent || '').trim();
-    const title = (card.querySelector('.card-name')?.textContent || '').toLowerCase();
-    const markaOk = markaChecks[marka] !== undefined ? markaChecks[marka] : digerChecked;
-    const parcaOk = !parcaNo || title.includes(parcaNo);
-    const show = markaOk && parcaOk;
+    const cardTip = norm(card.dataset.tip || '');
+    const marka = norm(card.querySelector('.card-brand')?.textContent || '');
+    const baslik = norm(card.querySelector('.card-name')?.textContent || '');
+    // Tip filtresi
+    let tipOk = !anyTipChecked;
+    if (!tipOk) {
+      for (const [key, checked] of Object.entries(tipChecks)) {
+        if (!checked) continue;
+        if (key === 'diger') {
+          // hiçbir bilinen tipe uymuyorsa
+          const knownMatch = ['vkayis','solenoid','rulman','piston','rotor']
+            .some(k => tipMap[k].some(w => cardTip.includes(w)));
+          if (!knownMatch) { tipOk = true; break; }
+        } else if (tipMap[key].some(w => cardTip.includes(w))) {
+          tipOk = true; break;
+        }
+      }
+    }
+    // Marka filtresi
+    const markaOk = markaChecks[marka] !== undefined ? markaChecks[marka] :
+                    (digerMarkaChecked !== false);
+    // Metin arama
+    const aramaOk = !aramaQ || cardTip.includes(aramaQ) || baslik.includes(aramaQ);
+    const parcaOk = !parcaNoQ || baslik.includes(parcaNoQ);
+    const show = tipOk && markaOk && aramaOk && parcaOk;
     card.style.display = show ? '' : 'none';
     if (show) visible++;
   });
