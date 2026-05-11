@@ -3697,17 +3697,22 @@ function renderTeknikFields(cat, containerId, cardId, titleId) {
   const fields = {
     komp: {
       title: 'Teknik Özellikler',
-      html: () =>
-        row3(finp('ilan-kapasite','Kapasite (m³/dk)','2.4'), finp('ilan-guc','Motor Gücü (kW)','15'), finp('ilan-basinc','Maks. Basınç (bar)','8')) +
-        row2(fsel('ilan-sogutma','Soğutma Tipi',['Hava Soğutmalı','Su Soğutmalı']), fsel('ilan-yag','Yağlama',['Yağlı','Yağsız'])) +
-        row2(finp('ilan-tank','Tank Hacmi (L)','200'), finp('ilan-voltaj','Voltaj','380V 3F')) +
-        txtarea('ilan-teknik','Ek Teknik Bilgiler','Gürültü seviyesi, IP sınıfı, sertifikalar...')
+      html: () => {
+        const sub = (document.getElementById('ilan-subcat')?.value || '').toLowerCase();
+        // Alt kategori zaten yağlı/yağsız bilgisini içeriyor (Vidalı, Yağsız vs.)
+        // Sadece alt kategoride belirtilmeyen bilgileri sor
+        const isYagsiz = sub.includes('yağsız') || sub.includes('yagsiz');
+        return row3(finp('ilan-kapasite','Kapasite (m³/dk)','2.4'), finp('ilan-guc','Motor Gücü (kW)','15'), finp('ilan-basinc','Maks. Basınç (bar)','8')) +
+        row2(fsel('ilan-sogutma','Soğutma Tipi',['Hava Soğutmalı','Su Soğutmalı']), finp('ilan-tank','Tank Hacmi (L)','200')) +
+        row2(finp('ilan-voltaj','Voltaj','380V 3F'), finp('ilan-devir','Devir (rpm)','')) +
+        txtarea('ilan-teknik','Ek Teknik Bilgiler','Gürültü seviyesi, IP sınıfı, sertifikalar...');
+      }
     },
     kuru: {
       title: 'Teknik Özellikler',
       html: () => {
-        const sub = document.getElementById('ilan-subcat')?.value || '';
-        const isKimyasal = sub.toLowerCase().includes('kimyasal') || sub.toLowerCase().includes('adsorps');
+        const sub = (document.getElementById('ilan-subcat')?.value || '').toLowerCase();
+        const isKimyasal = sub.includes('kimyasal') || sub.includes('adsorps');
         const common = row2(finp('ilan-kapasite','Kapasite (m³/dk)','3.0'), finp('ilan-basinc','Çalışma Basıncı (bar)','10'));
         const extra = isKimyasal
           ? row2(fsel('ilan-malzeme','Dolgu Malzemesi',['Silikajel','Aktif Alümina','Moleküler Elek']), finp('ilan-cikis-nem','Çıkış Çiğ Noktası (°C)','-40')) +
@@ -3719,10 +3724,12 @@ function renderTeknikFields(cat, containerId, cardId, titleId) {
     },
     filtre: {
       title: 'Filtre Özellikleri',
-      html: () =>
-        row2(finp('ilan-kapasite','Kapasite (m³/dk)','5.0'), finp('ilan-basinc','Maks. Basınç (bar)','16')) +
+      html: () => {
+        const sub = (document.getElementById('ilan-subcat')?.value || '');
+        return row2(finp('ilan-kapasite','Kapasite (m³/dk)','5.0'), finp('ilan-basinc','Maks. Basınç (bar)','16')) +
         row2(fsel('ilan-filtre-sinif','Filtre Sınıfı',['ISO 8573-1 Sınıf 1','Sınıf 2','Sınıf 3','Sınıf 4','Sınıf 5']), finp('ilan-baglanti','Bağlantı Boyutu','G 1/2')) +
-        txtarea('ilan-teknik','Ek Teknik Bilgiler','Gövde malzemesi, element değişim periyodu...')
+        txtarea('ilan-teknik','Ek Teknik Bilgiler','Gövde malzemesi, element değişim periyodu...');
+      }
     },
     aksesuar: {
       title: 'Aksesuar Özellikleri',
@@ -3732,18 +3739,22 @@ function renderTeknikFields(cat, containerId, cardId, titleId) {
     },
     jenerator: {
       title: 'Jeneratör Özellikleri',
-      html: () =>
-        row2(fsel('ilan-gaz-turu','Gaz Türü',['Azot (N₂)','Oksijen (O₂)','Hidrojen (H₂)']), finp('ilan-kapasite','Kapasite (m³/saat)','10')) +
-        row2(finp('ilan-safiyet','Safiyet (%)', '99.9'), finp('ilan-basinc','Çıkış Basıncı (bar)','5')) +
-        row2(finp('ilan-guc','Güç Tüketimi (kW)','3.5'), finp('ilan-voltaj','Voltaj','380V')) +
-        txtarea('ilan-teknik','Ek Teknik Bilgiler','Besleme havası gereksinimi, güvenlik sınıfı...')
+      html: () => {
+        // Alt kategoride zaten gaz türü seçildi (Azot/Oksijen/Hidrojen)
+        return row2(finp('ilan-kapasite','Kapasite (m³/saat)','10'), finp('ilan-safiyet','Safiyet (%)','99.9')) +
+        row2(finp('ilan-basinc','Çıkış Basıncı (bar)','5'), finp('ilan-guc','Güç Tüketimi (kW)','3.5')) +
+        row2(finp('ilan-voltaj','Voltaj','380V'), finp('ilan-besleme','Besleme Havası (bar)','7')) +
+        txtarea('ilan-teknik','Ek Teknik Bilgiler','Güvenlik sınıfı, sertifikalar...');
+      }
     },
     yp: {
       title: 'Parça Özellikleri',
-      html: () =>
-        row2(finp('ilan-parca-no','Parça Numarası',''), finp('ilan-uyumlu-model','Uyumlu Model','Atlas Copco GA 15')) +
-        row2(fsel('ilan-parca-tipi','Parça Tipi',['Hava Filtresi','Yağ Filtresi','Separator Filtre','V-Kayış','Solenoid Valf','Yatak / Rulman','Diğer']), finp('ilan-adet','Adet','1')) +
-        txtarea('ilan-teknik','Ek Teknik Bilgiler','Orijinal mi yedek mi, garanti durumu, stok adedi...')
+      html: () => {
+        // Alt kategoride parça tipi zaten seçildi, tekrar sorma
+        return row2(finp('ilan-parca-no','Parça Numarası',''), finp('ilan-uyumlu-model','Uyumlu Model','Atlas Copco GA 15')) +
+        row2(finp('ilan-adet','Adet','1'), finp('ilan-stok','Stok Durumu','')) +
+        txtarea('ilan-teknik','Ek Teknik Bilgiler','Orijinal mi yedek mi, garanti durumu, paketleme...');
+      }
     }
   };
 
