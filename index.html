@@ -5875,9 +5875,11 @@ function applyFilters(btn) {
   const maxKapasite = ranges[0] ? parseFloat(ranges[0].value) : Infinity;
   const maxGuc      = ranges[1] ? parseFloat(ranges[1].value) : Infinity;
 
+  console.log('checkedMarkas:', checkedMarkas, 'markaFilterActive:', markaFilterActive, 'total:', totalMarkas);
   let visible = 0;
   grid.querySelectorAll('.listing-card').forEach(card => {
     const cardMarka = card.querySelector('.card-brand')?.textContent?.trim() || '';
+    console.log('card marka:', cardMarka);
 
     // Marka filtresi
     let markaOk = true;
