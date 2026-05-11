@@ -5854,112 +5854,72 @@ function applyFilters(btn) {
   const panel = btn.closest('.filter-panel');
   const page  = btn.closest('.page');
   if (!panel || !page) return;
-
   const grid = page.querySelector('.cards-grid');
   if (!grid) return;
 
-  // Tüm checkbox satırlarını oku
-  const allRows = [...panel.querySelectorAll('.f-row')];
-
-  // Marka satırları: "Marka" başlıklı f-section içindeki tüm f-row'lar
-  const markaSections = [...panel.querySelectorAll('.f-section')].filter(s =>
-    s.querySelector('.f-group-label')?.textContent?.trim().toLowerCase().includes('marka')
+  // Marka: "Marka" başlıklı section'daki işaretli/işaretsiz label'lar
+  const markaSection = [...panel.querySelectorAll('.f-section')].find(s =>
+    (s.querySelector('.f-group-label')?.textContent || '').toLowerCase().includes('marka')
   );
-  const brandRows = markaSections.flatMap(s => [...s.querySelectorAll('.f-row')]);
-  const allBrandRows = brandRows.filter(r => r.querySelector('input[type=checkbox]'));
-  const checkedBrands = allBrandRows
-    .filter(r => r.querySelector('input[type=checkbox]')?.checked)
-    .map(r => r.querySelector('label')?.textContent?.trim().toLowerCase()).filter(Boolean);
-  const uncheckedBrands = allBrandRows
-    .filter(r => !r.querySelector('input[type=checkbox]')?.checked)
-    .map(r => r.querySelector('label')?.textContent?.trim().toLowerCase()).filter(Boolean);
-  const hasMarkaFilter = allBrandRows.length > 0 && uncheckedBrands.length > 0;
+  const markaRows = markaSection ? [...markaSection.querySelectorAll('.f-row')] : [];
+  const checkedMarkas = markaRows.filter(r => r.querySelector('input')?.checked).map(r => r.querySelector('label')?.textContent?.trim() || '').filter(Boolean);
+  const totalMarkas = markaRows.length;
+  const markaFilterActive = totalMarkas > 0 && checkedMarkas.length < totalMarkas;
 
-  // Durum satırları
-  const durumYeniRow = allRows.find(r => r.querySelector('label')?.textContent?.trim().toLowerCase() === 'yeni');
-  const durumUsedRow = allRows.find(r => r.querySelector('label')?.textContent?.trim().toLowerCase() === '2. el');
-  const allowYeni = durumYeniRow?.querySelector('input')?.checked ?? true;
-  const allowUsed = durumUsedRow?.querySelector('input')?.checked ?? true;
+  // Durum
+  const allowYeni = [...panel.querySelectorAll('.f-row')].find(r => r.querySelector('label')?.textContent?.trim() === 'Yeni')?.querySelector('input')?.checked ?? true;
+  const allowUsed = [...panel.querySelectorAll('.f-row')].find(r => r.querySelector('label')?.textContent?.trim() === '2. El')?.querySelector('input')?.checked ?? true;
 
-  // Range slider'lar
-  const rangeInputs = [...panel.querySelectorAll('input[type=range]')];
-  const maxKapasite = rangeInputs[0] ? parseFloat(rangeInputs[0].value) : Infinity;
-  const maxGuc      = rangeInputs[1] ? parseFloat(rangeInputs[1].value) : Infinity;
+  // Range
+  const ranges = [...panel.querySelectorAll('input[type=range]')];
+  const maxKapasite = ranges[0] ? parseFloat(ranges[0].value) : Infinity;
+  const maxGuc      = ranges[1] ? parseFloat(ranges[1].value) : Infinity;
 
   let visible = 0;
   grid.querySelectorAll('.listing-card').forEach(card => {
-    const brand   = card.querySelector('.card-brand')?.textContent?.trim().toLowerCase() || '';
-    const name    = card.querySelector('.card-name')?.textContent?.trim().toLowerCase() || '';
-    const badge   = card.querySelector('.card-badge');
-    const isNew   = badge?.classList.contains('badge-new');
-    const isUsed  = badge?.classList.contains('badge-used');
+    const cardMarka = card.querySelector('.card-brand')?.textContent?.trim() || '';
 
     // Marka filtresi
-    let brandOk = true;
-    if (hasMarkaFilter) {
-      // Diğer işaretliyse eşleşmeyen markalara da izin ver
-      const digerChecked = checkedBrands.includes('diğer');
-      const knownChecked = checkedBrands.filter(l => l !== 'diğer');
-      // Kartın markası bilinen markalarda var mı?
-      const matchesKnown = knownChecked.some(l => brand && (brand.includes(l) || l.includes(brand) && brand.length > 2));
-      const matchesAny = checkedBrands.some(l => l !== 'diğer' && brand && (brand.includes(l) || l.includes(brand) && brand.length > 2));
-      if (digerChecked) {
-        // Diğer seçiliyse: bilinen seçili markalardan biri eşleşir VEYA hiçbir bilinen markayla eşleşmiyorsa göster
-        const matchesNoKnownBrand = !uncheckedBrands.some(l => brand && brand.includes(l));
-        brandOk = matchesKnown || matchesNoKnownBrand;
+    let markaOk = true;
+    if (markaFilterActive) {
+      const digerChecked = checkedMarkas.includes('Diğer');
+      const namedChecked = checkedMarkas.filter(m => m !== 'Diğer');
+      const allNamedMarkas = markaRows.map(r => r.querySelector('label')?.textContent?.trim()).filter(m => m && m !== 'Diğer');
+      const matchesNamed = namedChecked.some(m => cardMarka.toLowerCase().includes(m.toLowerCase()) || m.toLowerCase().includes(cardMarka.toLowerCase()) && cardMarka.length > 1);
+      const isKnownBrand = allNamedMarkas.some(m => cardMarka.toLowerCase().includes(m.toLowerCase()));
+      if (digerChecked && !namedChecked.length) {
+        markaOk = !isKnownBrand; // Sadece Diğer: bilinen markalar dışındakiler
+      } else if (digerChecked) {
+        markaOk = matchesNamed || !isKnownBrand; // Named + Diğer
       } else {
-        brandOk = matchesAny;
+        markaOk = matchesNamed;
       }
     }
 
-    // Durum filtresi
+    // Durum
+    const badge = card.querySelector('.card-badge');
+    const isNew  = badge?.classList.contains('badge-new');
+    const isUsed = badge?.classList.contains('badge-used');
     const durumOk = (isNew && allowYeni) || (isUsed && allowUsed) || (!isNew && !isUsed);
 
-    // Spec tag'lerden kapasite ve güç oku
+    // Kapasite / güç
     const specs = [...card.querySelectorAll('.spec-tag')].map(s => s.textContent.trim());
-    let kapasiteOk = true;
-    let gucOk = true;
+    let kapasiteOk = true, gucOk = true;
     specs.forEach(s => {
-      const numMatch = s.match(/([\d.]+)/);
-      if (!numMatch) return;
-      const val = parseFloat(numMatch[1]);
-      if (s.includes('m³/dk') && val > maxKapasite) kapasiteOk = false;
-      if (s.includes('kW')    && val > maxGuc)      gucOk = false;
+      const n = parseFloat(s.match(/([\d.]+)/)?.[1] || 'NaN');
+      if (s.includes('m³/dk') && n > maxKapasite) kapasiteOk = false;
+      if (s.includes('kW')    && n > maxGuc)      gucOk = false;
     });
 
-    const show = brandOk && durumOk && kapasiteOk && gucOk;
+    const show = markaOk && durumOk && kapasiteOk && gucOk;
     card.style.display = show ? '' : 'none';
     if (show) visible++;
   });
 
-  // Sonuç sayısını güncelle
   const countEl = page.querySelector('.listing-count');
   if (countEl) countEl.textContent = '— ' + visible + ' ilan';
-
   showToast('Filtre uygulandı', visible + ' ilan gösteriliyor.', null, false);
 }
-
-// Tüm f-apply butonlarına event delegation
-document.addEventListener('click', function(e) {
-  if (e.target.classList.contains('f-apply')) applyFilters(e.target);
-  if (e.target.classList.contains('ilan-edit-btn')) openIlanEdit(e.target);
-  if (e.target.classList.contains('contact-btn') || e.target.classList.contains('btn-save-list')) {
-    if (!loadUser()) { go('login'); return; }
-  }
-  if (e.target.classList.contains('contact-btn')) {
-    openContactModal(e.target.dataset.seller, e.target.dataset.ilan);
-  }
-  // Teklif butonları
-  if (e.target.classList.contains('btn-teklif')) {
-    const btn = e.target;
-    const kategori = btn.dataset.kategori;
-    const kategoriLabel = btn.dataset.label;
-    const formId = btn.dataset.form;
-    const baslik = btn.dataset.baslik;
-    if (kategori && formId) submitTeklif(kategori, kategoriLabel, formId, baslik);
-  }
-});
-
 window.applyFilters = applyFilters;
 
 function toggleMobileNav() {
