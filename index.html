@@ -3782,6 +3782,9 @@ async function loadListings(kategori, gridId, countId) {
 
   grid.dataset.loading = '';
   grid.innerHTML = cards;
+  // Alt kategori filtresini başlat
+  if (gridId === 'kuru-cards-grid') { filterKuru('tumu', null); }
+  if (gridId === 'komp-cards-grid') { filterKomp('tumu', null); }
 
   // Sayacı güncelle
   const total = grid.querySelectorAll('.listing-card').length;
@@ -4975,14 +4978,20 @@ function filterKuru(tip, btn) {
   const tipLabels = { tumu:'Tüm Kurutucular', gazli:'Gazlı Kurutucular', kimyasal:'Kimyasal Kurutucular' };
   if (titleEl) titleEl.textContent = tipLabels[tip] || 'Kurutucular';
   // Alt kategori → alt_kategori eşleşmesi
-  const altKatMap = { gazli: ['gazli kurutucu','gazlı kurutucu','freon','soğutmalı'], kimyasal: ['kimyasal kurutucu','silikajel','adsorption'] };
+  // alt_kategori normalize: Türkçe karakterleri ascii'ye çevir, küçük harf
+  function normKuru(s) {
+    return (s||'').toLowerCase()
+      .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
+      .replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c');
+  }
+  // subcats kuru: 'Gazlı (Soğutmalı)' → norm → 'gazli (sogutmali)'
+  // subcats kuru: 'Kimyasal (Adsorpsiyonlu)' → norm → 'kimyasal (adsorpsiyonlu)'
   let visible = 0;
   grid.querySelectorAll('.db-card').forEach(card => {
-    const cardTip = (card.dataset.tip || '').toLowerCase();
+    const cardTip = normKuru(card.dataset.tip || '');
     let show = tip === 'tumu';
-    if (!show && altKatMap[tip]) {
-      show = altKatMap[tip].some(k => cardTip.includes(k));
-    }
+    if (tip === 'gazli')    show = cardTip.includes('gazl') || cardTip.includes('sogutmal') || cardTip.includes('freon');
+    if (tip === 'kimyasal') show = cardTip.includes('kimyasal') || cardTip.includes('adsorps') || cardTip.includes('silikajel');
     card.style.display = show ? '' : 'none';
     if (show) visible++;
   });
@@ -4990,8 +4999,8 @@ function filterKuru(tip, btn) {
   // Filtre panelini alt kategoriye göre güncelle
   const gazEl = document.getElementById('kuru-filter-gazcinsi');
   const malzEl = document.getElementById('kuru-filter-malzeme');
-  if (gazEl) gazEl.style.display = tip === 'kimyasal' ? 'none' : '';
-  if (malzEl) malzEl.style.display = tip === 'gazli' ? 'none' : (tip === 'kimyasal' ? '' : 'none');
+  if (gazEl) gazEl.style.display = (tip === 'tumu' || tip === 'kimyasal') ? 'none' : '';
+  if (malzEl) malzEl.style.display = tip === 'kimyasal' ? '' : 'none';
 }
 window.filterKuru = filterKuru;
 
