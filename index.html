@@ -4016,7 +4016,7 @@ async function loadListings(kategori, gridId, countId) {
     const thumb = photo
       ? `<img src="${escapeHtml(photo)}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius)">`
       : `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg>`;
-    return `<div class="listing-card db-card" data-tip="${escapeHtml((l.alt_kategori||'').toLowerCase())}" onclick="openListingDetail('${l.id}')">
+    return `<div class="listing-card db-card" data-tip="${escapeHtml((l.alt_kategori||'').toLowerCase())}" data-subtype="${escapeHtml((l.alt_kategori||'').toLowerCase())}" data-marka="${escapeHtml((l.marka||'').toLowerCase())}" onclick="openListingDetail('${l.id}')">
       <div class="card-thumb">${thumb}<span class="card-badge ${badge}">${escapeHtml(l.durum||'Yeni')}</span></div>
       <div class="card-body">
         <div class="card-brand">${escapeHtml(l.marka||'')}</div>
@@ -5854,61 +5854,121 @@ function applyFilters(btn) {
   const grid = page.querySelector('.cards-grid');
   if (!grid) return;
 
-  // Marka: "Marka" başlıklı section'daki işaretli/işaretsiz label'lar
-  const markaSection = [...panel.querySelectorAll('.f-section')].find(s =>
-    (s.querySelector('.f-group-label')?.textContent || '').toLowerCase().includes('marka')
-  );
-  const markaRows = markaSection ? [...markaSection.querySelectorAll('.f-row')] : [];
-  const checkedMarkas = markaRows.filter(r => r.querySelector('input')?.checked).map(r => r.querySelector('label')?.textContent?.trim() || '').filter(Boolean);
-  const totalMarkas = markaRows.length;
+  // Tüm f-section'ları tara ve her birinin başlığına göre grupla
+  const sections = [...panel.querySelectorAll('.f-section')];
+
+  // Yardımcı: belirli başlığa sahip section'ı bul
+  function findSection(keywords) {
+    return sections.find(s => {
+      const lbl = (s.querySelector('.f-group-label')?.textContent || '').toLowerCase();
+      return keywords.some(k => lbl.includes(k));
+    });
+  }
+  function getChecked(section) {
+    if (!section) return { checked: [], total: 0 };
+    const rows = [...section.querySelectorAll('.f-row')];
+    return {
+      checked: rows.filter(r => r.querySelector('input')?.checked).map(r => r.querySelector('label')?.textContent?.trim() || '').filter(Boolean),
+      total: rows.length,
+      rows
+    };
+  }
+
+  // --- MARKA ---
+  const markaSection = findSection(['marka']);
+  const { checked: checkedMarkas, total: totalMarkas, rows: markaRows } = getChecked(markaSection);
   const markaFilterActive = totalMarkas > 0 && checkedMarkas.length < totalMarkas;
 
-  // Durum
-  const allowYeni = [...panel.querySelectorAll('.f-row')].find(r => r.querySelector('label')?.textContent?.trim() === 'Yeni')?.querySelector('input')?.checked ?? true;
-  const allowUsed = [...panel.querySelectorAll('.f-row')].find(r => r.querySelector('label')?.textContent?.trim() === '2. El')?.querySelector('input')?.checked ?? true;
+  // --- DURUM ---
+  const durumSection = findSection(['durum']);
+  const allowYeni = durumSection
+    ? ([...durumSection.querySelectorAll('.f-row')].find(r => r.querySelector('label')?.textContent?.trim() === 'Yeni')?.querySelector('input')?.checked ?? true)
+    : true;
+  const allowUsed = durumSection
+    ? ([...durumSection.querySelectorAll('.f-row')].find(r => r.querySelector('label')?.textContent?.trim() === '2. El')?.querySelector('input')?.checked ?? true)
+    : true;
 
-  // Range
+  // --- GAZ CİNSİ / GAZ TÜRÜ (her ikisi için aynı mantık) ---
+  const gazSection = findSection(['gaz cinsi', 'gaz türü', 'gaz turu', 'gaz cinsi']);
+  const { checked: checkedGaz, total: totalGaz } = getChecked(gazSection);
+  const gazFilterActive = totalGaz > 0 && checkedGaz.length < totalGaz;
+
+  // --- FİLTRE TÜRÜ / YEDEK PARÇA TİPİ ---
+  const tipSection = findSection(['filtre türü', 'filtre turu', 'yedek parça tipi', 'yedek parca tipi']);
+  const { checked: checkedTip, total: totalTip } = getChecked(tipSection);
+  const tipFilterActive = totalTip > 0 && checkedTip.length < totalTip;
+
+  // --- RANGE ---
   const ranges = [...panel.querySelectorAll('input[type=range]')];
   const maxKapasite = ranges[0] ? parseFloat(ranges[0].value) : Infinity;
   const maxGuc      = ranges[1] ? parseFloat(ranges[1].value) : Infinity;
 
+  // --- KARTI NORMALIZE ET ---
+  function normTR(s) { return (s||'').toLowerCase().replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c'); }
+
   let visible = 0;
   grid.querySelectorAll('.listing-card').forEach(card => {
-    const cardMarka = card.querySelector('.card-brand')?.textContent?.trim() || '';
+    const cardMarka   = card.querySelector('.card-brand')?.textContent?.trim() || '';
+    const cardSubtype = card.dataset.subtype || card.dataset.tip || '';  // alt_kategori (lowercase)
+    const cardTitle   = (card.querySelector('.card-name')?.textContent || '').toLowerCase();
 
-    // Marka filtresi
+    // --- MARKA FİLTRESİ ---
     let markaOk = true;
     if (markaFilterActive) {
       const digerChecked = checkedMarkas.includes('Diğer');
       const namedChecked = checkedMarkas.filter(m => m !== 'Diğer');
-      const allNamedMarkas = markaRows.map(r => r.querySelector('label')?.textContent?.trim()).filter(m => m && m !== 'Diğer');
-      const matchesNamed = namedChecked.some(m => cardMarka.toLowerCase().includes(m.toLowerCase()) || m.toLowerCase().includes(cardMarka.toLowerCase()) && cardMarka.length > 1);
-      const isKnownBrand = allNamedMarkas.some(m => cardMarka.toLowerCase().includes(m.toLowerCase()));
+      const allNamedMarkas = (markaRows || []).map(r => r.querySelector('label')?.textContent?.trim()).filter(m => m && m !== 'Diğer');
+      const matchesNamed = namedChecked.some(m => normTR(cardMarka).includes(normTR(m)) || (normTR(m).includes(normTR(cardMarka)) && cardMarka.length > 1));
+      const isKnownBrand = allNamedMarkas.some(m => normTR(cardMarka).includes(normTR(m)));
       if (digerChecked && !namedChecked.length) {
-        markaOk = !isKnownBrand; // Sadece Diğer: bilinen markalar dışındakiler
+        markaOk = !isKnownBrand;
       } else if (digerChecked) {
-        markaOk = matchesNamed || !isKnownBrand; // Named + Diğer
+        markaOk = matchesNamed || !isKnownBrand;
       } else {
         markaOk = matchesNamed;
       }
     }
 
-    // Durum
-    const badge = card.querySelector('.card-badge');
+    // --- DURUM FİLTRESİ ---
+    const badge  = card.querySelector('.card-badge');
     const isNew  = badge?.classList.contains('badge-new');
     const isUsed = badge?.classList.contains('badge-used');
     const durumOk = (isNew && allowYeni) || (isUsed && allowUsed) || (!isNew && !isUsed);
 
-    // Kapasite / güç
-    const specs = [...card.querySelectorAll('.spec-tag')].map(s => s.textContent.trim());
+    // --- GAZ CİNSİ / GAZ TÜRÜ FİLTRESİ ---
+    // alt_kategori veya başlık içinde geçiyor mu kontrol et
+    let gazOk = true;
+    if (gazFilterActive) {
+      gazOk = checkedGaz.some(g => {
+        const gN = normTR(g);
+        return normTR(cardSubtype).includes(gN) || normTR(cardTitle).includes(gN);
+      });
+    }
+
+    // --- FİLTRE TÜRÜ / PARÇA TİPİ FİLTRESİ ---
+    let tipOk = true;
+    if (tipFilterActive) {
+      tipOk = checkedTip.some(t => {
+        const tN = normTR(t);
+        // "Diğer Filtreler" / "Diğer" için bilinen tiplerin dışında olanları eşleştir
+        if (t === 'Diğer Filtreler' || t === 'Diğer') {
+          const knownTips = [...tipSection.querySelectorAll('.f-row label')].map(l => normTR(l.textContent?.trim())).filter(l => l !== 'diger filtreler' && l !== 'diger');
+          return !knownTips.some(kt => normTR(cardSubtype).includes(kt) || normTR(cardTitle).includes(kt));
+        }
+        return normTR(cardSubtype).includes(tN) || normTR(cardTitle).includes(tN);
+      });
+    }
+
+    // --- KAPASİTE / GÜÇ RANGE FİLTRESİ ---
+    const specTags = [...card.querySelectorAll('.spec-tag')].map(s => s.textContent.trim());
     let kapasiteOk = true, gucOk = true;
-    specs.forEach(s => {
+    specTags.forEach(s => {
       const n = parseFloat(s.match(/([\d.]+)/)?.[1] || 'NaN');
       if (s.includes('m³/dk') && n > maxKapasite) kapasiteOk = false;
       if (s.includes('kW')    && n > maxGuc)      gucOk = false;
     });
 
-    const show = markaOk && durumOk && kapasiteOk && gucOk;
+    const show = markaOk && durumOk && gazOk && tipOk && kapasiteOk && gucOk;
     card.style.display = show ? '' : 'none';
     if (show) visible++;
   });
