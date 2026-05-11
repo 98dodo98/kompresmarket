@@ -3910,13 +3910,14 @@ async function publishIlan(status) {
     return;
   }
 
-  const btn = document.querySelector(status === 'aktif' ? '.btn-publish' : '.btn-draft');
+  // btn-publish/draft özellikle ilan-ver section içinden al
+  const ilanVerSection = document.getElementById('dash-ilan-ver');
+  const btn = ilanVerSection?.querySelector(status === 'aktif' ? '.btn-publish' : '.btn-draft') || null;
   if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
 
-  const fiyatRaw = (document.getElementById('ilan-fiyat')?.value || '').replace(/\D/g, '');
+  const fiyatRaw = (document.getElementById('ilan-fiyat')?.value || '').replace(/[^0-9]/g, '');
 
   const gv = id => (document.getElementById(id)?.value || '');
-  // Dinamik teknik field'leri topla
   const { error } = await _sb.from('listings').insert({
     seller_id: u.id,
     kategori,
@@ -3940,9 +3941,11 @@ async function publishIlan(status) {
   if (btn) { btn.disabled = false; btn.textContent = status === 'aktif' ? 'İlanı Yayınla' : 'Taslak Kaydet'; }
 
   if (error) {
-    if (errEl) { errEl.textContent = 'Hata: ' + error.message; errEl.style.display = 'block'; }
+    console.error('publishIlan error:', error);
+    if (errEl) { errEl.textContent = 'Hata: ' + (error.message || JSON.stringify(error)); errEl.style.display = 'block'; }
     return;
   }
+  console.log('publishIlan success');
 
   ['ilan-baslik','ilan-marka','ilan-model','ilan-yil','ilan-kapasite','ilan-guc','ilan-basinc','ilan-teknik','ilan-fiyat','ilan-aciklama'].forEach(id => {
     const el = document.getElementById(id); if (el) el.value = '';
