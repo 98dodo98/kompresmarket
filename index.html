@@ -3917,14 +3917,6 @@ async function publishIlan(status) {
 
   const gv = id => (document.getElementById(id)?.value || '');
   // Dinamik teknik field'leri topla
-  const extraFields = {};
-  ['ilan-sogutma','ilan-yag','ilan-tank','ilan-voltaj','ilan-malzeme','ilan-cikis-nem',
-   'ilan-gaz','ilan-filtre-sinif','ilan-baglanti','ilan-gaz-turu','ilan-safiyet',
-   'ilan-parca-no','ilan-uyumlu-model','ilan-parca-tipi','ilan-adet'].forEach(id => {
-    const v = gv(id);
-    if (v) extraFields[id.replace('ilan-','')] = v;
-  });
-
   const { error } = await _sb.from('listings').insert({
     seller_id: u.id,
     kategori,
@@ -3938,7 +3930,6 @@ async function publishIlan(status) {
     guc: gv('ilan-guc'),
     basinc: gv('ilan-basinc'),
     teknik_aciklama: gv('ilan-teknik'),
-    extra_fields: JSON.stringify(extraFields),
     fiyat: fiyatRaw ? parseInt(fiyatRaw) : null,
     fiyat_gosterim: gv('ilan-fiyat-tip') || 'Fiyatı Göster',
     aciklama: gv('ilan-aciklama'),
