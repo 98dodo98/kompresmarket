@@ -5904,7 +5904,14 @@ function applyFilters(btn) {
   const maxGuc      = ranges[1] ? parseFloat(ranges[1].value) : Infinity;
 
   // --- KARTI NORMALIZE ET ---
-  function normTR(s) { return (s||'').toLowerCase().replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c'); }
+  function normTR(s) {
+    return (s||'').toLowerCase()
+      .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c')
+      .replace(/[₀₁₂₃₄₅₆₇₈₉]/g,'') // alt simgeler
+      .replace(/\(.*?\)/g,'')         // parantez içi (N₂, O₂ gibi)
+      .replace(/[^a-z0-9\s\/]/g,'')   // diğer özel karakterler
+      .trim();
+  }
 
   let visible = 0;
   grid.querySelectorAll('.listing-card').forEach(card => {
