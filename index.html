@@ -2354,21 +2354,20 @@ body {
       <p class="f-title">Filtrele</p>
       <div class="f-section">
         <p class="f-group-label">Kapasite (m³/dk)</p>
-        <input type="range" class="f-range" min="0" max="30" value="30" oninput="this.nextElementSibling.children[1].textContent='0–'+this.value+' m³/dk'">
-        <div class="f-range-row"><span>0</span><span>0–30 m³/dk</span><span>30</span></div>
+        <input type="range" class="f-range" id="kuru-range-kapasite" min="0" max="30" value="30" oninput="this.nextElementSibling.children[1].textContent='0–'+this.value+' m³/dk'">
+        <div class="f-range-row"><span>0</span><span id="kuru-range-label">0–30 m³/dk</span><span>30</span></div>
       </div>
-      <div class="f-section">
+      <div class="f-section" id="kuru-filter-gazcinsi">
         <p class="f-group-label">Gaz Cinsi (Freon)</p>
-        <div class="f-row"><input type="checkbox" checked><label>R-410A</label><span class="f-count">22</span></div>
-        <div class="f-row"><input type="checkbox" checked><label>R-134a</label><span class="f-count">14</span></div>
-        <div class="f-row"><input type="checkbox" checked><label>R-407C</label><span class="f-count">8</span></div>
+        <div class="f-row"><input type="checkbox" checked><label>R-410A</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>R-134a</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>R-407C</label></div>
       </div>
-      <div class="f-section">
-        <p class="f-group-label">Marka</p>
-        <div class="f-row"><input type="checkbox" checked><label>Beko</label><span class="f-count">18</span></div>
-        <div class="f-row"><input type="checkbox" checked><label>Atlas Copco</label><span class="f-count">10</span></div>
-        <div class="f-row"><input type="checkbox" checked><label>Kaeser</label><span class="f-count">7</span></div>
-        <div class="f-row"><input type="checkbox" checked><label>Diğer</label><span class="f-count">9</span></div>
+      <div class="f-section" id="kuru-filter-malzeme" style="display:none">
+        <p class="f-group-label">Malzeme Cinsi</p>
+        <div class="f-row"><input type="checkbox" checked><label>Silikajel</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Aktif Alümina</label></div>
+        <div class="f-row"><input type="checkbox" checked><label>Moleküler Elek</label></div>
       </div>
       <div class="f-section">
         <p class="f-group-label">Durum</p>
@@ -4975,13 +4974,24 @@ function filterKuru(tip, btn) {
   if (!grid) return;
   const tipLabels = { tumu:'Tüm Kurutucular', gazli:'Gazlı Kurutucular', kimyasal:'Kimyasal Kurutucular' };
   if (titleEl) titleEl.textContent = tipLabels[tip] || 'Kurutucular';
+  // Alt kategori → alt_kategori eşleşmesi
+  const altKatMap = { gazli: ['gazli kurutucu','gazlı kurutucu','freon','soğutmalı'], kimyasal: ['kimyasal kurutucu','silikajel','adsorption'] };
   let visible = 0;
-  grid.querySelectorAll('.kuru-card').forEach(card => {
-    const show = tip === 'tumu' || card.dataset.tip === tip;
+  grid.querySelectorAll('.db-card').forEach(card => {
+    const cardTip = (card.dataset.tip || '').toLowerCase();
+    let show = tip === 'tumu';
+    if (!show && altKatMap[tip]) {
+      show = altKatMap[tip].some(k => cardTip.includes(k));
+    }
     card.style.display = show ? '' : 'none';
     if (show) visible++;
   });
   if (countEl) countEl.textContent = '— ' + visible + ' ilan';
+  // Filtre panelini alt kategoriye göre güncelle
+  const gazEl = document.getElementById('kuru-filter-gazcinsi');
+  const malzEl = document.getElementById('kuru-filter-malzeme');
+  if (gazEl) gazEl.style.display = tip === 'kimyasal' ? 'none' : '';
+  if (malzEl) malzEl.style.display = tip === 'gazli' ? 'none' : (tip === 'kimyasal' ? '' : 'none');
 }
 window.filterKuru = filterKuru;
 
@@ -5005,9 +5015,14 @@ function filterKomp(tip, btn) {
   if (!grid) return;
   const tipLabels = { tumu:'Tüm Kompresörler', pistonlu:'Pistonlu Kompresörler', vidali:'Vidalı Kompresörler', paletli:'Paletli Kompresörler', turbo:'Turbo Kompresörler', yagsiz:'Yağsız Kompresörler' };
   if (titleEl) titleEl.textContent = tipLabels[tip] || 'Kompresörler';
+  const altKatMapKomp = { pistonlu:['pistonlu'], vidali:['vidalı','vidali'], paletli:['paletli'], turbo:['turbo'], yagsiz:['yağsız','yagsiz'] };
   let visible = 0;
-  grid.querySelectorAll('.komp-card').forEach(card => {
-    const show = tip === 'tumu' || card.dataset.tip === tip;
+  grid.querySelectorAll('.db-card').forEach(card => {
+    const cardTip = (card.dataset.tip || '').toLowerCase();
+    let show = tip === 'tumu';
+    if (!show && altKatMapKomp[tip]) {
+      show = altKatMapKomp[tip].some(k => cardTip.includes(k));
+    }
     card.style.display = show ? '' : 'none';
     if (show) visible++;
   });
