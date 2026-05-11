@@ -4761,13 +4761,20 @@ async function sendSellerMessage() {
   const u = loadUser();
   if (!u) return;
 
-  // conversation_id al
+  // Önce bu satıcıya ait mevcut conversation'ı ara
   const { data: offerData } = await _sb
-    .from('offers').select('conversation_id, user_id').eq('id', currentTeklifId).single();
+    .from('offers').select('user_id').eq('id', currentTeklifId).single();
 
-  let convId = offerData?.conversation_id;
+  const { data: existingConv } = await _sb
+    .from('conversations')
+    .select('id')
+    .eq('seller_id', u.id)
+    .eq('listing_id', currentTeklifId)
+    .maybeSingle();
 
-  // yoksa oluştur
+  let convId = existingConv?.id;
+
+  // Bu satıcı için conversation yoksa oluştur
   if (!convId) {
     const { data: conv, error } = await _sb.from('conversations').insert({
       seller_id: u.id,
@@ -4777,7 +4784,6 @@ async function sendSellerMessage() {
     }).select().single();
     if (error) { showToast('Hata', error.message, null, true); return; }
     convId = conv.id;
-    await _sb.from('offers').update({ conversation_id: convId }).eq('id', currentTeklifId);
     if (_chatSubscription) _chatSubscription.unsubscribe();
     _chatSubscription = _sb.channel('seller-chat-' + convId)
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + convId },
@@ -5488,8 +5494,6 @@ async function openTeklifDetayPage(offerId, role) {
     document.getElementById('teklif-detay-kopyala').onclick = function() { copyToClipboard(offer.iletisim); };
   } else iletisimWrap.style.display = 'none';
 
-  // Realtime subscription başlat
-  _detayConvId = offer.conversation_id;
   const inputWrap = document.getElementById('teklif-detay-input-wrap');
   const noInputWrap = document.getElementById('teklif-detay-no-input');
   const saticiListEl = document.getElementById('teklif-detay-satici-list');
@@ -5498,6 +5502,7 @@ async function openTeklifDetayPage(offerId, role) {
 
   if (role === 'buyer') {
     // Müşteri: satıcı listesini göster
+    _detayConvId = null;
     if (saticiListEl) saticiListEl.style.display = 'flex';
     if (messagesEl) messagesEl.style.display = 'none';
     if (inputWrap) inputWrap.style.display = 'none';
@@ -5505,7 +5510,15 @@ async function openTeklifDetayPage(offerId, role) {
     if (chatTitle) chatTitle.textContent = 'Satıcı Teklifleri';
     await loadSaticiList(offerId);
   } else {
-    // Satıcı
+    // Satıcı: kendi conversation'ını bul
+    const { data: myConv } = await _sb
+      .from('conversations')
+      .select('id')
+      .eq('seller_id', u.id)
+      .eq('listing_id', offerId)
+      .maybeSingle();
+    _detayConvId = myConv?.id || null;
+
     if (saticiListEl) saticiListEl.style.display = 'none';
     if (messagesEl) messagesEl.style.display = 'flex';
     if (chatTitle) chatTitle.textContent = 'Mesajlar';
@@ -5660,31 +5673,43 @@ async function sendTeklifDetayMsg() {
   // Müşteri ise _detaySaticiConvId kullan, satıcı ise _detayConvId
   let convId = _detayRole === 'buyer' ? _detaySaticiConvId : _detayConvId;
 
-  // Satıcı ise conversation yoksa oluştur
-  if (!convId && _detayRole === 'seller') {
-    const { data: offer } = await _sb.from('offers').select('user_id').eq('id', _detayOfferId).single();
-    const { data: conv, error: convErr } = await _sb.from('conversations').insert({
-      seller_id: u.id,
-      buyer_id: offer?.user_id || u.id,
-      listing_id: _detayOfferId,
-      listing_title: document.getElementById('teklif-detay-baslik')?.textContent || ''
-    }).select().single();
+  // Satıcı ise bu satıcıya ait mevcut conversation'ı ara, yoksa oluştur
+  if (_detayRole === 'seller') {
+    const { data: existingConv } = await _sb
+      .from('conversations')
+      .select('id')
+      .eq('seller_id', u.id)
+      .eq('listing_id', _detayOfferId)
+      .maybeSingle();
 
-    if (convErr) { showToast('Hata', convErr.message, null, true); return; }
-    convId = conv.id;
-    _detayConvId = convId;
-    await _sb.from('offers').update({ conversation_id: convId }).eq('id', _detayOfferId);
+    convId = existingConv?.id || null;
 
-    // Input alanını güncelle
-    const inputWrap = document.getElementById('teklif-detay-input-wrap');
-    if (inputWrap) inputWrap.style.display = 'flex';
+    if (!convId) {
+      const { data: offer } = await _sb.from('offers').select('user_id').eq('id', _detayOfferId).single();
+      const { data: conv, error: convErr } = await _sb.from('conversations').insert({
+        seller_id: u.id,
+        buyer_id: offer?.user_id || u.id,
+        listing_id: _detayOfferId,
+        listing_title: document.getElementById('teklif-detay-baslik')?.textContent || ''
+      }).select().single();
 
-    // Realtime başlat
-    if (_detayChatSub) _detayChatSub.unsubscribe();
-    _detayChatSub = _sb.channel('detay-chat-' + convId)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + convId },
-        function() { loadTeklifDetayMessages(); })
-      .subscribe();
+      if (convErr) { showToast('Hata', convErr.message, null, true); return; }
+      convId = conv.id;
+      _detayConvId = convId;
+
+      // Input alanını güncelle
+      const inputWrap = document.getElementById('teklif-detay-input-wrap');
+      if (inputWrap) inputWrap.style.display = 'flex';
+
+      // Realtime başlat
+      if (_detayChatSub) _detayChatSub.unsubscribe();
+      _detayChatSub = _sb.channel('detay-chat-' + convId)
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: 'conversation_id=eq.' + convId },
+          function() { loadTeklifDetayMessages(); })
+        .subscribe();
+    } else {
+      _detayConvId = convId;
+    }
   }
 
   if (!convId) {
