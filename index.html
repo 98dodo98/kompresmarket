@@ -355,7 +355,7 @@ body {
 .how-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
 
 /* ========== FEATURED LISTINGS ========== */
-.feat-section { padding: 32px 28px; background: var(--bg); }
+.feat-section { padding: 32px 28px 40px; background: var(--bg); }
 
 .cards-grid {
   display: grid;
@@ -2163,16 +2163,10 @@ body {
   </div>
 
   <div class="feat-section">
-    <div class="section-head">
-      <div class="section-label">Öne çıkan ilanlar</div>
+    <div class="section-head" style="margin-bottom:18px">
+      <div class="section-label" style="color:#5a5a52">Öne çıkan ilanlar</div>
     </div>
-    <div class="cards-grid">
-      
-        <!-- Vidalı -->
-        <!-- Paletli -->
-        <!-- Turbo -->
-        <!-- Yağsız -->
-      </div>
+    <div class="cards-grid" id="featured-grid">
     </div>
   </div>
 </div>
@@ -4125,9 +4119,50 @@ function loadAllListings() {
   loadListings('aksesuar', 'aksesuar-cards-grid', 'aksesuar-list-count');
   loadListings('jenerator', 'jenerator-cards-grid', 'jenerator-list-count');
   loadListings('yp', 'yp-cards-grid', 'yp-list-count');
+  loadFeaturedListings();
 }
 window.loadAllListings = loadAllListings;
 window.loadListings = loadListings;
+
+async function loadFeaturedListings() {
+  const grid = document.getElementById('featured-grid');
+  if (!grid) return;
+
+  const kategoriList = ['komp', 'kuru', 'filtre', 'jenerator', 'aksesuar', 'yp'];
+  const kategoriLabel = { komp: 'Kompresör', kuru: 'Kurutucu', filtre: 'Filtre', jenerator: 'Gaz Jeneratörü', aksesuar: 'Aksesuar', yp: 'Yedek Parça' };
+
+  const results = await Promise.all(
+    kategoriList.map(k =>
+      _sb.from('listings').select('*').eq('kategori', k).eq('status', 'aktif').order('created_at', { ascending: false }).limit(1)
+    )
+  );
+
+  const ilanlar = results.map((r, i) => r.data?.[0] ? { ...r.data[0], _katLabel: kategoriLabel[kategoriList[i]] } : null).filter(Boolean);
+  if (!ilanlar.length) return;
+
+  grid.innerHTML = ilanlar.map(l => {
+    const fiyat = l.fiyat_gosterim === 'İletişime Geçiniz'
+      ? `<span class="card-price-contact">İletişime geçiniz</span>`
+      : `<span class="card-price" >₺ ${(l.fiyat||0).toLocaleString('tr-TR')}</span>`;
+    const specs = [l.kapasite ? l.kapasite+' m³/dk' : '', l.guc ? l.guc+' kW' : '', l.basinc ? l.basinc+' bar' : '']
+      .filter(Boolean).map(s => `<span class="spec-tag">${escapeHtml(s)}</span>`).join('');
+    const badge = l.durum === '2. El' ? 'badge-used' : 'badge-new';
+    const photo = (JSON.parse(l.photos || '[]')[0]) || '';
+    const thumb = photo
+      ? `<img src="${escapeHtml(photo)}" style="width:100%;height:100%;object-fit:cover;border-radius:var(--radius)">`
+      : `<svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.2" style="color:#444"><rect x="8" y="18" width="48" height="32" rx="4"/><path d="M20 34h24M32 26v16"/></svg>`;
+    return `<div class="listing-card"  onclick="openListingDetail('${l.id}')">
+      <div class="card-thumb">${thumb}<span class="card-badge ${badge}">${escapeHtml(l.durum||'Yeni')}</span></div>
+      <div class="card-body">
+        <div class="card-brand" >${escapeHtml(l._katLabel)}</div>
+        <div class="card-name" >${escapeHtml(l.baslik)}</div>
+        <div class="card-specs">${specs}</div>
+        <div class="card-foot">${fiyat}<span class="card-cta">Detay →</span></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+window.loadFeaturedListings = loadFeaturedListings;
 
 
 
@@ -6820,6 +6855,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try { refreshBadge(); } catch(e) {}
   try { refreshBadge(); } catch(e) {}
   try { updateNav(); } catch(e) {}
+  setTimeout(() => { try { loadFeaturedListings(); } catch(e) {} }, 300);
   // Eğer doğrulama bekliyorsa ve kullanıcı /verify'e doğrudan gelirse alanları doldur
   const p = loadPending();
   if (p && document.getElementById('verify-mail-display')) {
