@@ -5875,11 +5875,9 @@ function applyFilters(btn) {
   const maxKapasite = ranges[0] ? parseFloat(ranges[0].value) : Infinity;
   const maxGuc      = ranges[1] ? parseFloat(ranges[1].value) : Infinity;
 
-  console.log('checkedMarkas:', checkedMarkas, 'markaFilterActive:', markaFilterActive, 'total:', totalMarkas);
   let visible = 0;
   grid.querySelectorAll('.listing-card').forEach(card => {
     const cardMarka = card.querySelector('.card-brand')?.textContent?.trim() || '';
-    console.log('card marka:', cardMarka);
 
     // Marka filtresi
     let markaOk = true;
@@ -5923,6 +5921,17 @@ function applyFilters(btn) {
   showToast('Filtre uygulandı', visible + ' ilan gösteriliyor.', null, false);
 }
 window.applyFilters = applyFilters;
+
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('f-apply')) { applyFilters(e.target); return; }
+  if (e.target.classList.contains('ilan-edit-btn')) { openIlanEdit(e.target); return; }
+  if ((e.target.classList.contains('contact-btn') || e.target.classList.contains('btn-save-list')) && !loadUser()) { go('login'); return; }
+  if (e.target.classList.contains('contact-btn')) { openContactModal(e.target.dataset.seller, e.target.dataset.ilan); return; }
+  if (e.target.classList.contains('btn-teklif')) {
+    const btn = e.target;
+    if (btn.dataset.kategori && btn.dataset.form) submitTeklif(btn.dataset.kategori, btn.dataset.label, btn.dataset.form, btn.dataset.baslik);
+  }
+});
 
 function toggleMobileNav() {
   document.getElementById('mobile-nav-drawer').classList.toggle('open');
