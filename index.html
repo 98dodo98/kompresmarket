@@ -4036,7 +4036,80 @@ async function loadListings(kategori, gridId, countId) {
   // Sayacı güncelle
   const total = grid.querySelectorAll('.listing-card').length;
   if (countEl) countEl.textContent = '— ' + total + ' ilan';
+
+  // Filtre paneli f-count sayılarını gerçek veriye göre güncelle
+  updateFilterCounts(grid);
 }
+
+function updateFilterCounts(grid) {
+  // Grid'in bulunduğu sayfanın filtre panelini bul
+  const page = grid.closest('.page');
+  if (!page) return;
+  const panel = page.querySelector('.filter-panel');
+  if (!panel) return;
+
+  function normTR(s) {
+    return (s||'').toLowerCase()
+      .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s').replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c')
+      .replace(/[₀₁₂₃₄₅₆₇₈₉]/g,'')
+      .replace(/\(.*?\)/g,'')
+      .replace(/[^a-z0-9\s\/]/g,'')
+      .trim();
+  }
+
+  const allCards = [...grid.querySelectorAll('.listing-card')];
+
+  panel.querySelectorAll('.f-section').forEach(section => {
+    const sectionLabel = (section.querySelector('.f-group-label')?.textContent || '').toLowerCase();
+    // Marka section'ı için: card-brand ile eşleştir
+    const isMarka = sectionLabel.includes('marka');
+
+    section.querySelectorAll('.f-row').forEach(row => {
+      const countEl = row.querySelector('.f-count');
+      if (!countEl) return;
+      const labelText = row.querySelector('label')?.textContent?.trim() || '';
+      const labelN = normTR(labelText);
+
+      let count = 0;
+      if (isMarka) {
+        // Marka eşleştirme
+        const isDiger = labelText === 'Diğer';
+        const allNamedMarkas = [...section.querySelectorAll('.f-row label')]
+          .map(l => normTR(l.textContent?.trim()))
+          .filter(m => m && m !== 'diger');
+        allCards.forEach(card => {
+          const cardMarka = normTR(card.querySelector('.card-brand')?.textContent?.trim() || '');
+          if (isDiger) {
+            if (!allNamedMarkas.some(m => cardMarka.includes(m))) count++;
+          } else {
+            if (cardMarka.includes(labelN) || (labelN.length > 2 && labelN.includes(cardMarka) && cardMarka.length > 1)) count++;
+          }
+        });
+      } else {
+        // Alt kategori / başlık eşleştirme (Gaz Cinsi, Filtre Türü, Gaz Türü vb.)
+        const isDiger = labelText === 'Diğer' || labelText === 'Diğer Filtreler';
+        if (isDiger) {
+          const allNamedLabels = [...section.querySelectorAll('.f-row label')]
+            .map(l => normTR(l.textContent?.trim()))
+            .filter(m => m && m !== 'diger' && m !== 'diger filtreler');
+          allCards.forEach(card => {
+            const subtype = normTR(card.dataset.subtype || card.dataset.tip || '');
+            const title   = normTR(card.querySelector('.card-name')?.textContent || '');
+            if (!allNamedLabels.some(m => subtype.includes(m) || title.includes(m))) count++;
+          });
+        } else {
+          allCards.forEach(card => {
+            const subtype = normTR(card.dataset.subtype || card.dataset.tip || '');
+            const title   = normTR(card.querySelector('.card-name')?.textContent || '');
+            if (subtype.includes(labelN) || title.includes(labelN)) count++;
+          });
+        }
+      }
+      countEl.textContent = count;
+    });
+  });
+}
+window.updateFilterCounts = updateFilterCounts;
 
 // Sayfa açılınca ilgili kategorileri yükle
 function loadAllListings() {
